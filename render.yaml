@@ -19,7 +19,7 @@ services:
       - key: JWT_SECRET
         sync: false # Set this in Render Dashboard
       - key: DB_SYNCHRONIZE
-        value: "false" # Change to "true" only for initial deploy to create tables
+        sync: false # Escribe "true" para crear las tablas en el primer despliegue
 
   # Frontend Service
   - type: web
