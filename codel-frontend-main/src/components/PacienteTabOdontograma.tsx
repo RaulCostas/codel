@@ -206,13 +206,13 @@ const PacienteTabOdontograma: React.FC<PacienteTabOdontogramaProps> = ({ tipo })
                     <div class="print-box-group">
                         <span class="print-box-label">N.º MATRICULA SD-MSC</span>
                         <div class="print-grid">
-                            ${(pacienteData?.matricula_seguro || '').split('').map(char => `<div class="print-cell">${char}</div>`).join('')}
+                            ${(pacienteData?.matricula_seguro || '').split('').map((char: string) => `<div class="print-cell">${char}</div>`).join('')}
                         </div>
                     </div>
                     <div class="print-box-group">
                         <span class="print-box-label">C.I.</span>
                         <div class="print-grid">
-                            ${(pacienteData?.ci || '').split('').map(char => `<div class="print-cell">${char}</div>`).join('')}
+                            ${(pacienteData?.ci || '').split('').map((char: string) => `<div class="print-cell">${char}</div>`).join('')}
                         </div>
                     </div>
                 </div>
