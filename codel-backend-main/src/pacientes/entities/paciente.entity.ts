@@ -1,0 +1,72 @@
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { HistoriaClinica } from '../../historia_clinica/entities/historia_clinica.entity';
+import { FichaClinicaParticular } from './ficha_clinica_particular.entity';
+
+@Entity('pacientes')
+export class Paciente {
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column({ type: 'date', default: () => 'CURRENT_DATE' })
+    fecha_ingreso: string;
+
+    @Column({ type: 'text', nullable: true })
+    paterno: string;
+
+    @Column({ type: 'text', nullable: true })
+    materno: string;
+
+    @Column({ type: 'text', nullable: true })
+    nombre: string;
+
+    @Column({ type: 'date', nullable: true })
+    fecha_nacimiento: string;
+
+    @Column({ type: 'text', nullable: true })
+    genero: string;
+
+    @Column({ type: 'text', nullable: true })
+    ci: string;
+
+    @Column({ type: 'text', nullable: true })
+    direccion: string;
+
+    @Column({ type: 'text', nullable: true })
+    ocupacion: string;
+
+    @Column({ type: 'text', nullable: true })
+    telefono_celular: string;
+
+    @Column({ type: 'text', nullable: true })
+    email: string;
+
+    @Column({ type: 'text', nullable: true })
+    tutor_nombre: string;
+
+    @Column({ type: 'text', nullable: true })
+    tutor_ci: string;
+
+    @Column({ type: 'text', default: 'activo' })
+    estado: string;
+
+    @Column({ type: 'text', nullable: true })
+    observaciones: string;
+
+    @Column({ type: 'boolean', default: false })
+    esta_firmado: boolean;
+
+    @OneToOne(() => FichaClinicaParticular, (ficha) => ficha.paciente, { cascade: true, eager: false })
+    fichaClinica: FichaClinicaParticular;
+
+    @OneToMany(() => HistoriaClinica, (historia) => historia.paciente)
+    historiaClinica: HistoriaClinica[];
+
+    @OneToMany('Propuesta', (propuesta: any) => propuesta.paciente)
+    propuestas: any[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
+}

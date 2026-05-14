@@ -1,0 +1,41 @@
+services:
+  # Backend Service
+  - type: web
+    name: codel-backend
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    rootDir: codel-backend-main
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false # Set this in Render Dashboard
+      - key: SUPABASE_URL
+        sync: false # Set this in Render Dashboard
+      - key: SUPABASE_KEY
+        sync: false # Set this in Render Dashboard
+      - key: JWT_SECRET
+        sync: false # Set this in Render Dashboard
+      - key: DB_SYNCHRONIZE
+        value: "false" # Change to "true" only for initial deploy to create tables
+
+  # Frontend Service
+  - type: web
+    name: codel-frontend
+    env: static
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    rootDir: codel-frontend-main
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: codel-backend
+          property: url
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
