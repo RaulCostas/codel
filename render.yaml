@@ -22,10 +22,8 @@ services:
         value: "false" # Change to "true" only for initial deploy to create tables
 
   # Frontend Service
-  - type: web
+  - type: static
     name: codel-frontend
-    env: static
-    plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     rootDir: codel-frontend-main
