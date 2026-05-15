@@ -55,7 +55,7 @@ export class ArancelSeguroService {
                 where,
                 skip,
                 take: limit,
-                order: { detalle: 'ASC' },
+                order: { codigo: 'ASC', detalle: 'ASC' },
                 relations: ['especialidad', 'seguro'],
             });
 
