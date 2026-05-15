@@ -60,9 +60,9 @@ export class Proforma {
     @Column({ type: 'boolean', default: false })
     esta_firmado: boolean;
 
-    @CreateDateColumn()
+    @Column({ type: 'timestamp', default: () => "timezone('America/La_Paz', now())" })
     createdAt: Date;
 
-    @UpdateDateColumn()
+    @Column({ type: 'timestamp', default: () => "timezone('America/La_Paz', now())", onUpdate: "timezone('America/La_Paz', now())" })
     updatedAt: Date;
 }

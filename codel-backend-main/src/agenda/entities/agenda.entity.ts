@@ -62,7 +62,7 @@ export class Agenda {
     @JoinColumn({ name: 'usuarioId' })
     usuario: User;
 
-    @CreateDateColumn({ name: 'fecha_agendado' })
+    @Column({ name: 'fecha_agendado', type: 'timestamp', default: () => "timezone('America/La_Paz', now())" })
     fechaAgendado: Date;
 
     // Hora agendado is implicitly part of fecha_agendado timestamp, but if specific column needed:
@@ -77,6 +77,6 @@ export class Agenda {
     @Column({ type: 'boolean', default: false })
     recordatorioEnviado: boolean;
 
-    @UpdateDateColumn()
+    @Column({ type: 'timestamp', default: () => "timezone('America/La_Paz', now())", onUpdate: "timezone('America/La_Paz', now())" })
     updatedAt: Date;
 }

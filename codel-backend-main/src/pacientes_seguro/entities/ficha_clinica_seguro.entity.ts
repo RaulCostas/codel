@@ -133,9 +133,9 @@ export class FichaClinicaSeguro {
     @JoinColumn({ name: 'usuarioId' })
     usuario: User;
 
-    @CreateDateColumn()
+    @Column({ type: 'timestamp', default: () => "timezone('America/La_Paz', now())" })
     createdAt: Date;
 
-    @UpdateDateColumn()
+    @Column({ type: 'timestamp', default: () => "timezone('America/La_Paz', now())", onUpdate: "timezone('America/La_Paz', now())" })
     updatedAt: Date;
 }

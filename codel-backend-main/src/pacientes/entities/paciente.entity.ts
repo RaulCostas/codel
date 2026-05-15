@@ -72,9 +72,9 @@ export class Paciente {
     @OneToMany('Propuesta', (propuesta: any) => propuesta.paciente)
     propuestas: any[];
 
-    @CreateDateColumn()
+    @Column({ type: 'timestamp', default: () => "timezone('America/La_Paz', now())" })
     createdAt: Date;
 
-    @UpdateDateColumn()
+    @Column({ type: 'timestamp', default: () => "timezone('America/La_Paz', now())", onUpdate: "timezone('America/La_Paz', now())" })
     updatedAt: Date;
 }

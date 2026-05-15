@@ -54,9 +54,9 @@ export class ProformaSeguro {
     @OneToMany(() => HistoriaClinicaSeguro, (historia) => historia.proformaSeguro)
     detalles: HistoriaClinicaSeguro[];
 
-    @CreateDateColumn()
+    @Column({ type: 'timestamp', default: () => "timezone('America/La_Paz', now())" })
     createdAt: Date;
 
-    @UpdateDateColumn()
+    @Column({ type: 'timestamp', default: () => "timezone('America/La_Paz', now())", onUpdate: "timezone('America/La_Paz', now())" })
     updatedAt: Date;
 }
