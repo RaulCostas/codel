@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
 import { Paciente } from './paciente.entity';
 import { PacienteSeguro } from '../../pacientes_seguro/entities/paciente_seguro.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('odontogramas')
 export class Odontograma {
@@ -24,5 +25,9 @@ export class Odontograma {
     fecha: Date;
 
     @Column({ type: 'int', nullable: true })
-    usuarioId: number; // Who created it
+    usuarioId: number | null; // Who created it
+
+    @ManyToOne(() => User, { nullable: true })
+    @JoinColumn({ name: 'usuarioId' })
+    usuario: User;
 }

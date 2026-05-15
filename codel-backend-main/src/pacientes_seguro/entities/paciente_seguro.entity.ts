@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { FichaClinicaSeguro } from './ficha_clinica_seguro.entity';
 import { Seguro } from '../../seguro/entities/seguro.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('pacientes_seguro')
 export class PacienteSeguro {
@@ -69,6 +70,13 @@ export class PacienteSeguro {
 
     @OneToOne(() => FichaClinicaSeguro, (ficha) => ficha.pacienteSeguro, { cascade: true, eager: false })
     fichaClinica: FichaClinicaSeguro;
+
+    @Column({ type: 'int', nullable: true })
+    usuarioId: number | null;
+
+    @ManyToOne(() => User, { nullable: true })
+    @JoinColumn({ name: 'usuarioId' })
+    usuario: User;
 
     @CreateDateColumn()
     createdAt: Date;

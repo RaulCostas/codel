@@ -50,4 +50,8 @@ export class CreatePagoDto {
     @IsOptional()
     @IsString()
     observaciones?: string;
+
+    @IsOptional()
+    @IsNumber()
+    usuarioId?: number;
 }

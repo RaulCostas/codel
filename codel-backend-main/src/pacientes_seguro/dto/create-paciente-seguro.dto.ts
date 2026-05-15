@@ -211,4 +211,8 @@ export class CreatePacienteSeguroDto {
     @IsNumber()
     @IsOptional()
     seguroId?: number;
+
+    @IsNumber()
+    @IsOptional()
+    usuarioId?: number;
 }

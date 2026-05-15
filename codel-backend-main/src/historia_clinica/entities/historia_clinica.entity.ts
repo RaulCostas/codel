@@ -5,6 +5,7 @@ import { Especialidad } from '../../especialidad/entities/especialidad.entity';
 import { Proforma } from '../../proformas/entities/proforma.entity';
 import { ProformaDetalle } from '../../proformas/entities/proforma-detalle.entity';
 import { PagosDetalleDoctores } from '../../pagos_doctores/entities/pagos-detalle-doctores.entity';
+import { User } from '../../users/entities/user.entity';
 
 
 @Entity('historia_clinica')
@@ -86,6 +87,13 @@ export class HistoriaClinica {
 
     @OneToMany(() => PagosDetalleDoctores, (detalle) => detalle.historiaClinica)
     pagosDetalleDoctores: PagosDetalleDoctores[];
+
+    @Column({ type: 'int', nullable: true })
+    usuarioId: number | null;
+
+    @ManyToOne(() => User, { nullable: true })
+    @JoinColumn({ name: 'usuarioId' })
+    usuario: User;
 
     @CreateDateColumn()
     createdAt: Date;

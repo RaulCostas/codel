@@ -3,6 +3,7 @@ import { PacienteSeguro } from './paciente_seguro.entity';
 import { ArancelSeguro } from '../../arancel_seguro/entities/arancel_seguro.entity';
 import { Doctor } from '../../doctors/entities/doctor.entity';
 import { ProformaSeguro } from '../../proforma_seguro/entities/proforma_seguro.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('historia_clinica_seguro')
 export class HistoriaClinicaSeguro {
@@ -75,6 +76,13 @@ export class HistoriaClinicaSeguro {
 
     @Column({ type: 'text', nullable: true })
     imagen_descripcion: string;
+
+    @Column({ type: 'int', nullable: true })
+    usuarioId: number | null;
+
+    @ManyToOne(() => User, { nullable: true })
+    @JoinColumn({ name: 'usuarioId' })
+    usuario: User;
 
     @CreateDateColumn()
     createdAt: Date;

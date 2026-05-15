@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsDateString, IsBoolean, ValidateIf } from 'class-validator';
+import { IsString, IsOptional, IsDateString, IsBoolean, ValidateIf, IsNumber } from 'class-validator';
 
 export class CreatePacienteDto {
     @IsDateString()
@@ -181,4 +181,8 @@ export class CreatePacienteDto {
     @IsString()
     @IsOptional()
     observaciones?: string;
+
+    @IsNumber()
+    @IsOptional()
+    usuarioId?: number;
 }

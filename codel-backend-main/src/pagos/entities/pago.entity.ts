@@ -3,6 +3,7 @@ import { Paciente } from '../../pacientes/entities/paciente.entity';
 import { Proforma } from '../../proformas/entities/proforma.entity';
 import { ComisionTarjeta } from '../../comision_tarjeta/entities/comision_tarjeta.entity';
 import { FormaPago } from '../../forma_pago/entities/forma_pago.entity';
+import { User } from '../../users/entities/user.entity';
 
 
 @Entity('pagos')
@@ -60,7 +61,16 @@ export class Pago {
     })
     moneda: string;
 
-    @CreateDateColumn()
+    @Column({ name: 'usuarioId', type: 'int', nullable: true })
+    usuarioId: number | null;
+    
+    @ManyToOne(() => User, { nullable: true })
+    @JoinColumn({ name: 'usuarioId' })
+    usuario: User;
+
+    @Column({ type: 'timestamp', default: () => "timezone('America/La_Paz', now())" })
     createdAt: Date;
+
+    @Column({ type: 'timestamp', default: () => "timezone('America/La_Paz', now())", onUpdate: "timezone('America/La_Paz', now())" })
     updatedAt: Date;
 }

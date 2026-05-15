@@ -23,7 +23,8 @@ export class PacientesService {
     private readonly pacienteWhitelistedFields = [
         'fecha_ingreso', 'paterno', 'materno', 'nombre', 'fecha_nacimiento', 
         'genero', 'ci', 'direccion', 'ocupacion', 'telefono_celular', 
-        'email', 'tutor_nombre', 'tutor_ci', 'estado', 'observaciones'
+        'email', 'tutor_nombre', 'tutor_ci', 'estado', 'observaciones',
+        'usuarioId'
     ];
 
     // Whitelist de campos permitidos para la entidad FichaClinicaParticular
@@ -38,24 +39,25 @@ export class PacientesService {
         'ant_pat_otros',
         'ant_no_pat_fuma', 'fuma_cantidad', 'ant_no_pat_bruxismo', 'ant_no_pat_bebe',
         'ant_no_pat_succion_digital', 'ant_no_pat_onicofagia', 'ant_no_pat_mordisqueo_objetos',
-        'ant_no_pat_queilofagia', 'ant_no_pat_otros', 'particularidad'
+        'ant_no_pat_queilofagia', 'ant_no_pat_otros', 'particularidad',
+        'usuarioId'
     ];
 
     private splitDto(dto: any): { pacienteData: any; fichaData: any } {
         const pacienteData: any = {};
         const fichaData: any = {};
         
-        // REGLA DE ORO: Solo permitimos campos que estén en nuestras whitelists.
-        // Cualquier otro campo (como particularSeguro) se ignora por completo.
         for (const [key, value] of Object.entries(dto)) {
-            if (this.pacienteWhitelistedFields.includes(key)) {
+            if (key === 'usuarioId') {
+                pacienteData[key] = value;
+                fichaData[key] = value;
+            } else if (this.pacienteWhitelistedFields.includes(key)) {
                 pacienteData[key] = value;
             } else if (this.fichaWhitelistedFields.includes(key)) {
                 fichaData[key] = value;
             } else {
-                // Registro preventivo de campos ignorados (útil para debug si algo falta)
                 if (key !== 'id' && !key.startsWith('_')) {
-                    console.log(`[PacientesService] Campo ignorado por no estar en whitelist: ${key}`);
+                    console.log(`[PacientesService] Campo ignorado: ${key}`);
                 }
             }
         }
@@ -93,6 +95,9 @@ export class PacientesService {
 
         return await this.dataSource.transaction(async (manager) => {
             const paciente = manager.create(Paciente, pacienteData);
+            if (pacienteData.usuarioId) {
+                paciente.usuario = { id: Number(pacienteData.usuarioId) } as any;
+            }
             const savedPaciente = await manager.save(Paciente, paciente);
 
             const ficha = manager.create(FichaClinicaParticular, {
@@ -170,6 +175,9 @@ export class PacientesService {
             if (!paciente) throw new NotFoundException(`Paciente #${id} not found`);
 
             manager.merge(Paciente, paciente, pacienteData);
+            if (pacienteData.usuarioId) {
+                paciente.usuario = { id: Number(pacienteData.usuarioId) } as any;
+            }
             await manager.save(Paciente, paciente);
 
             // Update or create ficha

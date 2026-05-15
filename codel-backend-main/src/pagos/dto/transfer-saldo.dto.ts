@@ -4,4 +4,5 @@ export class TransferSaldoDto {
     targetPacienteId: number;
     targetProformaId?: number;
     amount: number;
+    usuarioId?: number;
 }

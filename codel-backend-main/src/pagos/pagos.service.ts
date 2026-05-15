@@ -19,14 +19,31 @@ export class PagosService {
 
     async create(createDto: CreatePagoDto): Promise<Pago> {
         try {
+            console.log('PagosService.create - DTO recibido:', createDto);
             const pago = this.pagoRepository.create(createDto);
+            
+            // Explicit assignment to ensure TypeORM persists it
+            if (createDto.usuarioId !== undefined && createDto.usuarioId !== null) {
+                pago.usuarioId = Number(createDto.usuarioId);
+                pago.usuario = { id: Number(createDto.usuarioId) } as any;
+            }
+
             if (createDto.formaPagoId) {
                 pago.formaPagoRel = { id: createDto.formaPagoId } as any;
             }
+            
+            console.log('PagosService.create - Entidad antes de save:', {
+                id: pago.id,
+                monto: pago.monto,
+                usuarioId: pago.usuarioId,
+                usuario: pago.usuario ? 'SET' : 'MISSING'
+            });
             if (createDto.comisionTarjetaId) {
                 pago.comisionTarjeta = { id: createDto.comisionTarjetaId } as any;
             }
-            return await this.pagoRepository.save(pago);
+            const savedPago = await this.pagoRepository.save(pago);
+            console.log('PagosService.create - Pago guardado:', savedPago);
+            return savedPago;
         } catch (error) {
             console.error('Error al guardar pago en BD:', error);
             throw error;
@@ -72,9 +89,21 @@ export class PagosService {
     async update(id: number, updateDto: UpdatePagoDto): Promise<Pago> {
         const pago = await this.findOne(id);
         this.pagoRepository.merge(pago, updateDto);
+        
+        if (updateDto.usuarioId !== undefined && updateDto.usuarioId !== null) {
+            pago.usuarioId = Number(updateDto.usuarioId);
+            pago.usuario = { id: Number(updateDto.usuarioId) } as any;
+        }
+
         if (updateDto.formaPagoId) {
             pago.formaPagoRel = { id: updateDto.formaPagoId } as any;
         }
+
+        console.log('PagosService.update - Entidad antes de save:', {
+            id: pago.id,
+            usuarioId: pago.usuarioId,
+            usuario: pago.usuario ? 'SET' : 'MISSING'
+        });
         if (updateDto.comisionTarjetaId) {
             pago.comisionTarjeta = { id: updateDto.comisionTarjetaId } as any;
         }
@@ -153,6 +182,10 @@ export class PagosService {
             outgoingPago.formaPagoRel = efectivo; // EFECTIVO
             outgoingPago.observaciones = obsSource.toUpperCase();
             outgoingPago.fecha = new Date().toISOString().split('T')[0];
+            outgoingPago.usuarioId = transferDto.usuarioId ?? null;
+            if (transferDto.usuarioId) {
+                outgoingPago.usuario = { id: Number(transferDto.usuarioId) } as any;
+            }
 
             // 2. Incoming Payment (Target)
             // "TRAS. DE SALDO DEL PACIENTE: Y, DEL PRES. # YY AL PACIENTE: X AL PRES. # XX"
@@ -169,6 +202,10 @@ export class PagosService {
             incomingPago.formaPagoRel = efectivo; // EFECTIVO
             incomingPago.observaciones = obsTarget.toUpperCase();
             incomingPago.fecha = new Date().toISOString().split('T')[0];
+            incomingPago.usuarioId = transferDto.usuarioId ?? null;
+            if (transferDto.usuarioId) {
+                incomingPago.usuario = { id: Number(transferDto.usuarioId) } as any;
+            }
 
             await queryRunner.manager.save(outgoingPago);
             await queryRunner.manager.save(incomingPago);

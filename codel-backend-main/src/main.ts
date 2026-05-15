@@ -14,7 +14,9 @@ async function bootstrap() {
     origin: [
       'https://codel-frontend.onrender.com',
       'https://clinicacodel.com',
-      'https://www.clinicacodel.com'
+      'https://www.clinicacodel.com',
+      'http://localhost:5173',
+      'http://localhost:3001'
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,

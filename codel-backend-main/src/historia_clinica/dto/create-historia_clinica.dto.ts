@@ -72,4 +72,8 @@ export class CreateHistoriaClinicaDto {
     @IsOptional()
     @IsString()
     firmaPaciente?: string;
+
+    @IsOptional()
+    @IsNumber()
+    usuarioId?: number;
 }

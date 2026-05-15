@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { PacienteSeguro } from './paciente_seguro.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('ficha_clinica_seguro')
 export class FichaClinicaSeguro {
@@ -124,6 +125,13 @@ export class FichaClinicaSeguro {
 
     @Column({ type: 'boolean', default: false })
     esta_firmado: boolean;
+
+    @Column({ type: 'int', nullable: true })
+    usuarioId: number | null;
+
+    @ManyToOne(() => User, { nullable: true })
+    @JoinColumn({ name: 'usuarioId' })
+    usuario: User;
 
     @CreateDateColumn()
     createdAt: Date;

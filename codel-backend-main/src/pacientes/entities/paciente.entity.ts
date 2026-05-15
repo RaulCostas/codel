@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { HistoriaClinica } from '../../historia_clinica/entities/historia_clinica.entity';
 import { FichaClinicaParticular } from './ficha_clinica_particular.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('pacientes')
 export class Paciente {
@@ -60,6 +61,13 @@ export class Paciente {
 
     @OneToMany(() => HistoriaClinica, (historia) => historia.paciente)
     historiaClinica: HistoriaClinica[];
+
+    @Column({ type: 'int', nullable: true })
+    usuarioId: number | null;
+
+    @ManyToOne(() => User, { nullable: true })
+    @JoinColumn({ name: 'usuarioId' })
+    usuario: User;
 
     @OneToMany('Propuesta', (propuesta: any) => propuesta.paciente)
     propuestas: any[];

@@ -38,13 +38,17 @@ export class PacientesSeguroService {
         'enf_gastritis', 'enf_gastritis_tratamiento',
         'enf_otros', 'enf_otros_detalle', 'enf_otros_tratamiento',
         'examen_clinico_extraoral', 'particularidad',
+        'usuarioId'
     ];
 
     private splitDto(dto: any): { pacienteData: any; fichaData: any } {
         const pacienteData: any = {};
         const fichaData: any = {};
         for (const [key, value] of Object.entries(dto)) {
-            if (this.fichaFields.includes(key)) {
+            if (key === 'usuarioId') {
+                pacienteData[key] = value;
+                fichaData[key] = value;
+            } else if (this.fichaFields.includes(key)) {
                 fichaData[key] = value;
             } else {
                 pacienteData[key] = value;
@@ -84,11 +88,15 @@ export class PacientesSeguroService {
 
         return await this.dataSource.transaction(async (manager) => {
             const paciente = manager.create(PacienteSeguro, pacienteData);
+            if (pacienteData.usuarioId) {
+                paciente.usuario = { id: Number(pacienteData.usuarioId) } as any;
+            }
             const saved = await manager.save(PacienteSeguro, paciente);
 
             const ficha = manager.create(FichaClinicaSeguro, {
                 ...fichaData,
                 pacienteSeguroId: saved.id,
+                usuarioId: dto.usuarioId // Manually set since it's also in pacienteData
             });
             await manager.save(FichaClinicaSeguro, ficha);
 
@@ -139,6 +147,9 @@ export class PacientesSeguroService {
             if (!paciente) throw new NotFoundException(`Paciente Seguro #${id} not found`);
 
             manager.merge(PacienteSeguro, paciente, pacienteData);
+            if (pacienteData.usuarioId) {
+                paciente.usuario = { id: Number(pacienteData.usuarioId) } as any;
+            }
             await manager.save(PacienteSeguro, paciente);
 
             if (Object.keys(fichaData).length > 0) {

@@ -11,7 +11,14 @@ import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
     cors: {
-        origin: '*', // Allow all origins for now, constrain in production
+        origin: [
+            'https://codel-frontend.onrender.com',
+            'https://clinicacodel.com',
+            'https://www.clinicacodel.com',
+            'http://localhost:5173',
+            'http://localhost:3001'
+        ],
+        credentials: true,
     },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
