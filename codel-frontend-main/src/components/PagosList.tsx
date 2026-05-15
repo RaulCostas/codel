@@ -6,7 +6,7 @@ import type { Pago } from '../types';
 import Pagination from './Pagination';
 import jsPDF from 'jspdf';
 import { formatDate } from '../utils/dateUtils';
-import { formatFullName } from '../utils/formatters';
+import { formatFullName, formatNumber, formatCurrency } from '../utils/formatters';
 import ManualModal, { type ManualSection } from './ManualModal';
 
 
@@ -172,9 +172,7 @@ const PagosList: React.FC = () => {
         doc.setFont('helvetica', 'bold');
         doc.text('La suma de:', xLabel, y);
         doc.setFont('helvetica', 'normal');
-        const montoStr = pago.moneda === 'Dólares'
-            ? `USD ${Number(pago.monto).toFixed(2)}`
-            : `Bs ${Number(pago.monto).toFixed(2)}`;
+        const montoStr = formatCurrency(pago.monto, pago.moneda === 'Dólares' ? 'USD' : 'Bs');
         doc.text(montoStr, xValue, y);
         y += 12;
 
@@ -334,8 +332,8 @@ const PagosList: React.FC = () => {
                         {currentItems.map((pago) => {
                             const isDollar = pago.moneda === 'Dólares';
                             const displayMonto = isDollar
-                                ? `USD ${Number(pago.monto).toFixed(2)} (TC. ${Number(pago.tc).toFixed(2)})`
-                                : `Bs ${Number(pago.monto).toFixed(2)}`;
+                                ? `${formatCurrency(pago.monto, 'USD')} (TC. ${formatNumber(pago.tc)})`
+                                : formatCurrency(pago.monto, 'Bs');
 
                             const isLocked = false;
 

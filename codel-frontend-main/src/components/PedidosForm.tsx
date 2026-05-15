@@ -4,6 +4,7 @@ import api from '../services/api';
 import Swal from 'sweetalert2';
 import type { Proveedor, Inventario } from '../types';
 import { formatDate, getLocalDateString } from '../utils/dateUtils';
+import { formatNumber } from '../utils/formatters';
 import ManualModal, { type ManualSection } from './ManualModal';
 
 import ProveedorForm from './ProveedorForm';
@@ -486,8 +487,8 @@ const PedidosForm: React.FC<PedidosFormProps> = ({ isOpen, onClose, id, onSaveSu
                                         <tr key={index} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50">
                                             <td className="py-3 px-6 text-left whitespace-nowrap font-medium">{detalle.inventarioNombre}</td>
                                             <td className="py-3 px-6 text-center">{detalle.cantidad}</td>
-                                            <td className="py-3 px-6 text-right">{detalle.precio_unitario.toFixed(2)}</td>
-                                            <td className="py-3 px-6 text-right">{(detalle.cantidad * detalle.precio_unitario).toFixed(2)}</td>
+                                            <td className="py-3 px-6 text-right">{formatNumber(detalle.precio_unitario)}</td>
+                                            <td className="py-3 px-6 text-right">{formatNumber(detalle.cantidad * detalle.precio_unitario)}</td>
                                             <td className="py-3 px-6 text-center">{formatDate(detalle.fecha_vencimiento)}</td>
                                             <td className="py-3 px-6 text-center">
                                                 <div className="flex item-center justify-center gap-2">
@@ -549,7 +550,7 @@ const PedidosForm: React.FC<PedidosFormProps> = ({ isOpen, onClose, id, onSaveSu
                             <div className="w-full md:w-1/3 space-y-2">
                                 <div className="flex justify-between">
                                     <span className="font-medium text-sm text-gray-700 dark:text-gray-300">Sub Total:</span>
-                                    <span className="dark:text-white">{subTotal.toFixed(2)}</span>
+                                    <span className="dark:text-white">{formatNumber(subTotal)}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="font-medium text-sm text-gray-700 dark:text-gray-300">Descuento:</span>
@@ -573,7 +574,7 @@ const PedidosForm: React.FC<PedidosFormProps> = ({ isOpen, onClose, id, onSaveSu
                                 </div>
                                 <div className="flex justify-between text-xl font-medium text-sm text-[#2c3e50] dark:text-white border-t border-gray-200 dark:border-gray-600 pt-2">
                                     <span>Total:</span>
-                                    <span>{total.toFixed(2)}</span>
+                                    <span>{formatNumber(total)}</span>
                                 </div>
                             </div>
                         </div>

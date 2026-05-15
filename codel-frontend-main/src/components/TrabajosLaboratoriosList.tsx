@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import type { TrabajoLaboratorio } from '../types';
 import Pagination from './Pagination';
-import { formatFullName } from '../utils/formatters';
+import { formatFullName, formatNumber } from '../utils/formatters';
 import * as XLSX from 'xlsx';
 import ManualModal, { type ManualSection } from './ManualModal';
 import TrabajoLaboratorioViewModal from './TrabajoLaboratorioViewModal';
@@ -274,7 +274,7 @@ const TrabajosLaboratoriosList: React.FC = () => {
                                 </td>
                                 <td className="p-3 text-gray-700 dark:text-gray-300">{trabajo.pieza}</td>
                                 <td className="p-3 text-gray-700 dark:text-gray-300">{trabajo.cantidad}</td>
-                                <td className="p-3 font-bold text-gray-800 dark:text-gray-200">{Number(trabajo.total).toFixed(2)}</td>
+                                <td className="p-3 font-bold text-gray-800 dark:text-gray-200">{formatNumber(trabajo.total)}</td>
                                 <td className="p-3">
                                     <span className={`px-2 py-1 rounded text-white text-xs ${trabajo.estado === 'terminado' ? 'bg-green-500' : 'bg-yellow-500'}`}>
                                         {trabajo.estado}

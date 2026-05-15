@@ -144,7 +144,7 @@ const SeguimientoImagesModal: React.FC<SeguimientoImagesModalProps> = ({ isOpen,
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Explicación / Observación</label>
                                 <textarea
-                                    className={`w-full h-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm text-gray-800 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none ${item.proformaSeguro?.estado === 'pagada' ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                    className={`w-full h-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm text-gray-800 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none ${item.proformaSeguro?.estado === 'pagada' ? 'opacity-60 cursor-not-allowed' : ''}`}
                                     placeholder="Escriba aquí la explicación de esta imagen..."
                                     value={descripcion}
                                     onChange={(e) => setDescripcion(e.target.value)}

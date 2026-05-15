@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import type { Paciente, Propuesta } from '../types';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { formatDateSpanish, numberToWords, formatFullName } from '../utils/formatters';
+import { formatDateSpanish, numberToWords, formatFullName, formatNumber, formatCurrency } from '../utils/formatters';
 import { formatDate } from '../utils/dateUtils';
 import ManualModal, { type ManualSection } from './ManualModal';
 import Pagination from './Pagination';
@@ -299,8 +299,8 @@ const PropuestasList: React.FC = () => {
                 item.piezas,
                 item.arancel?.detalle || '',
                 item.cantidad,
-                Number(item.precioUnitario).toFixed(2),
-                Number(item.total).toFixed(2)
+                formatNumber(item.precioUnitario),
+                formatNumber(item.total)
             ];
             tableRows.push(row);
         });
@@ -374,11 +374,11 @@ const PropuestasList: React.FC = () => {
         // Draw Subtotal and Discount if exists
         if (discount > 0) {
             doc.text('SUBTOTAL Bs.', penultColX + penultColWidth - 2, finalY, { align: 'right' });
-            doc.text(subtotal.toFixed(2), lastColX + lastColWidth - 2, finalY, { align: 'right' });
+            doc.text(formatNumber(subtotal), lastColX + lastColWidth - 2, finalY, { align: 'right' });
             finalY += 6;
 
             doc.text('DESCUENTO (Bs.)', penultColX + penultColWidth - 2, finalY, { align: 'right' });
-            doc.text(`-${discount.toFixed(2)}`, lastColX + lastColWidth - 2, finalY, { align: 'right' });
+            doc.text(`-${formatNumber(discount)}`, lastColX + lastColWidth - 2, finalY, { align: 'right' });
             finalY += 6;
         }
 
@@ -386,13 +386,13 @@ const PropuestasList: React.FC = () => {
         doc.rect(penultColX, finalY - 4, penultColWidth, 7);
         doc.rect(lastColX, finalY - 4, lastColWidth, 7);
         doc.text('TOTAL Bs.', penultColX + penultColWidth - 2, finalY + 1, { align: 'right' });
-        doc.text(totalAmount.toFixed(2), lastColX + lastColWidth - 2, finalY + 1, { align: 'right' });
+        doc.text(formatNumber(totalAmount), lastColX + lastColWidth - 2, finalY + 1, { align: 'right' });
 
         finalY += 10;
 
         // 5. Amount in Words
         doc.setFont('helvetica', 'normal');
-        const decimalPart = (totalAmount % 1).toFixed(2).substring(2);
+        const decimalPart = formatNumber(totalAmount).split(',')[1] || '00';
         const words = numberToWords(totalAmount);
         doc.text(`SON: ${words} ${decimalPart}/100 BOLIVIANOS`, 14, finalY);
 
@@ -587,7 +587,7 @@ const PropuestasList: React.FC = () => {
                                             <td key={letra} className="px-5 py-4 whitespace-nowrap text-sm text-center">
                                                 {total > 0 ? (
                                                     <div className="flex flex-col items-center gap-2">
-                                                        <span className="font-bold text-gray-800 dark:text-gray-200">{total.toFixed(2)}</span>
+                                                        <span className="font-bold text-gray-800 dark:text-gray-200">{formatNumber(total)}</span>
                                                         <div className="flex gap-2">
                                                             <button
                                                                 onClick={() => generatePDF(propuesta, 'print', letra)}

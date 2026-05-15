@@ -5,6 +5,7 @@ import api from '../services/api';
 import type { ComisionTarjeta } from '../types';
 import Swal from 'sweetalert2';
 import Pagination from './Pagination';
+import { formatNumber, formatCurrency } from '../utils/formatters';
 import ComisionTarjetaForm from './ComisionTarjetaForm';
 import { Printer, CreditCard } from 'lucide-react';
 
@@ -257,7 +258,7 @@ const ComisionTarjetaList: React.FC = () => {
                                 <tr>
                                     <td>${index + 1}</td>
                                     <td>${comision.redBanco || '-'}</td>
-                                    <td>Bs. ${Number(comision.monto || 0).toFixed(2)}</td>
+                                    <td>${formatCurrency(Number(comision.monto || 0), 'Bs')}</td>
                                     <td class="${comision.estado === 'activo' ? 'status-active' : 'status-inactive'}">
                                         ${comision.estado ? (comision.estado.charAt(0).toUpperCase() + comision.estado.slice(1)) : 'Inactivo'}
                                     </td>
@@ -442,7 +443,7 @@ const ComisionTarjetaList: React.FC = () => {
                             <tr key={comision.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{indexOfFirstItem + index + 1}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{comision.redBanco}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{Number(comision.monto).toFixed(2)}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{formatNumber(Number(comision.monto))}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                     <span className={`px-2 py-1 rounded text-sm ${comision.estado === 'activo' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}`}>
                                         {comision.estado}

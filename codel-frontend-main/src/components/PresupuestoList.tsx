@@ -6,10 +6,11 @@ import type { Paciente } from '../types';
 import jsPDF from 'jspdf';
 import Pagination from './Pagination';
 import autoTable from 'jspdf-autotable';
-import { formatDateSpanish, numberToWords, formatFullName } from '../utils/formatters';
+import { formatDateSpanish, numberToWords, formatFullName, formatNumber, formatCurrency } from '../utils/formatters';
 import { formatDate } from '../utils/dateUtils';
 import ManualModal, { type ManualSection } from './ManualModal';
 import SignatureModal from './SignatureModal';
+import PresupuestoViewModal from './PresupuestoViewModal';
 
 import { Printer } from 'lucide-react';
 
@@ -45,6 +46,7 @@ const PresupuestoList: React.FC = () => {
     // Signature states
     const [showSignatureModal, setShowSignatureModal] = useState(false);
     const [selectedPresupuesto, setSelectedPresupuesto] = useState<Proforma | null>(null);
+    const [showViewModal, setShowViewModal] = useState(false);
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
@@ -346,8 +348,8 @@ const PresupuestoList: React.FC = () => {
                 item.piezas,
                 isPosible ? `${item.arancel.detalle} (*)` : item.arancel.detalle,
                 item.cantidad,
-                Number(item.precioUnitario).toFixed(2),
-                isPosible ? '-' : sub.toFixed(2)  // posible items show '-' in total
+                formatNumber(item.precioUnitario),
+                isPosible ? '-' : formatNumber(sub)  // posible items show '-' in total
             ];
             tableRows.push(row);
             tableStyles.push(isPosible ? { fontStyle: 'italic', textColor: [120, 90, 0] } : {});
@@ -439,12 +441,12 @@ const PresupuestoList: React.FC = () => {
         // Subtotal row if there is a discount
         if (proforma.descuento && proforma.descuento > 0) {
             doc.text('SUBTOTAL Bs.', penultColX + penultColWidth - 2, finalY, { align: 'right' });
-            doc.text(Number(proforma.sub_total).toFixed(2), lastColX + lastColWidth - 2, finalY, { align: 'right' });
+            doc.text(formatNumber(proforma.sub_total), lastColX + lastColWidth - 2, finalY, { align: 'right' });
             finalY += 6;
 
             doc.text(`DESCUENTO (Bs.)`, penultColX + penultColWidth - 2, finalY, { align: 'right' });
             const montoDescuento = Number(proforma.descuento);
-            doc.text(`-${montoDescuento.toFixed(2)}`, lastColX + lastColWidth - 2, finalY, { align: 'right' });
+            doc.text(`-${formatNumber(proforma.descuento)}`, lastColX + lastColWidth - 2, finalY, { align: 'right' });
             finalY += 6;
         }
 
@@ -452,13 +454,13 @@ const PresupuestoList: React.FC = () => {
         doc.rect(lastColX, finalY - 4, lastColWidth, 7);
 
         doc.text('TOTAL Bs.', penultColX + penultColWidth - 2, finalY + 1, { align: 'right' });
-        doc.text(Number(proforma.total).toFixed(2), lastColX + lastColWidth - 2, finalY + 1, { align: 'right' });
+        doc.text(formatNumber(proforma.total), lastColX + lastColWidth - 2, finalY + 1, { align: 'right' });
 
         finalY += 10;
 
         // 5. Amount in Words
         doc.setFont('helvetica', 'normal');
-        const decimalPart = (Number(proforma.total) % 1).toFixed(2).substring(2);
+        const decimalPart = formatNumber(proforma.total).split(',')[1] || '00';
         const words = numberToWords(Number(proforma.total));
         doc.text(`SON: ${words} ${decimalPart}/100 BOLIVIANOS`, 14, finalY);
 
@@ -679,7 +681,7 @@ const PresupuestoList: React.FC = () => {
                                         {proforma.usuario?.name || 'Sistema'}
                                     </td>
                                     <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-gray-800 dark:text-gray-200">
-                                        {Number(proforma.total).toFixed(2)}
+                                        {formatNumber(proforma.total)}
                                     </td>
                                     <td className="px-5 py-4 whitespace-nowrap text-center no-print">
                                         <button
@@ -738,7 +740,10 @@ const PresupuestoList: React.FC = () => {
                                     <td className="px-5 py-4 whitespace-nowrap text-center no-print">
                                         <div className="flex gap-2 justify-center">
                                             <button
-                                                onClick={() => navigate(`/pacientes/${id}/presupuestos/view/${proforma.id}`)}
+                                                onClick={() => {
+                                                    setSelectedPresupuesto(proforma);
+                                                    setShowViewModal(true);
+                                                }}
                                                 className="p-2 bg-orange-400 text-white rounded-lg hover:bg-orange-500 shadow-md transition-all transform hover:-translate-y-0.5"
                                                 title="Ver"
                                             >
@@ -809,6 +814,17 @@ const PresupuestoList: React.FC = () => {
                 onClose={() => setShowManual(false)}
                 title="Manual de Usuario - Planes de Tratamiento"
                 sections={manualSections}
+            />
+
+            {/* View Modal */}
+            <PresupuestoViewModal
+                isOpen={showViewModal}
+                onClose={() => {
+                    setShowViewModal(false);
+                    setSelectedPresupuesto(null);
+                }}
+                id={id || ''}
+                proformaId={selectedPresupuesto ? selectedPresupuesto.id.toString() : null}
             />
 
             {/* Signature Modal */}

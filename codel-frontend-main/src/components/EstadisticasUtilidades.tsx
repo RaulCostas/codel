@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ManualModal, { type ManualSection } from './ManualModal';
 import api from '../services/api';
+import { formatNumber, formatCurrency } from '../utils/formatters';
 
 import { TrendingUp } from 'lucide-react';
 
@@ -65,7 +66,7 @@ const EstadisticasUtilidades: React.FC = () => {
     }, [year]);
 
     const getData = (stat: UtilidadStat) => currency === 'Bolivianos' ? stat.bolivianos : stat.dolares;
-    const formatMoney = (amount: number) => amount.toLocaleString('es-BO', { style: 'currency', currency: currency === 'Bolivianos' ? 'BOB' : 'USD' });
+    const formatMoney = (amount: number) => formatCurrency(amount, currency === 'Bolivianos' ? 'Bs' : '$us');
 
     const totalIngresos = stats.reduce((acc, curr) => acc + getData(curr).ingresos, 0);
     const totalEgresos = stats.reduce((acc, curr) => acc + getData(curr).egresos, 0);
@@ -200,10 +201,10 @@ const EstadisticasUtilidades: React.FC = () => {
                                 return (
                                     <tr key={index} className="border-b last:border-0 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td className="py-3 font-medium text-gray-600 dark:text-gray-400">{months[index]}</td>
-                                        <td className="py-3 text-right text-green-600">{data.ingresos.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</td>
-                                        <td className="py-3 text-right text-red-500">{data.egresos.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</td>
+                                        <td className="py-3 text-right text-green-600">{formatNumber(data.ingresos)}</td>
+                                        <td className="py-3 text-right text-red-500">{formatNumber(data.egresos)}</td>
                                         <td className={`py-3 text-right font-bold ${data.utilidad >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
-                                            {data.utilidad.toLocaleString('es-BO', { minimumFractionDigits: 2 })}
+                                            {formatNumber(data.utilidad)}
                                         </td>
                                     </tr>
                                 );

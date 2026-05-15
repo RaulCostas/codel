@@ -109,3 +109,17 @@ export const formatFullName = (person: any): string => {
 
     return parts.length > 0 ? parts.join(' ') : '-';
 };
+
+export const formatNumber = (amount: number | string | undefined | null): string => {
+    const val = Number(amount);
+    if (isNaN(val)) return '0,00';
+    return new Intl.NumberFormat('es-BO', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(val);
+};
+
+export const formatCurrency = (amount: number | string | undefined | null, currency: string = 'Bs'): string => {
+    const formattedNumber = formatNumber(amount);
+    return `${currency} ${formattedNumber}`;
+};

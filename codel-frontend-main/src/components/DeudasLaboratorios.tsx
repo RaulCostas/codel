@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Swal from 'sweetalert2';
 import Pagination from './Pagination';
-import { formatFullName } from '../utils/formatters';
+import { formatFullName, formatNumber, formatCurrency } from '../utils/formatters';
 import PagosLaboratoriosForm from './PagosLaboratoriosForm';
 
 const DeudasLaboratorios: React.FC = () => {
@@ -131,7 +131,7 @@ const DeudasLaboratorios: React.FC = () => {
                                     {work.precioLaboratorio ? work.precioLaboratorio.detalle : '-'}
                                 </td>
                                 <td className="p-3 text-green-600 dark:text-green-400 font-bold">
-                                    {work.total}
+                                    {formatNumber(Number(work.total))}
                                 </td>
                                 <td className="p-3">
                                     <button
@@ -166,7 +166,7 @@ const DeudasLaboratorios: React.FC = () => {
                             Total de Deudas:
                         </span>
                         <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                            Bs {currentItems.reduce((sum, work) => sum + (Number(work.total) || 0), 0).toFixed(2)}
+                            {formatCurrency(currentItems.reduce((sum, work) => sum + (Number(work.total) || 0), 0), 'Bs')}
                         </span>
                     </div>
                 </div>

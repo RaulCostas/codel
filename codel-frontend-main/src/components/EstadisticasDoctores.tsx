@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ManualModal, { type ManualSection } from './ManualModal';
 import api from '../services/api';
+import { formatCurrency } from '../utils/formatters';
 
 import { User } from 'lucide-react';
 
@@ -191,7 +192,7 @@ const EstadisticasDoctores: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="w-32 pl-4 text-gray-800 dark:text-white font-bold">
-                                        {stat.totalGenerado.toLocaleString('es-BO', { style: 'currency', currency: 'BOB' })}
+                                        {formatCurrency(stat.totalGenerado, 'Bs')}
                                     </div>
                                 </div>
                             );

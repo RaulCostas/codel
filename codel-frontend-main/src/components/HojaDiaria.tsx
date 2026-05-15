@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import Swal from 'sweetalert2';
 import { formatDate, getLocalDateString } from '../utils/dateUtils';
-import { formatFullName } from '../utils/formatters';
+import { formatFullName, formatNumber, formatCurrency } from '../utils/formatters';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import ManualModal, { type ManualSection } from './ManualModal';
@@ -479,15 +479,15 @@ const HojaDiaria: React.FC = () => {
                     <div style="background-color: white; padding: 10px; margin-bottom: 8px; border-radius: 4px; border: 1px solid #e0e0e0;">
                         <div style="font-weight: bold; color: #333; margin-bottom: 5px;">${method}</div>
                         <div style="display: flex; justify-content: space-between; font-size: 11px;">
-                            <span>Bs: <strong style="color: #2563eb;">${totals.Bs.toFixed(2)}</strong></span>
-                            <span>$us: <strong style="color: #16a34a;">${totals.Sus.toFixed(2)}</strong></span>
+                            <span>Bs: <strong style="color: #2563eb;">${formatNumber(totals.Bs)}</strong></span>
+                            <span>$us: <strong style="color: #16a34a;">${formatNumber(totals.Sus)}</strong></span>
                         </div>
                     </div>
                 `).join('')}
                 <div style="margin-top: 12px; padding-top: 12px; border-top: 2px solid #333; font-weight: bold;">
                     <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                        <span>Total Bs: ${totalBs.toFixed(2)}</span>
-                        <span>Total $us: ${totalSus.toFixed(2)}</span>
+                        <span>Total Bs: ${formatNumber(totalBs)}</span>
+                        <span>Total $us: ${formatNumber(totalSus)}</span>
                     </div>
                 </div>
             </div>
@@ -578,7 +578,7 @@ const HojaDiaria: React.FC = () => {
                                 ${searchMode === 'range' ? `<td>${formatDate(r.fecha.split('T')[0])}</td>` : ''}
                                 <td style="font-weight: 600;">${formatFullName(r.paciente)}</td>
                                 <td>${r.proforma?.numero || '<span style="color: #94a3b8; font-style: italic;">Generales</span>'}</td>
-                                <td class="amount">${formatMoney(Number(r.monto), r.moneda)}${r.moneda === 'Dólares' && r.tc ? ` (TC ${Number(r.tc).toFixed(2)})` : ''}</td>
+                                <td class="amount">${formatCurrency(Number(r.monto), r.moneda === 'Dólares' ? '$us' : 'Bs')}${r.moneda === 'Dólares' && r.tc ? ` (TC ${formatNumber(r.tc)})` : ''}</td>
                                 <td>${r.formaPagoRel?.forma_pago || 'N/A'}${r.formaPagoRel?.forma_pago?.toLowerCase() === 'tarjeta' && r.comisionTarjeta?.redBanco ? ` (${r.comisionTarjeta.redBanco})` : ''}</td>
                                 <td style="font-size: 10px;">${r.observaciones || '-'}</td>
                             </tr>
@@ -704,7 +704,7 @@ const HojaDiaria: React.FC = () => {
                             <tr>
                                 ${searchMode === 'range' ? `<td>${formatDate(r.fecha.split('T')[0])}</td>` : ''}
                                 <td style="font-weight: 600;">${r.detalle}</td>
-                                <td class="amount">${formatMoney(Number(r.monto), r.moneda)}</td>
+                                <td class="amount">${formatCurrency(Number(r.monto), r.moneda === 'Dólares' ? '$us' : 'Bs')}</td>
                                 <td>${r.formaPago?.forma_pago || 'N/A'}</td>
                             </tr>
                         `).join('')}
@@ -829,7 +829,7 @@ const HojaDiaria: React.FC = () => {
                             <tr>
                                 ${searchMode === 'range' ? `<td>${formatDate(r.fecha.split('T')[0])}</td>` : ''}
                                 <td style="font-weight: 600;">Dr. ${formatFullName(r.doctor)}</td>
-                                <td class="amount">${formatMoney(Number(r.total), r.moneda)}</td>
+                                <td class="amount">${formatCurrency(Number(r.total), r.moneda === 'Dólares' ? '$us' : 'Bs')}</td>
                                 <td>${r.formaPago?.forma_pago || 'N/A'}</td>
                             </tr>
                         `).join('')}
@@ -958,7 +958,7 @@ const HojaDiaria: React.FC = () => {
                                 <td style="font-weight: 600;">${r.trabajoLaboratorio?.laboratorio?.laboratorio || '-'}</td>
                                 <td>${r.trabajoLaboratorio?.precioLaboratorio?.detalle || '-'}</td>
                                 <td>${formatFullName(r.trabajoLaboratorio?.paciente)}</td>
-                                <td class="amount">${formatMoney(Number(r.monto), r.moneda)}</td>
+                                <td class="amount">${formatCurrency(Number(r.monto), r.moneda === 'Dólares' ? '$us' : 'Bs')}</td>
                                 <td>${r.formaPago?.forma_pago || '-'}</td>
                             </tr>
                         `).join('')}
@@ -1087,7 +1087,7 @@ const HojaDiaria: React.FC = () => {
                                 <td style="font-weight: 600;">${r.pedido?.proveedor?.proveedor || '-'}</td>
                                 <td>${r.factura || '-'}</td>
                                 <td>${r.recibo || '-'}</td>
-                                <td class="amount">${formatMoney(Number(r.monto), 'Bolivianos')}</td>
+                                <td class="amount">${formatCurrency(Number(r.monto), 'Bs')}</td>
                                 <td>${r.forma_pago || '-'}</td>
                             </tr>
                         `).join('')}
@@ -1213,7 +1213,7 @@ const HojaDiaria: React.FC = () => {
                             <tr>
                                 ${searchMode === 'range' ? `<td>${formatDate(r.fecha.split('T')[0])}</td>` : ''}
                                 <td style="font-weight: 600;">${r.gastoFijo?.gasto_fijo || '-'}</td>
-                                <td class="amount">${formatMoney(Number(r.monto), r.moneda)}</td>
+                                <td class="amount">${formatCurrency(Number(r.monto), r.moneda === 'Dólares' ? '$us' : 'Bs')}</td>
                                 <td>${r.formaPago?.forma_pago || '-'}</td>
                                 <td style="font-size: 10px;">${r.observaciones || '-'}</td>
                             </tr>
@@ -1286,12 +1286,7 @@ const HojaDiaria: React.FC = () => {
         }
     };
 
-    const formatMoney = (amount: number, currency: string = 'Bolivianos') => {
-        return amount.toLocaleString('es-BO', {
-            style: 'currency',
-            currency: currency === 'Bolivianos' ? 'BOB' : 'USD'
-        });
-    };
+    // Use shared utilities instead of local formatMoney
 
     const handlePrintSeguros = () => {
         const iframe = document.createElement('iframe');
@@ -1377,7 +1372,7 @@ const HojaDiaria: React.FC = () => {
                                 <td style="font-weight: 600;">${r.seguro?.nombre || '-'}</td>
                                 <td>${r.numero_proforma || '-'}</td>
                                 <td>${r.periodo || '-'}</td>
-                                <td class="amount">${formatMoney(Number(r.total), 'Bolivianos')}</td>
+                                <td class="amount">${formatCurrency(Number(r.total), 'Bs')}</td>
                                 <td>${r.formaPago?.forma_pago || '-'}</td>
                             </tr>
                         `).join('')}
@@ -1506,16 +1501,16 @@ const HojaDiaria: React.FC = () => {
                         <li key={idx} className="flex flex-col bg-white dark:bg-gray-700 p-3 rounded border border-gray-100 dark:border-gray-600 shadow-sm">
                             <span className="font-semibold text-gray-800 dark:text-gray-200 mb-1">{method}</span>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600 dark:text-gray-300">Bs: <span className="font-bold text-blue-600 dark:text-blue-400">{totals.Bs.toFixed(2)}</span></span>
-                                <span className="text-gray-600 dark:text-gray-300">Sus: <span className="font-bold text-green-600 dark:text-green-400">{totals.Sus.toFixed(2)}</span></span>
+                                <span className="text-gray-600 dark:text-gray-300">Bs: <span className="font-bold text-blue-600 dark:text-blue-400">{formatNumber(totals.Bs)}</span></span>
+                                <span className="text-gray-600 dark:text-gray-300">Sus: <span className="font-bold text-green-600 dark:text-green-400">{formatNumber(totals.Sus)}</span></span>
                             </div>
                         </li>
                     ))}
                     <li className="pt-2 mt-2 border-t dark:border-gray-600 flex flex-col">
                         <span className="font-bold text-gray-900 dark:text-white">Total General</span>
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-800 dark:text-gray-300">Bs: {Object.values(summary).reduce((acc, v) => acc + v.Bs, 0).toFixed(2)}</span>
-                            <span className="text-gray-800 dark:text-gray-300">Sus: {Object.values(summary).reduce((acc, v) => acc + v.Sus, 0).toFixed(2)}</span>
+                            <span className="text-gray-800 dark:text-gray-300">Bs: {formatNumber(Object.values(summary).reduce((acc, v) => acc + v.Bs, 0))}</span>
+                            <span className="text-gray-800 dark:text-gray-300">Sus: {formatNumber(Object.values(summary).reduce((acc, v) => acc + v.Sus, 0))}</span>
                         </div>
                     </li>
                 </ul>
@@ -1585,8 +1580,8 @@ const HojaDiaria: React.FC = () => {
                             const isDollar = r.moneda === 'Dólares';
                             return (
                                 <span className="font-bold text-green-600 dark:text-green-400">
-                                    {formatMoney(Number(r.monto), r.moneda)}
-                                    {isDollar && r.tc && ` (TC. ${Number(r.tc).toFixed(2)})`}
+                                    {formatCurrency(Number(r.monto), r.moneda === 'Dólares' ? '$us' : 'Bs')}
+                                    {isDollar && r.tc && ` (TC. ${formatNumber(r.tc)})`}
                                 </span>
                             );
                         }
@@ -1610,21 +1605,21 @@ const HojaDiaria: React.FC = () => {
                     { header: 'Seguro', accessor: r => r.seguro?.nombre || '-' },
                     { header: 'Proforma #', accessor: r => r.numero_proforma || '-' },
                     { header: 'Periodo', accessor: r => r.periodo || '-' },
-                    { header: 'Monto', accessor: r => <span className="font-bold text-green-600 dark:text-green-400">{formatMoney(Number(r.total), 'Bolivianos')}</span> },
+                    { header: 'Monto', accessor: r => <span className="font-bold text-green-600 dark:text-green-400">{formatCurrency(Number(r.total), 'Bs')}</span> },
                     { header: 'Forma Pago', accessor: r => r.formaPago?.forma_pago || '-' },
                 ], ingresosSeguros, 'seguro');
             case 2: // Egresos Diarios
                 return renderTableWithSummary([
                     ...getDateColumn(),
                     { header: 'Detalle', accessor: r => r.detalle },
-                    { header: 'Monto', accessor: r => <span className="font-bold text-red-600 dark:text-red-400">{formatMoney(Number(r.monto), r.moneda)}</span> },
+                    { header: 'Monto', accessor: r => <span className="font-bold text-red-600 dark:text-red-400">{formatCurrency(Number(r.monto), r.moneda === 'Dólares' ? '$us' : 'Bs')}</span> },
                     { header: 'Forma Pago', accessor: r => r.formaPago?.forma_pago || 'N/A' },
                 ], egresos, 'egreso');
             case 3: // Pagos Doctores
                 return renderTableWithSummary([
                     ...getDateColumn(),
                     { header: 'Doctor', accessor: r => `Dr. ${formatFullName(r.doctor)}` },
-                    { header: 'Monto Total', accessor: r => <span className="font-bold text-red-600 dark:text-red-400">{formatMoney(Number(r.total), r.moneda)}</span> },
+                    { header: 'Monto Total', accessor: r => <span className="font-bold text-red-600 dark:text-red-400">{formatCurrency(Number(r.total), r.moneda === 'Dólares' ? '$us' : 'Bs')}</span> },
                     { header: 'Forma Pago', accessor: r => r.formaPago?.forma_pago || 'N/A' },
                 ], pagosDoctores, 'doctor');
             case 4: // Pagos Laboratorios
@@ -1633,7 +1628,7 @@ const HojaDiaria: React.FC = () => {
                     { header: 'Laboratorio', accessor: r => r.trabajoLaboratorio?.laboratorio?.laboratorio || '-' },
                     { header: 'Trabajo', accessor: r => r.trabajoLaboratorio?.precioLaboratorio?.detalle || '-' },
                     { header: 'Paciente', accessor: r => formatFullName(r.trabajoLaboratorio?.paciente) },
-                    { header: 'Monto', accessor: r => <span className="font-bold text-red-600 dark:text-red-400">{formatMoney(Number(r.monto), r.moneda)}</span> },
+                    { header: 'Monto', accessor: r => <span className="font-bold text-red-600 dark:text-red-400">{formatCurrency(Number(r.monto), r.moneda === 'Dólares' ? '$us' : 'Bs')}</span> },
                     { header: 'Forma Pago', accessor: r => r.formaPago?.forma_pago || '-' },
                 ], pagosLaboratorios, 'laboratorio');
             case 5: // Pagos Pedidos
@@ -1642,14 +1637,14 @@ const HojaDiaria: React.FC = () => {
                     { header: 'Proveedor', accessor: r => r.pedido?.proveedor?.proveedor || '-' },
                     { header: 'Factura', accessor: r => r.factura || '-' },
                     { header: 'Recibo', accessor: r => r.recibo || '-' },
-                    { header: 'Monto', accessor: r => <span className="font-bold text-red-600 dark:text-red-400">{formatMoney(Number(r.monto), 'Bolivianos')}</span> },
+                    { header: 'Monto', accessor: r => <span className="font-bold text-red-600 dark:text-red-400">{formatCurrency(Number(r.monto), 'Bs')}</span> },
                     { header: 'Forma Pago', accessor: r => r.forma_pago || '-' },
                 ], pagosPedidos, 'pedido');
             case 6: // Gastos Fijos
                 return renderTableWithSummary([
                     ...getDateColumn(),
                     { header: 'Gasto', accessor: r => r.gastoFijo?.gasto_fijo || '-' },
-                    { header: 'Monto', accessor: r => <span className="font-bold text-red-600 dark:text-red-400">{formatMoney(Number(r.monto), r.moneda)}</span> },
+                    { header: 'Monto', accessor: r => <span className="font-bold text-red-600 dark:text-red-400">{formatCurrency(Number(r.monto), r.moneda === 'Dólares' ? '$us' : 'Bs')}</span> },
                     { header: 'Forma Pago', accessor: r => r.formaPago?.forma_pago || '-' },
                     { header: 'Observaciones', accessor: r => r.observaciones || '-' },
                 ], pagosGastosFijos, 'gasto');
@@ -1810,22 +1805,22 @@ const HojaDiaria: React.FC = () => {
                         <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded">
                             <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Ingresos:</span>
                             <div className="flex flex-col text-right">
-                                <span className="font-bold text-green-600 dark:text-green-400">{currentTotals.ingresos.bs.toFixed(2)} Bs</span>
-                                <span className="text-xs text-green-500">{currentTotals.ingresos.sus.toFixed(2)} $us</span>
+                                <span className="font-bold text-green-600 dark:text-green-400">{formatNumber(currentTotals.ingresos.bs)} Bs</span>
+                                <span className="text-xs text-green-500">{formatNumber(currentTotals.ingresos.sus)} $us</span>
                             </div>
                         </div>
                         <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded">
                             <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Egresos:</span>
                             <div className="flex flex-col text-right">
-                                <span className="font-bold text-red-600 dark:text-red-400">{currentTotals.egresos.bs.toFixed(2)} Bs</span>
-                                <span className="text-xs text-red-500">{currentTotals.egresos.sus.toFixed(2)} $us</span>
+                                <span className="font-bold text-red-600 dark:text-red-400">{formatNumber(currentTotals.egresos.bs)} Bs</span>
+                                <span className="text-xs text-red-500">{formatNumber(currentTotals.egresos.sus)} $us</span>
                             </div>
                         </div>
                         <div className="flex justify-between items-center border-t-2 dark:border-gray-600 pt-2 font-bold mb-4">
                             <span className="text-sm text-gray-800 dark:text-gray-200">Utilidad Neta:</span>
                             <div className="flex flex-col text-right">
-                                <span className={currentTotals.utilidad.bs >= 0 ? "text-blue-600 dark:text-blue-400" : "text-red-500"}>{currentTotals.utilidad.bs.toFixed(2)} Bs</span>
-                                <span className={`text-xs ${currentTotals.utilidad.sus >= 0 ? "text-blue-500" : "text-red-400"}`}>{currentTotals.utilidad.sus.toFixed(2)} $us</span>
+                                <span className={currentTotals.utilidad.bs >= 0 ? "text-blue-600 dark:text-blue-400" : "text-red-500"}>{formatNumber(currentTotals.utilidad.bs)} Bs</span>
+                                <span className={`text-xs ${currentTotals.utilidad.sus >= 0 ? "text-blue-500" : "text-red-400"}`}>{formatNumber(currentTotals.utilidad.sus)} $us</span>
                             </div>
                         </div>
 
@@ -1846,13 +1841,13 @@ const HojaDiaria: React.FC = () => {
                                                 <span className="text-xs font-bold text-gray-700 dark:text-gray-200">{method}</span>
                                                 <div className="text-right">
                                                     <div className={`text-sm font-black ${netBs >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-500'}`}>
-                                                        {netBs.toFixed(2)} Bs
+                                                        {formatNumber(netBs)} Bs
                                                     </div>
                                                 </div>
                                             </div>
                                             {(netSus !== 0 || totals.ingresosSus !== 0) && (
                                                 <div className={`text-[10px] text-right font-bold ${netSus >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-400'}`}>
-                                                    {netSus.toFixed(2)} $us
+                                                    {formatNumber(netSus)} $us
                                                 </div>
                                             )}
                                         </div>
@@ -1873,7 +1868,7 @@ const HojaDiaria: React.FC = () => {
                                         <XAxis dataKey="name" fontSize={10} tick={{ fill: '#888' }} />
                                         <Tooltip 
                                             contentStyle={{ backgroundColor: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: 4, padding: 4, fontSize: 10 }}
-                                            formatter={(value: any) => [`${Number(value).toFixed(2)} Bs`, 'Utilidad']}
+                                            formatter={(value: any) => [`${formatNumber(value)} Bs`, 'Utilidad']}
                                         />
                                         <Bar dataKey="Utilidad" fill="#3b82f6" radius={[4, 4, 0, 0]}>
                                             {

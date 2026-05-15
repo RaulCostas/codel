@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import type { Pago, Proforma, Paciente, PacienteSeguro, FormaPago } from '../types';
 import { formatDate, getLocalDateString } from '../utils/dateUtils';
-import { formatFullName } from '../utils/formatters';
+import { formatFullName, formatNumber, formatCurrency } from '../utils/formatters';
 import { FileText, Plus, Trash2, DollarSign, CreditCard, Wallet, Info, X, Calendar, Hash, Tag, MessageSquare, Edit, Printer } from 'lucide-react';
 import ManualModal, { type ManualSection } from './ManualModal';
 import Swal from 'sweetalert2';
@@ -285,7 +285,7 @@ const PacienteTabPagos: React.FC<PacienteTabPagosProps> = ({ tipo }) => {
             doc.text('PLAN DE TRATAMIENTO SELECCIONADO', 14, 60);
             doc.setFont('helvetica', 'normal');
             doc.text(`Plan #${selectedProforma?.numero || selectedProformaId} - Fecha: ${selectedProforma ? formatDate(selectedProforma.fecha) : 'N/A'}`, 14, 67);
-            doc.text(`Total Presupuesto: Bs. ${totalTratamiento.toLocaleString('es-BO', { minimumFractionDigits: 2 })}`, 14, 72);
+            doc.text(`Total Presupuesto: ${formatCurrency(totalTratamiento, 'Bs')}`, 14, 72);
         } else {
             doc.setFont('helvetica', 'bold');
             doc.text('TODOS LOS PLANES DE TRATAMIENTO', 14, 60);
@@ -315,9 +315,9 @@ const PacienteTabPagos: React.FC<PacienteTabPagosProps> = ({ tipo }) => {
         doc.setFont('helvetica', 'bold');
         doc.text('RESUMEN FINANCIERO', 14, finalY);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Total Pagado: Bs. ${totalPagado.toLocaleString('es-BO', { minimumFractionDigits: 2 })}`, 14, finalY + 7);
+        doc.text(`Total Pagado: ${formatCurrency(totalPagado, 'Bs')}`, 14, finalY + 7);
         if (selectedProformaId > 0) {
-            doc.text(`Saldo Pendiente: Bs. ${saldo.toLocaleString('es-BO', { minimumFractionDigits: 2 })}`, 14, finalY + 12);
+            doc.text(`Saldo Pendiente: ${formatCurrency(saldo, 'Bs')}`, 14, finalY + 12);
         }
 
         doc.autoPrint();
@@ -409,7 +409,7 @@ const PacienteTabPagos: React.FC<PacienteTabPagosProps> = ({ tipo }) => {
                         <div>
                             <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Presupuesto</p>
                             <p className="text-xl font-black text-gray-800 dark:text-white">
-                                Bs. {totalTratamiento.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {formatCurrency(totalTratamiento, 'Bs')}
                             </p>
                             {selectedProforma && (
                                 <p className="text-[10px] text-gray-400 mt-0.5">Plan #{selectedProforma.numero}</p>
@@ -425,7 +425,7 @@ const PacienteTabPagos: React.FC<PacienteTabPagosProps> = ({ tipo }) => {
                         <div>
                             <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total Pagado</p>
                             <p className="text-xl font-black text-emerald-600 dark:text-emerald-400">
-                                Bs. {totalPagado.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {formatCurrency(totalPagado, 'Bs')}
                             </p>
                             <p className="text-[10px] text-gray-400 mt-0.5">{pagosFiltrados.length} pago(s)</p>
                         </div>
@@ -444,7 +444,7 @@ const PacienteTabPagos: React.FC<PacienteTabPagosProps> = ({ tipo }) => {
                                 {saldo > 0 ? 'Saldo Pendiente' : saldo < 0 ? 'Saldo a Favor' : 'Saldo'}
                             </p>
                             <p className={`text-xl font-black ${saldo > 0 ? 'text-amber-600' : saldo < 0 ? 'text-green-600' : 'text-gray-600'}`}>
-                                Bs. {Math.abs(saldo).toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {formatCurrency(Math.abs(saldo), 'Bs')}
                             </p>
                             <p className="text-[10px] text-gray-400 mt-0.5">
                                 {saldo === 0 ? 'Totalmente pagado' : saldo > 0 ? 'Por cobrar' : 'Abono extra'}
@@ -528,8 +528,8 @@ const PacienteTabPagos: React.FC<PacienteTabPagosProps> = ({ tipo }) => {
                                             <td className="px-6 py-4 font-bold">
                                                 <span className={p.moneda === 'Dólares' ? 'text-blue-600 dark:text-blue-400' : 'text-emerald-600 dark:text-emerald-400'}>
                                                     {p.moneda === 'Dólares'
-                                                        ? `$ ${Number(p.monto).toLocaleString('es-BO', { minimumFractionDigits: 2 })}`
-                                                        : `Bs. ${Number(p.monto).toLocaleString('es-BO', { minimumFractionDigits: 2 })}`}
+                                                        ? formatCurrency(Number(p.monto), '$us')
+                                                        : formatCurrency(Number(p.monto), 'Bs')}
                                                 </span>
                                                 {p.moneda === 'Dólares' && (
                                                     <p className="text-[10px] text-gray-400 font-normal">TC: {p.tc}</p>

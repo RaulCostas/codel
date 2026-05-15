@@ -3,13 +3,14 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
-import { formatFullName } from '../utils/formatters';
+import { formatFullName, formatNumber } from '../utils/formatters';
 import Swal from 'sweetalert2';
 import type { Paciente, HistoriaClinica as HistoriaClinicaType, Proforma, Pago } from '../types';
 import Odontogram from './Odontogram';
 import HistoriaClinicaForm from './HistoriaClinicaForm';
 import HistoriaClinicaList from './HistoriaClinicaList';
-import PlanTratamientoModal from './PlanTratamientoModal';
+import PresupuestoViewModal from './PresupuestoViewModal';
+import SeguimientoViewModal from './SeguimientoViewModal';
 import RecordatorioTratamientoModal from './RecordatorioTratamientoModal';
 import FichaOrtodonciaForm from './FichaOrtodoncia';
 import FichaEndodonciaForm from './FichaEndodoncia';
@@ -35,6 +36,7 @@ const HistoriaClinica: React.FC = () => {
     const [historiaToEdit, setHistoriaToEdit] = useState<HistoriaClinicaType | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [showPlanModal, setShowPlanModal] = useState(false);
+    const [showSeguimientoModal, setShowSeguimientoModal] = useState(false);
     const [showReminderModal, setShowReminderModal] = useState(false);
     const [selectedReminderHistoria, setSelectedReminderHistoria] = useState<HistoriaClinicaType | null>(null);
 
@@ -523,6 +525,7 @@ const HistoriaClinica: React.FC = () => {
                                     onNewHistoria={!showForm && !historiaToEdit ? () => setShowForm(true) : undefined}
                                     onPrint={handlePrintHistory}
                                     onViewPlan={() => setShowPlanModal(true)}
+                                    onViewTimeline={() => setShowSeguimientoModal(true)}
                                     onReminder={(item) => {
                                         setSelectedReminderHistoria(item);
                                         setShowReminderModal(true);
@@ -543,22 +546,22 @@ const HistoriaClinica: React.FC = () => {
                                             <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-xl border border-gray-200 dark:border-gray-600 flex gap-8">
                                                 <div className="text-right">
                                                     <div className="text-sm text-gray-500 dark:text-gray-400">Total Plan de Tratamiento</div>
-                                                    <div className="text-xl font-bold text-gray-800 dark:text-white">Bs. {totalPresupuesto.toFixed(2)}</div>
+                                                    <div className="text-xl font-bold text-gray-800 dark:text-white">{formatNumber(totalPresupuesto)}</div>
                                                 </div>
                                                 <div className="text-right">
                                                     <div className="text-sm text-gray-500 dark:text-gray-400">Total Pagado</div>
-                                                    <div className="text-xl font-bold text-gray-800 dark:text-white">Bs. {totalPagado.toFixed(2)}</div>
+                                                    <div className="text-xl font-bold text-gray-800 dark:text-white">{formatNumber(totalPagado)}</div>
                                                 </div>
                                                 {saldoFavor > 0 && (
                                                     <div className="text-right text-green-600 dark:text-green-400">
                                                         <div className="text-sm">Saldo a Favor</div>
-                                                        <div className="text-xl font-bold">Bs. {saldoFavor.toFixed(2)}</div>
+                                                        <div className="text-xl font-bold">{formatNumber(saldoFavor)}</div>
                                                     </div>
                                                 )}
                                                 {saldoContra > 0 && (
                                                     <div className="text-right text-red-600 dark:text-red-400">
                                                         <div className="text-sm">Saldo en Contra</div>
-                                                        <div className="text-xl font-bold">Bs. {saldoContra.toFixed(2)}</div>
+                                                        <div className="text-xl font-bold">{formatNumber(saldoContra)}</div>
                                                     </div>
                                                 )}
                                                 {saldo === 0 && (
@@ -721,11 +724,21 @@ const HistoriaClinica: React.FC = () => {
 
 
             {/* Plan Tratamiento Modal */}
-            <PlanTratamientoModal
+            <PresupuestoViewModal
                 isOpen={showPlanModal}
                 onClose={() => setShowPlanModal(false)}
-                proforma={proformas.find(p => p.id === selectedProformaId) || null}
+                id={id || ''}
+                proformaId={selectedProformaId ? selectedProformaId.toString() : null}
+            />
+
+            {/* Seguimiento View Modal */}
+            <SeguimientoViewModal
+                isOpen={showSeguimientoModal}
+                onClose={() => setShowSeguimientoModal(false)}
                 historia={historia}
+                paciente={paciente}
+                selectedProformaId={selectedProformaId}
+                proformas={proformas}
             />
 
             {/* Recordatorio Modal */}

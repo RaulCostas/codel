@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { formatDate } from '../utils/dateUtils';
+import { formatNumber, formatCurrency } from '../utils/formatters';
 import {
     LineChart,
     Line,
@@ -221,7 +222,7 @@ const EstadisticasProductos: React.FC = () => {
                             <div className="flex items-center gap-3 bg-blue-50 dark:bg-blue-900/30 px-4 py-2 rounded-full border border-blue-100 dark:border-blue-800 shadow-sm">
                                 <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Precio Promedio:</span>
                                 <span className="text-lg font-bold text-blue-700 dark:text-blue-300">
-                                    {(history.reduce((acc, curr) => acc + Number(curr.precio_unitario), 0) / history.length).toFixed(2)} Bs
+                                    {formatNumber(history.reduce((acc, curr) => acc + Number(curr.precio_unitario), 0) / history.length)}
                                 </span>
                             </div>
                         )}
@@ -248,7 +249,7 @@ const EstadisticasProductos: React.FC = () => {
                                     label={{ value: 'Precio Unitario (Bs)', angle: -90, position: 'insideLeft' }}
                                 />
                                 <Tooltip
-                                    formatter={(value: any) => [`Bs ${Number(value).toFixed(2)}`, 'Precio']}
+                                    formatter={(value: any) => [formatCurrency(Number(value), 'Bs'), 'Precio']}
                                     labelStyle={{ color: '#333' }}
                                 />
                                 <Legend />
@@ -310,8 +311,8 @@ const EstadisticasProductos: React.FC = () => {
                                             {!item.recibo && !item.factura && '-'}
                                         </td>
                                         <td className="p-3 text-center text-gray-800 dark:text-gray-300">{item.cantidad}</td>
-                                        <td className="p-3 text-right font-bold text-blue-600 dark:text-blue-400">{Number(item.precio_unitario).toFixed(2)}</td>
-                                        <td className="p-3 text-right text-gray-900 dark:text-gray-300">{Number(item.total).toFixed(2)}</td>
+                                        <td className="p-3 text-right font-bold text-blue-600 dark:text-blue-400">{formatNumber(Number(item.precio_unitario))}</td>
+                                        <td className="p-3 text-right text-gray-900 dark:text-gray-300">{formatNumber(Number(item.total))}</td>
                                     </tr>
                                 ))
                             )}

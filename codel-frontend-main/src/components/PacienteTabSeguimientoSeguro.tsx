@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { useParams } from 'react-router-dom';
 import api from '../services/api';
 import Swal from 'sweetalert2';
@@ -8,12 +10,13 @@ import { formatFullName } from '../utils/formatters';
 import { 
     Activity, Plus, Save, Trash2, Edit, CheckCircle, 
     AlertCircle, Search, ClipboardList, User, Calendar,
-    FileText, Hash, X, Camera, Image
+    FileText, Hash, X, Camera, Image, Printer
 } from 'lucide-react';
 import Pagination from './Pagination';
 import ManualModal from './ManualModal';
 import type { ManualSection } from './ManualModal';
 import SeguimientoImagesModal from './SeguimientoImagesModal';
+import SeguimientoViewModal from './SeguimientoViewModal';
 
 const PacienteTabSeguimientoSeguro: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -30,6 +33,7 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
     const [aranceles, setAranceles] = useState<any[]>([]);
     const [paciente, setPaciente] = useState<any>(null);
     const [showImagesModal, setShowImagesModal] = useState(false);
+    const [showSeguimientoModal, setShowSeguimientoModal] = useState(false);
     const [selectedItemForImages, setSelectedItemForImages] = useState<HistoriaClinicaSeguro | null>(null);
 
     const [formData, setFormData] = useState({
@@ -207,6 +211,125 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
             console.error('Error saving history:', error);
             Swal.fire('Error', 'No se pudo guardar el registro', 'error');
         }
+    };
+
+    const loadImage = (src: string): Promise<HTMLImageElement> => {
+        return new Promise((resolve, reject) => {
+            const img = new window.Image();
+            img.src = src;
+            img.crossOrigin = 'Anonymous';
+            img.onload = () => resolve(img);
+            img.onerror = (e: any) => reject(e);
+        });
+    };
+
+    const handlePrintHistory = async () => {
+        const doc = new jsPDF();
+        const filteredHist = filteredHistoria;
+
+        try {
+            const logoSrc = "/logo-curare.png";
+            if (logoSrc) {
+                const logo = await loadImage(logoSrc);
+                doc.addImage(logo, 'PNG', 14, 15, 35, 14);
+            }
+        } catch (error) {
+            console.warn('Could not load logo', error);
+        }
+
+        // Header
+        const pageWidth = doc.internal.pageSize.width;
+        doc.setDrawColor(52, 152, 219); // #3498db
+        doc.setLineWidth(1);
+        doc.line(15, 35, pageWidth - 15, 35);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.setTextColor(44, 62, 80); // #2c3e50
+        doc.text('SEGUIMIENTO CLÍNICO (SEGURO)', 105, 25, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
+
+        // Patient info box
+        const boxY = 40;
+        const boxHeight = 12;
+
+        // Gray background
+        doc.setFillColor(248, 249, 250); // #f8f9fa
+        doc.rect(15, boxY, pageWidth - 30, boxHeight, 'F');
+
+        // Blue left border
+        doc.setFillColor(52, 152, 219); // #3498db
+        doc.rect(15, boxY, 2, boxHeight, 'F');
+
+        // Patient info text
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text('PACIENTE:', 20, boxY + 7);
+        doc.setFont('helvetica', 'normal');
+        const pacienteNombre = paciente
+            ? `${paciente.nombre} ${paciente.paterno} ${paciente.materno}`
+            : 'N/A';
+        doc.text(pacienteNombre.toUpperCase(), 45, boxY + 7);
+
+        // Table
+        if (filteredHist.length > 0) {
+            const tableColumn = ["Fecha", "Pieza", "Tratamiento", "Observaciones", "Cant.", "Doctor", "Diagnóstico", "Estado"];
+            const tableRows = filteredHist.map(item => [
+                formatDate(item.fecha),
+                item.pieza || '-',
+                item.arancel?.detalle || '-',
+                item.observaciones || '-',
+                item.cantidad,
+                item.doctor ? formatFullName(item.doctor) : '-',
+                item.diagnostico || '-',
+                item.estadoTratamiento
+            ]);
+
+            const tableStartY = boxY + boxHeight + 5;
+
+            autoTable(doc, {
+                head: [tableColumn],
+                body: tableRows,
+                startY: tableStartY,
+                theme: 'plain',
+                margin: { left: 15, right: 15 },
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 2,
+                },
+                headStyles: {
+                    fillColor: [52, 152, 219], // #3498db
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    lineWidth: 0,
+                },
+                columnStyles: {
+                    0: { cellWidth: 20 },
+                    1: { cellWidth: 12 },
+                    2: { cellWidth: 35 },
+                    3: { cellWidth: 'auto' }, 
+                    4: { cellWidth: 10 },
+                    5: { cellWidth: 25 },
+                    6: { cellWidth: 30 },
+                    7: { cellWidth: 20 }
+                },
+                alternateRowStyles: {
+                    fillColor: [248, 249, 250] // #f8f9fa
+                }
+            });
+        }
+
+        doc.autoPrint();
+        const blobUrl = doc.output('bloburl');
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        iframe.src = String(blobUrl);
+        document.body.appendChild(iframe);
     };
 
     const handleDelete = async (itemId: number) => {
@@ -541,10 +664,23 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
                                 onClick={() => setShowForm(true)}
                                 className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold shadow-md transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
                             >
-                                <Plus size={20} />
                                 Nuevo Seguimiento
                             </button>
                         )}
+                        <button
+                            onClick={() => setShowSeguimientoModal(true)}
+                            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold shadow-md transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
+                        >
+                            <ClipboardList size={20} />
+                            Ver Seguimiento
+                        </button>
+                        <button
+                            onClick={handlePrintHistory}
+                            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold shadow-md transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
+                        >
+                            <Printer size={20} />
+                            Imprimir
+                        </button>
                     </div>
                 </div>
 
@@ -696,6 +832,14 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
                 onClose={() => setShowManual(false)}
                 title="Manual - Seguimiento Clínico Seguro"
                 sections={manualSections}
+            />
+
+            <SeguimientoViewModal
+                isOpen={showSeguimientoModal}
+                onClose={() => setShowSeguimientoModal(false)}
+                historia={historia}
+                paciente={paciente}
+                isSeguro={true}
             />
         </div>
     );

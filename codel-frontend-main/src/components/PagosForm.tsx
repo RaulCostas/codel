@@ -4,7 +4,7 @@ import api from '../services/api';
 import { formatDate, getLocalDateString } from '../utils/dateUtils';
 import Swal from 'sweetalert2';
 import type { Paciente, Proforma, Pago, ComisionTarjeta } from '../types';
-import { formatFullName } from '../utils/formatters';
+import { formatFullName, formatNumber } from '../utils/formatters';
 import ManualModal, { type ManualSection } from './ManualModal';
 
 import FormaPagoForm from './FormaPagoForm';
@@ -396,7 +396,7 @@ const PagosForm: React.FC = () => {
                 
                 <div class="patient-info">
                     <p><strong>Paciente:</strong> ${pacienteNombre ? formatFullName(pacienteNombre) : 'N/A'}</p>
-                    ${proformaNombre ? `<p><strong>Plan de Tratamiento:</strong> No. ${proformaNombre.numero} - Total: ${proformaNombre.total} Bs</p>` : ''}
+                    ${proformaNombre ? `<p><strong>Plan de Tratamiento:</strong> No. ${proformaNombre.numero} - Total: ${formatNumber(proformaNombre.total)} Bs</p>` : ''}
                 </div>
                 
                 <table>
@@ -413,8 +413,8 @@ const PagosForm: React.FC = () => {
                         ${existingPagos.map(pago => {
             const isDollar = pago.moneda === 'Dólares';
             const displayMonto = isDollar
-                ? `${Number(pago.monto).toFixed(2)} (TC: ${Number(pago.tc).toFixed(2)})`
-                : Number(pago.monto).toFixed(2);
+                ? `${formatNumber(pago.monto)} (TC: ${formatNumber(pago.tc)})`
+                : formatNumber(pago.monto);
             const displayMoneda = pago.moneda || 'Bolivianos';
 
             return `
@@ -435,19 +435,19 @@ const PagosForm: React.FC = () => {
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div style="padding: 10px; background-color: white; border-radius: 4px; border-left: 4px solid #3498db;">
                             <div style="font-size: 11px; color: #666; margin-bottom: 5px;">Total Plan de Tratamiento:</div>
-                            <div style="font-size: 16px; font-weight: bold; color: #2c3e50;">Bs. ${totalPresupuesto.toFixed(2)}</div>
+                            <div style="font-size: 16px; font-weight: bold; color: #2c3e50;">Bs. ${formatNumber(totalPresupuesto)}</div>
                         </div>
                         <div style="padding: 10px; background-color: white; border-radius: 4px; border-left: 4px solid #27ae60;">
                             <div style="font-size: 11px; color: #666; margin-bottom: 5px;">Pagado por Paciente:</div>
-                            <div style="font-size: 16px; font-weight: bold; color: #27ae60;">Bs. ${totalPagado.toFixed(2)}</div>
+                            <div style="font-size: 16px; font-weight: bold; color: #27ae60;">Bs. ${formatNumber(totalPagado)}</div>
                         </div>
                         <div style="padding: 10px; background-color: white; border-radius: 4px; border-left: 4px solid #3498db;">
                             <div style="font-size: 11px; color: #666; margin-bottom: 5px;">Saldo a Favor:</div>
-                            <div style="font-size: 16px; font-weight: bold; color: #3498db;">Bs. ${saldoFavor.toFixed(2)}</div>
+                            <div style="font-size: 16px; font-weight: bold; color: #3498db;">Bs. ${formatNumber(saldoFavor)}</div>
                         </div>
                         <div style="padding: 10px; background-color: white; border-radius: 4px; border-left: 4px solid #e74c3c;">
                             <div style="font-size: 11px; color: #666; margin-bottom: 5px;">Saldo en Contra:</div>
-                            <div style="font-size: 16px; font-weight: bold; color: #e74c3c;">Bs. ${saldoContra.toFixed(2)}</div>
+                            <div style="font-size: 16px; font-weight: bold; color: #e74c3c;">Bs. ${formatNumber(saldoContra)}</div>
                         </div>
                     </div>
                 </div>
@@ -756,7 +756,7 @@ const PagosForm: React.FC = () => {
                                     className="w-full pl-10 pr-3 py-1.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:cursor-not-allowed text-sm"
                                 ><option value={0}>-- Seleccione Plan de Tratamiento --</option>
                                     {filteredProformas.map(p => (
-                                        <option key={p.id} value={p.id}>No. {p.numero} - Total: {p.total}</option>
+                                        <option key={p.id} value={p.id}>No. {p.numero} - Total: {formatNumber(p.total)}</option>
                                     ))}
                                 </select>
                             </div>
@@ -1058,7 +1058,7 @@ const PagosForm: React.FC = () => {
                                 <div className="flex justify-between items-center border-b border-gray-100 dark:border-gray-600 pb-3">
                                     <div className="text-gray-600 dark:text-gray-300 text-sm">Total Plan de Tratamiento:</div>
                                     <div className="font-bold text-lg text-gray-800 dark:text-white">
-                                        Bs. {totalPresupuesto.toFixed(2)}
+                                        Bs. {formatNumber(totalPresupuesto)}
                                     </div>
                                 </div>
 
@@ -1066,7 +1066,7 @@ const PagosForm: React.FC = () => {
                                 <div className="flex justify-between items-center border-b border-gray-100 dark:border-gray-600 pb-3">
                                     <div className="text-gray-600 dark:text-gray-300 text-sm">Pagado por Paciente:</div>
                                     <div className="font-bold text-lg text-green-600 dark:text-green-400">
-                                        Bs. {totalPagado.toFixed(2)}
+                                        Bs. {formatNumber(totalPagado)}
                                     </div>
                                 </div>
 
@@ -1074,7 +1074,7 @@ const PagosForm: React.FC = () => {
                                 <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
                                     <div className="text-blue-800 dark:text-blue-300 text-sm font-bold">Saldo a Favor:</div>
                                     <div className="font-bold text-lg text-blue-600 dark:text-blue-400">
-                                        Bs. {saldoFavor.toFixed(2)}
+                                        Bs. {formatNumber(saldoFavor)}
                                     </div>
                                 </div>
 
@@ -1082,7 +1082,7 @@ const PagosForm: React.FC = () => {
                                 <div className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/30 rounded-xl">
                                     <div className="text-red-800 dark:text-red-300 text-sm font-bold">Saldo en Contra:</div>
                                     <div className="font-bold text-lg text-red-600 dark:text-red-400">
-                                        Bs. {saldoContra.toFixed(2)}
+                                        Bs. {formatNumber(saldoContra)}
                                     </div>
                                 </div>
                             </div>
@@ -1098,7 +1098,7 @@ const PagosForm: React.FC = () => {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                             <h3>
                                 Historial de Pagos
-                                {formData.proformaId ? ` - Plan de Tratamiento No. ${proformas.find(p => p.id === formData.proformaId)?.numero} - Total: ${proformas.find(p => p.id === formData.proformaId)?.total} Bs` : ''}
+                                {formData.proformaId ? ` - Plan de Tratamiento No. ${proformas.find(p => p.id === formData.proformaId)?.numero} - Total: ${formatNumber(proformas.find(p => p.id === formData.proformaId)?.total)} Bs` : ''}
                             </h3>
                             <div className="flex gap-3">
                                 <button
@@ -1152,8 +1152,8 @@ const PagosForm: React.FC = () => {
                                         {existingPagos.map((pago) => {
                                             const isDollar = pago.moneda === 'Dólares';
                                             const displayMonto = isDollar
-                                                ? `${Number(pago.monto).toFixed(2)} (${Number(pago.tc).toFixed(2)})`
-                                                : Number(pago.monto).toFixed(2);
+                                                ? `${formatNumber(pago.monto)} (${formatNumber(pago.tc)})`
+                                                : formatNumber(pago.monto);
                                             const displayMoneda = pago.moneda || 'Bolivianos';
 
                                             return (
@@ -1237,7 +1237,7 @@ const PagosForm: React.FC = () => {
                                         className="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 cursor-not-allowed"
                                     />
                                     <p className="mt-1 text-sm font-bold text-green-600 dark:text-green-400">
-                                        Saldo Disponible: Bs. {saldoFavor.toFixed(2)}
+                                        Saldo Disponible: Bs. {formatNumber(saldoFavor)}
                                     </p>
                                 </div>
 
@@ -1269,7 +1269,7 @@ const PagosForm: React.FC = () => {
                                             <option value="" disabled>-- Seleccione --</option>
                                             <option value={0}>-- General (Sin Plan de Tratamiento) --</option>
                                             {targetProformas.map(p => (
-                                                <option key={p.id} value={p.id}>No. {p.numero} - Total: {p.total}</option>
+                                                <option key={p.id} value={p.id}>No. {p.numero} - Total: {formatNumber(p.total)}</option>
                                             ))}
                                         </select>
                                     </div>

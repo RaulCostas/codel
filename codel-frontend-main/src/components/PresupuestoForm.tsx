@@ -6,7 +6,7 @@ import type { Paciente, Arancel, HistoriaClinica } from '../types';
 import ManualModal, { type ManualSection } from './ManualModal';
 import ArancelForm from './ArancelForm';
 import { formatDate } from '../utils/dateUtils';
-import { formatFullName } from '../utils/formatters';
+import { formatFullName, formatNumber, formatCurrency } from '../utils/formatters';
 
 
 interface DetalleItem {
@@ -21,11 +21,26 @@ interface DetalleItem {
     posible: boolean;
 }
 
-const PresupuestoForm: React.FC = () => {
-    const { id, proformaId } = useParams<{ id: string; proformaId?: string }>();
+interface PresupuestoFormProps {
+    id?: string;
+    proformaId?: string;
+    isReadOnly?: boolean;
+    onClose?: () => void;
+}
+
+const PresupuestoForm: React.FC<PresupuestoFormProps> = ({ 
+    id: propId, 
+    proformaId: propProformaId, 
+    isReadOnly: propIsReadOnly,
+    onClose
+}) => {
+    const { id: paramId, proformaId: paramProformaId } = useParams<{ id: string; proformaId?: string }>();
     const navigate = useNavigate();
     const location = useLocation();
-    const isReadOnly = location.pathname.includes('/view/');
+
+    const id = propId || paramId;
+    const proformaId = propProformaId || paramProformaId;
+    const isReadOnly = propIsReadOnly ?? location.pathname.includes('/view/');
     
     const [paciente, setPaciente] = useState<Paciente | null>(null);
     const [aranceles, setAranceles] = useState<Arancel[]>([]);
@@ -409,10 +424,10 @@ const PresupuestoForm: React.FC = () => {
                                                 <option value={0}>-- Seleccione --</option>
                                                 {aranceles.map(a => {
                                                     const itemMoneda = a.moneda || 'Bs.';
-                                                    const precioNor = Number(a.precio).toFixed(2);
+                                                    const precioNor = formatNumber(a.precio);
                                                     return (
                                                         <option key={a.id} value={a.id}>
-                                                            {a.detalle} - {precioNor} {itemMoneda}
+                                                            {a.detalle} - {formatCurrency(a.precio, a.moneda === 'Dólares' ? 'USD' : 'Bs')}
                                                         </option>
                                                     );
                                                 })}
@@ -623,10 +638,10 @@ const PresupuestoForm: React.FC = () => {
                                                 {isCompleted && <span className="ml-2 text-xs bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-300 px-2 py-0.5 rounded-full">COMPLETADO</span>}
                                             </td>
                                             <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-200">{renderPiezasWithCompletion()}</td>
-                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200 text-right">{item.precioUnitario.toFixed(2)}</td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200 text-right">{formatNumber(item.precioUnitario)}</td>
                                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200 text-center">{item.cantidad}</td>
                                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200 text-right">
-                                                Bs. {item.total.toFixed(2)}
+                                                {formatCurrency(item.total, 'Bs')}
                                             </td>
                                             {!isReadOnly && (
                                                 <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium text-center">
@@ -688,7 +703,7 @@ const PresupuestoForm: React.FC = () => {
                                 <div className="flex justify-between items-center">
                                     <span className="text-gray-500 dark:text-gray-400 font-bold uppercase text-xs tracking-wider">Subtotal</span>
                                     <span className="text-lg font-semibold text-gray-800 dark:text-white">
-                                        Bs. {calculateTotalBruto().toFixed(2)}
+                                        {formatCurrency(calculateTotalBruto(), 'Bs')}
                                     </span>
                                 </div>
 
@@ -710,7 +725,7 @@ const PresupuestoForm: React.FC = () => {
                                     <div className="flex flex-col items-end">
                                         <span className="text-gray-500 dark:text-gray-400 font-bold uppercase text-xs tracking-wider mb-1">Total Tratamiento Neto</span>
                                         <div className="text-3xl font-black text-blue-600 dark:text-blue-400 tracking-tight mb-6">
-                                            Bs. {calculateTotal().toFixed(2)}
+                                            {formatCurrency(calculateTotal(), 'Bs')}
                                         </div>
 
                                         {(() => {
@@ -769,7 +784,7 @@ const PresupuestoForm: React.FC = () => {
                                                 </button>
                                             )}
                                             <button
-                                                onClick={() => navigate(`/pacientes/${id}/presupuestos`)}
+                                                onClick={() => onClose ? onClose() : navigate(`/pacientes/${id}/presupuestos`)}
                                                 className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition-all transform hover:-translate-y-0.5 flex items-center gap-2 text-sm"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

@@ -3,7 +3,7 @@ import api from '../services/api';
 import Swal from 'sweetalert2';
 import type { TrabajoLaboratorio, FormaPago } from '../types';
 import { formatDate, getLocalDateString } from '../utils/dateUtils';
-import { formatFullName } from '../utils/formatters';
+import { formatFullName, formatNumber } from '../utils/formatters';
 import ManualModal, { type ManualSection } from './ManualModal';
 
 import FormaPagoForm from './FormaPagoForm';
@@ -394,7 +394,7 @@ const PagosLaboratoriosForm: React.FC<PagosLaboratoriosFormProps> = ({ isOpen, o
                                         <option value="">Seleccione el Trabajo...</option>
                                         {availableWorks.map((t) => (
                                             <option key={t.id} value={t.id}>
-                                                {t.precioLaboratorio?.detalle || 'Trabajo'} - {t.fecha ? formatDate(t.fecha) : ''} - Bs. {t.total}
+                                                {t.precioLaboratorio?.detalle || 'Trabajo'} - {t.fecha ? formatDate(t.fecha) : ''} - Bs. {formatNumber(t.total)}
                                             </option>
                                         ))}
                                     </select>
@@ -484,11 +484,11 @@ const PagosLaboratoriosForm: React.FC<PagosLaboratoriosFormProps> = ({ isOpen, o
                             {selectedWork && (
                                 <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl p-4 text-right">
                                     <span className="text-sm text-gray-600 dark:text-gray-300 mr-2">Monto del Trabajo (Base):</span>
-                                    <span className="font-medium text-gray-900 dark:text-white">Bs. {amountInBs.toFixed(2)}</span>
+                                    <span className="font-medium text-gray-900 dark:text-white">Bs. {formatNumber(amountInBs)}</span>
 
                                     <div className="mt-2 text-xl font-bold text-gray-800 dark:text-white">
                                         Total a Pagar: <span className="text-green-600 dark:text-green-400">
-                                            {moneda === 'Dólares' ? '$us ' : 'Bs. '} {amountToPay.toFixed(2)}
+                                            {moneda === 'Dólares' ? '$us ' : 'Bs. '} {formatNumber(amountToPay)}
                                         </span>
                                     </div>
                                 </div>

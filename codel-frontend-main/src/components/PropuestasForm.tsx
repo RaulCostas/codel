@@ -6,7 +6,7 @@ import type { Paciente, Arancel } from '../types';
 import ManualModal, { type ManualSection } from './ManualModal';
 import ArancelForm from './ArancelForm';
 import { formatDate } from '../utils/dateUtils';
-import { formatFullName } from '../utils/formatters';
+import { formatFullName, formatNumber, formatCurrency } from '../utils/formatters';
 
 interface DetalleItem {
     id?: number;
@@ -420,10 +420,10 @@ const PropuestasForm: React.FC = () => {
                                             <option value={0}>-- Seleccione Tratamiento --</option>
                                             {aranceles.map(a => {
                                                 const itemMoneda = a.moneda || 'Bs.';
-                                                const precioNor = Number(a.precio).toFixed(2);
+                                                const precioNor = formatNumber(a.precio);
                                                 return (
                                                     <option key={a.id} value={a.id}>
-                                                        {a.detalle} - {precioNor} {itemMoneda}
+                                                        {a.detalle} - {formatCurrency(a.precio, a.moneda === 'Dólares' ? 'USD' : 'Bs')}
                                                     </option>
                                                 );
                                             })}
@@ -567,9 +567,9 @@ const PropuestasForm: React.FC = () => {
                                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-center">{index + 1}</td>
                                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{item.tratamiento}</td>
                                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-center">{item.piezas}</td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-right">{item.precioUnitario.toFixed(2)}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-right">{formatNumber(item.precioUnitario)}</td>
                                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-center">{item.cantidad}</td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-right font-medium">{item.total.toFixed(2)}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-right font-medium">{formatNumber(item.total)}</td>
                                         <td className="px-4 py-3 whitespace-nowrap text-sm text-center">
                                             <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.posible ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}>
                                                 {item.posible ? 'SÍ' : 'NO'}
@@ -631,7 +631,7 @@ const PropuestasForm: React.FC = () => {
                         <div className="space-y-4">
                             <div className="flex justify-between items-center text-sm font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-600 pb-2">
                                 <span className="uppercase tracking-wide">SubTotal Propuesta {activeTab}</span>
-                                <span className="text-gray-800 dark:text-white font-semibold text-lg">{calculateTabSubTotal().toFixed(2)} Bs.</span>
+                                <span className="text-gray-800 dark:text-white font-semibold text-lg">{formatCurrency(calculateTabSubTotal(), 'Bs')}</span>
                             </div>
 
                             <div className="flex justify-between items-center text-sm font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-600 pb-2">
@@ -654,7 +654,7 @@ const PropuestasForm: React.FC = () => {
                             <div className="flex justify-between items-center pt-2">
                                 <span className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">TOTAL A COBRAR</span>
                                 <div className="text-4xl font-bold text-purple-600 dark:text-purple-400">
-                                    {calculateTabTotal().toFixed(2)} <span className="text-xl text-gray-500 dark:text-gray-400">Bs.</span>
+                                    {formatCurrency(calculateTabTotal(), 'Bs')}
                                 </div>
                             </div>
                         </div>

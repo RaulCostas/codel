@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { formatFullName } from '../utils/formatters';
+import { formatFullName, formatNumber, formatCurrency } from '../utils/formatters';
 import { getLocalDateString, formatDate } from '../utils/dateUtils';
 import { 
     FileText, Download, Search, Shield, Printer,
@@ -647,7 +647,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                                     <td class="text-center">${formatDate(t.fechaPlanilla || t.fecha)}</td>
                                     <td class="text-center">${t.pieza || ''}</td>
                                     <td>${t.arancel?.detalle || '-'}</td>
-                                    <td class="text-right">Bs. ${Number(t.precio).toFixed(2)}</td>
+                                    <td class="text-right">${formatCurrency(t.precio, 'Bs')}</td>
                                 </tr>
                             `).join('')
                         ).join('')}
@@ -655,7 +655,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                     <tfoot>
                         <tr class="total-row">
                             <td colspan="6" class="text-right">TOTAL PROFORMA:</td>
-                            <td class="text-right">Bs. ${Number(proforma.total).toFixed(2)}</td>
+                            <td class="text-right">Bs. ${formatNumber(proforma.total)}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -698,7 +698,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                                     <td class="text-center">${grupo.matricula}</td>
                                     <td class="text-center">${firstT.pacienteSeguro?.es_trabajador ? 'SI' : 'NO'}</td>
                                     <td class="text-center">${firstT.pacienteSeguro?.es_beneficiario ? 'SI' : 'NO'}</td>
-                                    <td class="text-right font-bold">Bs. ${grupo.subtotal.toFixed(2)}</td>
+                                    <td class="text-right font-bold">${formatCurrency(grupo.subtotal, 'Bs')}</td>
                                 </tr>
                             `;
                         }).join('')}
@@ -706,7 +706,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                     <tfoot>
                         <tr class="total-row">
                             <td colspan="5" class="text-right">TOTAL PLANILLA:</td>
-                            <td class="text-right">Bs. ${Number(proforma.total).toFixed(2)}</td>
+                            <td class="text-right">Bs. ${formatNumber(proforma.total)}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -829,7 +829,7 @@ const PlanillasProformasSeguro: React.FC = () => {
             item.arancel?.detalle || '-',
             item.pieza || '-',
             item.cantidad,
-            Number(item.precio).toFixed(2)
+            formatNumber(item.precio)
         ]);
 
         autoTable(doc, {
@@ -853,7 +853,7 @@ const PlanillasProformasSeguro: React.FC = () => {
             grupo.paciente,
             grupo.matricula,
             grupo.tratamientos.length,
-            grupo.subtotal.toFixed(2)
+            formatNumber(grupo.subtotal)
         ]);
 
         autoTable(doc, {
@@ -869,7 +869,7 @@ const PlanillasProformasSeguro: React.FC = () => {
         finalY = (doc as any).lastAutoTable.finalY || finalY + 20;
 
         doc.setFontSize(12);
-        doc.text(`TOTAL A PAGAR POR SEGURO: ${Number(proforma.total).toFixed(2)}`, 140, finalY + 15);
+        doc.text(`TOTAL A PAGAR POR SEGURO: ${formatNumber(proforma.total)}`, 140, finalY + 15);
 
         doc.save(`Proforma_${proforma.id}_${seguroName}.pdf`);
     };
@@ -1034,7 +1034,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                         <div className="flex items-center gap-6">
                             <div className="text-right">
                                 <span className="text-xs font-semibold text-gray-500 uppercase block">Total Seleccionado</span>
-                                <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">Bs. {totalSeleccionado.toFixed(2)}</span>
+                                <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(totalSeleccionado, 'Bs')}</span>
                             </div>
                             <button
                                 onClick={handleGuardarProforma}
@@ -1149,7 +1149,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white text-right">
-                                                    {Number(item.precio).toFixed(2)}
+                                                    {formatNumber(item.precio)}
                                                 </td>
                                             </tr>
                                         );
@@ -1258,7 +1258,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                                             {prof.seguro?.nombre || 'General'}
                                         </td>
                                         <td className="px-4 py-3 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
-                                            Bs. {Number(prof.total).toFixed(2)}
+                                            {formatCurrency(prof.total, 'Bs')}
                                         </td>
                                         <td className="px-4 py-3 text-center">
                                             <div className="flex flex-col items-center gap-1">
@@ -1450,7 +1450,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                                                     <td className="border border-gray-200 dark:border-gray-700 p-2 text-center">{tIdx === 0 ? grupo.matricula : ''}</td>
                                                     <td className="border border-gray-200 dark:border-gray-700 p-2 text-center">{formatDate(t.fechaPlanilla || t.fecha)}</td>
                                                     <td className="border border-gray-200 dark:border-gray-700 p-2">{t.arancel?.detalle}</td>
-                                                    <td className="border border-gray-200 dark:border-gray-700 p-2 text-right">Bs. {Number(t.precio).toFixed(2)}</td>
+                                                    <td className="border border-gray-200 dark:border-gray-700 p-2 text-right">{formatCurrency(t.precio, 'Bs')}</td>
                                                 </tr>
                                             ))
                                         )}
@@ -1458,7 +1458,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                                     <tfoot>
                                         <tr className="bg-gray-50 dark:bg-gray-800 font-bold">
                                             <td colSpan={5} className="border border-gray-200 dark:border-gray-700 p-2 text-right uppercase">Total Proforma:</td>
-                                            <td className="border border-gray-200 dark:border-gray-700 p-2 text-right text-blue-600">Bs. {Number(viewingProforma.total).toFixed(2)}</td>
+                                            <td className="border border-gray-200 dark:border-gray-700 p-2 text-right text-blue-600">{formatCurrency(viewingProforma.total, 'Bs')}</td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -1542,7 +1542,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-4">
-                                                <span className="font-bold text-emerald-600">Bs. {Number(t.precio).toFixed(2)}</span>
+                                                <span className="font-bold text-emerald-600">{formatCurrency(t.precio, 'Bs')}</span>
                                                 <button 
                                                     onClick={() => handleRemoverTratamiento(editingProforma!.id, t.id)}
                                                     className="p-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl shadow-lg shadow-rose-500/20 transition-all transform hover:-translate-y-0.5 active:scale-95"
@@ -1585,7 +1585,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <span className="text-sm font-bold text-blue-600">Bs. {Number(r.precio).toFixed(2)}</span>
+                                                    <span className="text-sm font-bold text-blue-600">{formatCurrency(r.precio, 'Bs')}</span>
                                                     <button 
                                                         onClick={() => handleAgregarTratamiento(editingProforma.id, r.id)}
                                                         className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg shadow-md transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center"
@@ -1604,7 +1604,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                         <div className="p-6 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-900/50">
                             <div className="text-right">
                                 <span className="text-xs text-gray-400 uppercase block">Total Actual</span>
-                                <span className="text-xl font-bold text-emerald-600">Bs. {Number(editingProforma?.total || 0).toFixed(2)}</span>
+                                <span className="text-xl font-bold text-emerald-600">{formatCurrency(editingProforma?.total || 0, 'Bs')}</span>
                             </div>
                             <div className="flex gap-3">
                                 <button 

@@ -11,7 +11,7 @@ import autoTable from 'jspdf-autotable';
 import ManualModal, { type ManualSection } from './ManualModal';
 import PrintFilterModal from './PrintFilterModal';
 import { formatDate } from '../utils/dateUtils';
-import { formatFullName } from '../utils/formatters';
+import { formatFullName, formatNumber, formatCurrency } from '../utils/formatters';
 import PagosLaboratoriosForm from './PagosLaboratoriosForm';
 
 import { FileText, Download, Printer, Wallet } from 'lucide-react';
@@ -283,7 +283,7 @@ const PagosLaboratoriosList: React.FC = () => {
                                     <td>${p.trabajoLaboratorio?.laboratorio?.laboratorio || '-'}</td>
                                     <td>${p.trabajoLaboratorio?.precioLaboratorio?.detalle || '-'}</td>
                                     <td>${p.moneda === 'Bolivianos' ? 'Bs' : '$us'}</td>
-                                    <td>${p.monto}</td>
+                                    <td>${formatNumber(Number(p.monto))}</td>
                                     <td>${p.formaPago?.nombre || p.formaPago?.forma_pago || '-'}</td>
                                 </tr>
                             `).join('')}
@@ -396,7 +396,7 @@ const PagosLaboratoriosList: React.FC = () => {
                 p.trabajoLaboratorio?.laboratorio?.laboratorio || '-',
                 p.trabajoLaboratorio?.precioLaboratorio?.detalle || '-',
                 p.moneda === 'Bolivianos' ? 'Bs' : '$us',
-                p.monto ? Number(p.monto).toFixed(2) : (p.trabajoLaboratorio ? p.trabajoLaboratorio.total : '0.00'),
+                p.monto ? formatNumber(Number(p.monto)) : (p.trabajoLaboratorio ? formatNumber(Number(p.trabajoLaboratorio.total)) : '0,00'),
                 p.formaPago ? p.formaPago.forma_pago : '-'
             ]);
 
@@ -459,7 +459,7 @@ const PagosLaboratoriosList: React.FC = () => {
             Laboratorio: p.trabajoLaboratorio?.laboratorio?.laboratorio || '-',
             Trabajo: p.trabajoLaboratorio?.precioLaboratorio?.detalle || '-',
             Moneda: p.moneda,
-            Monto: p.monto,
+            Monto: formatNumber(p.monto),
             FormaPago: p.formaPago?.nombre || (p.formaPago?.forma_pago || '-')
         })));
         const workbook = XLSX.utils.book_new();
@@ -602,7 +602,7 @@ const PagosLaboratoriosList: React.FC = () => {
                                     </td>
                                     <td className="p-3 text-gray-700 dark:text-gray-300">{pago.moneda === 'Bolivianos' ? 'Bs' : '$us'}</td>
                                     <td className="p-3 text-gray-700 dark:text-gray-300">
-                                        {pago.monto ? Number(pago.monto).toFixed(2) : (pago.trabajoLaboratorio ? pago.trabajoLaboratorio.total : '0.00')}
+                                        {pago.monto ? formatNumber(Number(pago.monto)) : (pago.trabajoLaboratorio ? formatNumber(Number(pago.trabajoLaboratorio.total)) : '0,00')}
                                     </td>
                                     <td className="p-3 text-gray-700 dark:text-gray-300">
                                         {pago.formaPago ? pago.formaPago.forma_pago : '-'}

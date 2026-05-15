@@ -4,7 +4,7 @@ import api from '../services/api';
 import type { TrabajoLaboratorio, Paciente, Laboratorio, PrecioLaboratorio, Cubeta, Doctor } from '../types';
 import Swal from 'sweetalert2';
 import ManualModal, { type ManualSection } from './ManualModal';
-import { formatFullName } from '../utils/formatters';
+import { formatFullName, formatNumber } from '../utils/formatters';
 import SearchablePatientSelect from './SearchablePatientSelect';
 
 import { Plus } from 'lucide-react';
@@ -524,11 +524,11 @@ const TrabajosLaboratoriosForm: React.FC = () => {
                 <div className="md:col-span-2 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg flex justify-end gap-6 items-center border dark:border-gray-600">
                     <div className="text-right">
                         <span className="block text-sm text-gray-600 dark:text-gray-300">Precio Unitario</span>
-                        <span className="text-lg font-semibold text-gray-900 dark:text-white">{Number(formData.precio_unitario).toFixed(2)}</span>
+                        <span className="text-lg font-semibold text-gray-900 dark:text-white">{formatNumber(formData.precio_unitario)}</span>
                     </div>
                     <div className="text-right">
                         <span className="block text-sm text-gray-600 dark:text-gray-300">Total</span>
-                        <span className="text-2xl font-bold text-green-600 dark:text-green-400">{Number(formData.total).toFixed(2)}</span>
+                        <span className="text-2xl font-bold text-green-600 dark:text-green-400">{formatNumber(formData.total)}</span>
                     </div>
                 </div>
 
