@@ -5,6 +5,7 @@ import type { TrabajoLaboratorio, Paciente, Laboratorio, PrecioLaboratorio, Cube
 import Swal from 'sweetalert2';
 import ManualModal, { type ManualSection } from './ManualModal';
 import { formatFullName } from '../utils/formatters';
+import SearchablePatientSelect from './SearchablePatientSelect';
 
 import { Plus } from 'lucide-react';
 
@@ -42,7 +43,6 @@ const TrabajosLaboratoriosForm: React.FC = () => {
         idHistoriaClinica: 0,
     });
 
-    const [pacientes, setPacientes] = useState<Paciente[]>([]);
     const [historiasClinica, setHistoriasClinica] = useState<any[]>([]);
     const [laboratorios, setLaboratorios] = useState<Laboratorio[]>([]);
     const [preciosLaboratorio, setPreciosLaboratorio] = useState<PrecioLaboratorio[]>([]);
@@ -89,15 +89,13 @@ const TrabajosLaboratoriosForm: React.FC = () => {
     const fetchDropdowns = async () => {
         try {
             const clinicaParam = '';
-            const [pacResponse, labRes, preciosRes, cubetasRes, docsRes] = await Promise.all([
-                api.get('/pacientes?limit=1000'),
+            const [labRes, preciosRes, cubetasRes, docsRes] = await Promise.all([
                 api.get('/laboratorios?limit=100'),
                 api.get('/precios-laboratorios?limit=1000'),
                 api.get(`/cubetas?dentro_fuera=DENTRO&limit=100${clinicaParam}`),
                 api.get('/doctors?limit=100')
             ]);
 
-            setPacientes(Array.isArray(pacResponse.data.data) ? pacResponse.data.data : pacResponse.data);
             const activeLabs = (labRes.data.data || []).filter((lab: any) => lab.estado === 'activo');
             setLaboratorios(activeLabs);
             setPreciosLaboratorio(Array.isArray(preciosRes.data.data) ? preciosRes.data.data : preciosRes.data);
@@ -264,26 +262,17 @@ const TrabajosLaboratoriosForm: React.FC = () => {
                     </div>
                 </div>
 
-                {/* 2. Paciente */}
                 <div className="form-group">
                     <label className="block text-gray-700 dark:text-gray-300 font-medium text-sm mb-2">Paciente</label>
-                    <div className="relative">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        <select
-                            name="idPaciente"
-                            value={formData.idPaciente}
-                            onChange={handleChange}
-                            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all appearance-none"
-                            required
-                        ><option value={0}>Seleccione Paciente</option>
-                            {pacientes.map(p => (
-                                <option key={p.id} value={p.id}>{formatFullName(p)}</option>
-                            ))}
-                        </select>
-                    </div>
+                    <SearchablePatientSelect
+                        onSelect={(type, id) => {
+                            setFormData(prev => ({ ...prev, idPaciente: id }));
+                        }}
+                        selectedId={formData.idPaciente}
+                        selectedType="particular"
+                        allowType="particular"
+                        required
+                    />
                 </div>
 
                 {/* 3. Laboratorio (Active Only) */}

@@ -57,12 +57,18 @@ const PermisosModal: React.FC<PermisosModalProps> = ({ user, isOpen, onClose, on
             title: 'Módulos Principales',
             items: [
                 { id: 'agenda', label: 'Agenda' },
-                { id: 'pacientes', label: 'Pacientes (Módulo)' },
-                { id: 'pacientes-registro', label: ' - Registro de Pacientes' },
-                { id: 'pagos', label: ' - Pagos' },
-                { id: 'pacientes-deudores', label: ' - Pacientes Deudores' },
-                { id: 'pacientes-pendientes', label: ' - Pacientes Pendientes' },
+                
+                { id: 'pacientes', label: 'Pacientes Particulares (Módulo)' },
+                { id: 'pacientes-registro', label: ' - Lista de Pacientes' },
+                { id: 'pacientes-deudores', label: ' - Deudores' },
+                { id: 'pacientes-pendientes', label: ' - Pendientes' },
+                { id: 'arancel', label: ' - Aranceles' },
                 { id: 'recetario', label: ' - Recetario' },
+
+                { id: 'pacientes-seguro', label: 'Pacientes Seguro (Módulo)' },
+                { id: 'pacientes-seguro-registro', label: ' - Lista de Pacientes' },
+                { id: 'planillas-proformas-seguro', label: ' - Planillas y Proformas' },
+                { id: 'arancel-seguro', label: ' - Aranceles (Seguro)' },
 
 
                 { id: 'doctores', label: 'Doctores (Módulo)' },
@@ -87,7 +93,6 @@ const PermisosModal: React.FC<PermisosModalProps> = ({ user, isOpen, onClose, on
                 { id: 'personal-registro', label: ' - Registro de Personal' },
                 { id: 'vacaciones', label: ' - Vacaciones' },
                 { id: 'calificacion', label: ' - Calificación' },
-                { id: 'arancel', label: ' - Arancel' },
 
                 { id: 'inventario', label: 'Inventario' },
                 { id: 'egresos', label: 'Egresos Diarios' },

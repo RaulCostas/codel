@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import ManualModal, { type ManualSection } from './ManualModal';
 import { getLocalDateString } from '../utils/dateUtils';
 import { formatFullName } from '../utils/formatters';
+import SearchablePatientSelect from './SearchablePatientSelect';
 
 
 interface FormData {
@@ -43,7 +44,6 @@ const RecetarioForm: React.FC<RecetarioFormProps> = ({ isOpen, onClose, id, onSa
         }]
     });
 
-    const [pacientes, setPacientes] = useState<Paciente[]>([]);
     const [showManual, setShowManual] = useState(false);
 
     const manualSections: ManualSection[] = [
@@ -85,7 +85,7 @@ const RecetarioForm: React.FC<RecetarioFormProps> = ({ isOpen, onClose, id, onSa
             }
         }
 
-        fetchPacientes();
+        // fetchPacientes(); // Removed to save egress
         if (isEditing) {
             fetchReceta();
         } else {
@@ -108,15 +108,7 @@ const RecetarioForm: React.FC<RecetarioFormProps> = ({ isOpen, onClose, id, onSa
 
 
 
-    const fetchPacientes = async () => {
-        try {
-            // Patients are global, no clinicId filter
-            const response = await api.get('/pacientes?limit=1000');
-            setPacientes(response.data.data || []);
-        } catch (error) {
-            console.error('Error fetching pacientes:', error);
-        }
-    };
+    // fetchPacientes removed to save egress
 
     const fetchReceta = async () => {
         try {
@@ -277,23 +269,15 @@ const RecetarioForm: React.FC<RecetarioFormProps> = ({ isOpen, onClose, id, onSa
 
                         <div>
                             <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">Paciente:</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                </div>
-                                <select
-                                    name="pacienteId"
-                                    value={formData.pacienteId}
-                                    onChange={handleChange}
-                                    className="w-full pl-10 p-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                                ><option value={0}>-- seleccionar --</option>
-                                    {pacientes.map(p => (
-                                        <option key={p.id} value={p.id}>{formatFullName(p)}</option>
-                                    ))}
-                                </select>
-                            </div>
+                            <SearchablePatientSelect
+                                onSelect={(type, id) => {
+                                    setFormData(prev => ({ ...prev, pacienteId: id }));
+                                }}
+                                selectedId={formData.pacienteId}
+                                selectedType="particular"
+                                allowType="particular"
+                                required
+                            />
                         </div>
 
                         {/* Details Table */}

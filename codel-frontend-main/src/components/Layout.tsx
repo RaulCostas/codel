@@ -234,7 +234,7 @@ const Layout: React.FC = () => {
                         )}
 
                         {/* PACIENTES SEGURO */}
-                        {hasAccess('pacientes') && (
+                        {hasAccess('pacientes-seguro') && (
                             <li className="nav-item">
                                 <div
                                     className={`nav-link ${isSeguroOpen || isActive('/pacientes-seguro') || isActive('/arancel-seguro') ? 'active' : ''}`}
@@ -265,17 +265,21 @@ const Layout: React.FC = () => {
                                 </div>
                                 {isSeguroOpen && (
                                     <ul className="submenu-list" style={{ paddingLeft: '20px', listStyle: 'none', background: 'rgba(0,0,0,0.05)' }}>
-                                        <li className="nav-item">
-                                            <Link to="/pacientes-seguro" className={`nav-link ${isActive('/pacientes-seguro')}`} onClick={closeSidebar}>
-                                                Lista de Pacientes
-                                            </Link>
-                                        </li>
-                                        <li className="nav-item">
-                                            <Link to="/planillas-proformas-seguro" className={`nav-link ${isActive('/planillas-proformas-seguro')}`} onClick={closeSidebar}>
-                                                Planillas y Proformas
-                                            </Link>
-                                        </li>
-                                        {hasAccess('arancel') && (
+                                        {hasAccess('pacientes-seguro-registro') && (
+                                            <li className="nav-item">
+                                                <Link to="/pacientes-seguro" className={`nav-link ${isActive('/pacientes-seguro')}`} onClick={closeSidebar}>
+                                                    Lista de Pacientes
+                                                </Link>
+                                            </li>
+                                        )}
+                                        {hasAccess('planillas-proformas-seguro') && (
+                                            <li className="nav-item">
+                                                <Link to="/planillas-proformas-seguro" className={`nav-link ${isActive('/planillas-proformas-seguro')}`} onClick={closeSidebar}>
+                                                    Planillas y Proformas
+                                                </Link>
+                                            </li>
+                                        )}
+                                        {hasAccess('arancel-seguro') && (
                                             <li className="nav-item">
                                                 <Link to="/arancel-seguro" className={`nav-link ${isActive('/arancel-seguro')}`} onClick={closeSidebar}>
                                                     Aranceles

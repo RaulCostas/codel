@@ -17,6 +17,7 @@ interface AgendaFormProps {
 }
 
 import QuickPacienteForm from './QuickPacienteForm';
+import SearchablePatientSelect from './SearchablePatientSelect';
 import Swal from 'sweetalert2';
 
 
@@ -25,8 +26,6 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
     isOpen, onClose, onSave, initialData, defaultDate, defaultTime, defaultConsultorio, existingAppointments = [],
     defaultPacienteId, defaultPacienteSeguroId
 }) => {
-    const [pacientes, setPacientes] = useState<Paciente[]>([]);
-    const [pacientesSeguro, setPacientesSeguro] = useState<any[]>([]);
     const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [proformas, setProformas] = useState<Proforma[]>([]);
     
@@ -167,15 +166,11 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
 
     const fetchCatalogs = async () => {
         try {
-            const [doctorsRes, pacientesRes, segurosRes] = await Promise.all([
-                api.get('/doctors?limit=1000'),
-                api.get('/pacientes?limit=1000'),
-                api.get('/pacientes-seguro?limit=1000')
+            const [doctorsRes] = await Promise.all([
+                api.get('/doctors?limit=1000')
             ]);
             const activeDoctors = (doctorsRes.data.data || []).filter((doctor: any) => doctor.estado === 'activo');
             setDoctors(activeDoctors);
-            setPacientes(pacientesRes.data.data || []);
-            setPacientesSeguro(segurosRes.data.data || []);
         } catch (error) {
             console.error('Error fetching catalogs:', error);
         }
@@ -218,12 +213,10 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
     };
 
     const handlePatientCreated = async (newPaciente: Paciente) => {
-        // Refresh the list to ensure we have the latest data
-        await fetchCatalogs();
-
         setFormData(prev => ({
             ...prev,
             pacienteId: newPaciente.id,
+            pacienteSeguroId: 0,
             proformaId: 0,
             tratamiento: ''
         }));
@@ -557,39 +550,43 @@ const AgendaForm: React.FC<AgendaFormProps> = ({
                             <div className="col-span-1 md:col-span-2">
                                 <label className="block mb-1 font-bold text-sm">Paciente:</label>
                                 <div className="flex gap-2.5">
-                                    <div className="relative flex-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="12" cy="7" r="4"></circle>
-                                        </svg>
-                                        <select
-                                            name="pacienteIdCombined"
-                                            value={formData.pacienteId > 0 ? `particular-${formData.pacienteId}` : formData.pacienteSeguroId > 0 ? `seguro-${formData.pacienteSeguroId}` : '0'}
-                                            onChange={handleChange}
-                                            required={!isNonPatientEvent}
-                                            className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all appearance-none"
-                                        >
-                                            <option value="0">-- Seleccione Paciente --</option>
-                                            {pacientes.length > 0 && (
-                                                <optgroup label="PARTICULARES">
-                                                    {pacientes.map(p => (
-                                                        <option key={`p-${p.id}`} value={`particular-${p.id}`}>
-                                                            {formatFullName(p)}
-                                                        </option>
-                                                    ))}
-                                                </optgroup>
-                                            )}
-                                            {pacientesSeguro.length > 0 && (
-                                                <optgroup label="PACIENTES SEGURO">
-                                                    {pacientesSeguro.map(p => (
-                                                        <option key={`s-${p.id}`} value={`seguro-${p.id}`}>
-                                                            {formatFullName(p)} {p.seguro ? `(${p.seguro.nombre})` : ''}
-                                                        </option>
-                                                    ))}
-                                                </optgroup>
-                                            )}
-                                        </select>
-                                    </div>
+                                    <SearchablePatientSelect
+                                        className="flex-1"
+                                        selectedId={formData.pacienteId || formData.pacienteSeguroId || 0}
+                                        selectedType={formData.pacienteId > 0 ? 'particular' : formData.pacienteSeguroId > 0 ? 'seguro' : null}
+                                        onSelect={(type, id) => {
+                                            if (type === 'particular') {
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    pacienteId: id,
+                                                    pacienteSeguroId: 0,
+                                                    proformaId: 0,
+                                                    tratamiento: ''
+                                                }));
+                                                if (id > 0) {
+                                                    fetchProformasByPaciente(id);
+                                                    fetchHistoriaClinica(id);
+                                                }
+                                            } else if (type === 'seguro') {
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    pacienteId: 0,
+                                                    pacienteSeguroId: id,
+                                                    proformaId: 0,
+                                                    tratamiento: ''
+                                                }));
+                                            } else {
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    pacienteId: 0,
+                                                    pacienteSeguroId: 0,
+                                                    proformaId: 0,
+                                                    tratamiento: ''
+                                                }));
+                                            }
+                                        }}
+                                        required={!isNonPatientEvent}
+                                    />
                                     <button
                                         type="button"
                                         onClick={() => setIsQuickPatientOpen(true)}

@@ -113,7 +113,7 @@ const AgendaView: React.FC = () => {
         } else {
             fetchMonthAppointments();
         }
-        fetchPatients();
+        // Removed fetchPatients() to save egress
         fetchPersonal();
     }, [currentDate, viewMode]);
 
@@ -123,30 +123,35 @@ const AgendaView: React.FC = () => {
         setDateValue(new Date(year, month - 1, day));
     }, [currentDate]);
 
+    // Patient Search Logic
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
     useEffect(() => {
-        if (searchTerm.trim() === '') {
+        const timer = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        if (debouncedSearchTerm.trim() === '') {
             setFilteredPacientes([]);
             setShowPatientResults(false);
-        } else {
-            const lowerComp = searchTerm.toLowerCase();
-            const filtered = pacientes.filter(p =>
-                p.nombre.toLowerCase().includes(lowerComp) ||
-                p.paterno.toLowerCase().includes(lowerComp) ||
-                p.materno?.toLowerCase().includes(lowerComp)
-            );
-            setFilteredPacientes(filtered.slice(0, 10)); // Limit to 10 results
-            setShowPatientResults(true);
+            return;
         }
-    }, [searchTerm, pacientes]);
 
-    const fetchPatients = async () => {
-        try {
-            const response = await api.get('/pacientes?limit=2000'); // Fetch enough patients
-            setPacientes(Array.isArray(response.data.data) ? response.data.data : response.data);
-        } catch (error) {
-            console.error('Error fetching patients:', error);
-        }
-    };
+        const searchPatients = async () => {
+            try {
+                const response = await api.get(`/pacientes?search=${debouncedSearchTerm}&limit=10`);
+                setFilteredPacientes(response.data.data || []);
+                setShowPatientResults(true);
+            } catch (error) {
+                console.error('Error searching patients:', error);
+            }
+        };
+
+        searchPatients();
+    }, [debouncedSearchTerm]);
 
     const handlePatientSelect = async (patient: Paciente) => {
         setSearchTerm(formatFullName(patient));

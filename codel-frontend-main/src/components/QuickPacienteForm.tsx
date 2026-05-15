@@ -18,10 +18,26 @@ const QuickPacienteForm: React.FC<QuickPacienteFormProps> = ({ isOpen, onClose, 
         nombre: '',
         paterno: '',
         materno: '',
-        telefono_celular: '',
-        fecha_nacimiento: '',
+        ci: '',
         genero: 'M' // Default
     });
+
+    const [countryCode, setCountryCode] = useState('+591');
+    const [localCelular, setLocalCelular] = useState('');
+
+    const countryCodes = [
+        { code: '+591', label: '🇧🇴 +591' },
+        { code: '+54', label: '🇦🇷 +54' },
+        { code: '+55', label: '🇧🇷 +55' },
+        { code: '+56', label: '🇨🇱 +56' },
+        { code: '+51', label: '🇵🇪 +51' },
+        { code: '+595', label: '🇵🇾 +595' },
+        { code: '+598', label: '🇺🇾 +598' },
+        { code: '+57', label: '🇨🇴 +57' },
+        { code: '+52', label: '🇲🇽 +52' },
+        { code: '+34', label: '🇪🇸 +34' },
+        { code: '+1', label: '🇺🇸 +1' },
+    ];
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -31,6 +47,9 @@ const QuickPacienteForm: React.FC<QuickPacienteFormProps> = ({ isOpen, onClose, 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            // Combine phone code and number
+            const fullCelular = `${countryCode}${localCelular}`;
+
             // Create a clean payload removing null, undefined, or empty values
             const payload: any = {};
             Object.entries(formData).forEach(([key, value]) => {
@@ -39,10 +58,13 @@ const QuickPacienteForm: React.FC<QuickPacienteFormProps> = ({ isOpen, onClose, 
                 }
             });
 
+            // Set phone number
+            payload.telefono_celular = fullCelular;
+
             // Set required defaults
             payload.fecha_ingreso = getLocalDateString();
             payload.estado = 'activo';
-            payload.genero = formData.genero; // Ensure it's re-added even if empty
+            payload.genero = formData.genero; 
 
             // Add medical history defaults if not present
             const defaults = {
@@ -66,11 +88,6 @@ const QuickPacienteForm: React.FC<QuickPacienteFormProps> = ({ isOpen, onClose, 
                     payload[key] = val;
                 }
             });
-
-            // Ensure idSeguro is a number if it exists
-            if (payload.idSeguro) {
-                payload.idSeguro = Number(payload.idSeguro);
-            }
 
             const response = await api.post('/pacientes', payload);
             if (response.data) {
@@ -140,28 +157,16 @@ const QuickPacienteForm: React.FC<QuickPacienteFormProps> = ({ isOpen, onClose, 
                                 />
                             </div>
                         </div>
-                        <div>
-                            <label className="block mb-1 font-bold text-sm text-gray-700 dark:text-gray-300">Celular:</label>
-                            <input
-                                type="text"
-                                name="telefono_celular"
-                                value={formData.telefono_celular}
-                                onChange={handleChange}
-                                required
-                                className="w-full p-2 pl-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Ej: 70012345"
-                            />
-                        </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label className="block mb-1 font-bold text-sm text-gray-700 dark:text-gray-300">Fecha Nacimiento:</label>
+                                <label className="block mb-1 font-bold text-sm text-gray-700 dark:text-gray-300">C.I.:</label>
                                 <input
-                                    type="date"
-                                    name="fecha_nacimiento"
-                                    value={formData.fecha_nacimiento}
+                                    type="text"
+                                    name="ci"
+                                    value={formData.ci}
                                     onChange={handleChange}
-                                    required
-                                    className="w-full p-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-2 pl-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Opcional"
                                 />
                             </div>
                             <div>
@@ -175,6 +180,28 @@ const QuickPacienteForm: React.FC<QuickPacienteFormProps> = ({ isOpen, onClose, 
                                     <option value="M">Masculino</option>
                                     <option value="F">Femenino</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block mb-1 font-bold text-sm text-gray-700 dark:text-gray-300">Celular:</label>
+                            <div className="flex gap-2">
+                                <select
+                                    value={countryCode}
+                                    onChange={(e) => setCountryCode(e.target.value)}
+                                    className="p-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500 transition-all font-sans text-sm"
+                                >
+                                    {countryCodes.map(c => (
+                                        <option key={c.code} value={c.code}>{c.label}</option>
+                                    ))}
+                                </select>
+                                <input
+                                    type="text"
+                                    value={localCelular}
+                                    onChange={(e) => setLocalCelular(e.target.value)}
+                                    required
+                                    className="flex-1 p-2 pl-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Ej: 70012345"
+                                />
                             </div>
                         </div>
                     </div>

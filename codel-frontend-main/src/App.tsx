@@ -154,6 +154,8 @@ function App() {
                                 {/* Arancel */}
                                 <Route element={<ProtectedRoute moduleId="arancel" />}>
                                     <Route path="/arancel" element={<ArancelList tipo="particular" />} />
+                                </Route>
+                                <Route element={<ProtectedRoute moduleId="arancel-seguro" />}>
                                     <Route path="/arancel-seguro" element={<ArancelList tipo="seguro" />} />
                                 </Route>
 
@@ -188,16 +190,12 @@ function App() {
                                     </Route>
                                 </Route>
 
-                                {/* Pacientes */}
+                                {/* Pacientes Particulares */}
                                 <Route element={<ProtectedRoute moduleId="pacientes" />}>
                                     <Route element={<ProtectedRoute moduleId="pacientes-registro" />}>
                                         <Route path="/pacientes" element={<PacienteList />} />
                                         <Route path="/pacientes/create" element={<PacienteForm />} />
                                         <Route path="/pacientes/edit/:id" element={<PacienteForm />} />
-                                        <Route path="/pacientes-seguro" element={<PacienteSeguroList />} />
-                                        <Route path="/pacientes-seguro/create" element={<PacienteSeguroForm />} />
-                                        <Route path="/pacientes-seguro/edit/:id" element={<PacienteSeguroForm />} />
-                                        <Route path="/planillas-proformas-seguro" element={<PlanillasProformasSeguro />} />
                                         <Route path="/personal-tipo" element={<PersonalTipoList />} />
                                         
                                         {/* Nested Patient Profile Routes (Particular) */}
@@ -217,17 +215,32 @@ function App() {
                                             <Route path="propuestas/view/:propuestaId" element={<PropuestasForm />} />
                                         </Route>
 
-                                        {/* Nested Patient Profile Routes (Seguro) */}
-                                        <Route path="/pacientes-seguro/:id" element={<PacientePerfil tipo="seguro" />}>
-                                            <Route path="ficha" element={<PacienteTabFicha tipo="seguro" />} />
-                                            <Route path="odontograma" element={<PacienteTabOdontograma tipo="seguro" />} />
-                                            <Route path="citas" element={<PacienteTabCitas tipo="seguro" />} />
-                                            <Route path="seguimiento" element={<PacienteTabSeguimientoSeguro />} />
-                                            <Route path="imagenes" element={<PacienteTabImagenes tipo="seguro" />} />
-                                        </Route>
-
                                         <Route path="/pacientes/:id/historia-clinica" element={<HistoriaClinica />} />
                                     </Route>
+                                </Route>
+
+                                {/* Pacientes Seguro */}
+                                <Route element={<ProtectedRoute moduleId="pacientes-seguro" />}>
+                                    <Route element={<ProtectedRoute moduleId="pacientes-seguro-registro" />}>
+                                        <Route path="/pacientes-seguro" element={<PacienteSeguroList />} />
+                                        <Route path="/pacientes-seguro/create" element={<PacienteSeguroForm />} />
+                                        <Route path="/pacientes-seguro/edit/:id" element={<PacienteSeguroForm />} />
+                                    </Route>
+                                    <Route element={<ProtectedRoute moduleId="planillas-proformas-seguro" />}>
+                                        <Route path="/planillas-proformas-seguro" element={<PlanillasProformasSeguro />} />
+                                    </Route>
+
+                                    {/* Nested Patient Profile Routes (Seguro) */}
+                                    <Route path="/pacientes-seguro/:id" element={<PacientePerfil tipo="seguro" />}>
+                                        <Route path="ficha" element={<PacienteTabFicha tipo="seguro" />} />
+                                        <Route path="odontograma" element={<PacienteTabOdontograma tipo="seguro" />} />
+                                        <Route path="citas" element={<PacienteTabCitas tipo="seguro" />} />
+                                        <Route path="seguimiento" element={<PacienteTabSeguimientoSeguro />} />
+                                        <Route path="imagenes" element={<PacienteTabImagenes tipo="seguro" />} />
+                                    </Route>
+                                </Route>
+
+                                <Route element={<ProtectedRoute moduleId="pacientes" />}>
                                     <Route element={<ProtectedRoute moduleId="pacientes-pendientes" />}>
                                         <Route path="/pacientes-pendientes" element={<PacientesPendientes />} />
                                     </Route>

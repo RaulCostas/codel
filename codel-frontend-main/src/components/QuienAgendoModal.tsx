@@ -3,6 +3,7 @@ import api from '../services/api';
 import type { Paciente, User, Agenda } from '../types';
 import { formatDate } from '../utils/dateUtils';
 import { formatFullName } from '../utils/formatters';
+import SearchablePatientSelect from './SearchablePatientSelect';
 
 interface QuienAgendoModalProps {
     isOpen: boolean;
@@ -22,41 +23,41 @@ const QuienAgendoModal: React.FC<QuienAgendoModalProps> = ({ isOpen, onClose }) 
     const [pacienteId, setPacienteId] = useState<number | undefined>(undefined);
     const [usuarioId, setUsuarioId] = useState<number | undefined>(undefined);
 
-    const [pacientes, setPacientes] = useState<Paciente[]>([]);
     const [usuarios, setUsuarios] = useState<User[]>([]);
+    const [userSearchTerm, setUserSearchTerm] = useState('');
+    const [isUserSearchOpen, setIsUserSearchOpen] = useState(false);
     const [results, setResults] = useState<Agenda[]>([]);
     const [showResults, setShowResults] = useState(false);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
-            fetchPacientes();
-            fetchUsuarios();
+            // fetchPacientes(); // Removed
+            // fetchUsuarios(); // Removed
             // Reset state when modal opens
             setShowResults(false);
             setResults([]);
         }
     }, [isOpen]);
 
-    const fetchPacientes = async () => {
-        try {
-            const response = await api.get('/pacientes?estado=activo&limit=2000');
-            const data = Array.isArray(response.data.data) ? response.data.data : response.data;
-            setPacientes(data);
-        } catch (error) {
-            console.error('Error fetching pacientes:', error);
+    // User Search Logic
+    useEffect(() => {
+        if (!isOpen || userSearchTerm.trim().length < 2) {
+            setUsuarios([]);
+            return;
         }
-    };
 
-    const fetchUsuarios = async () => {
-        try {
-            const response = await api.get('/users?estado=activo&limit=1000');
-            const data = Array.isArray(response.data.data) ? response.data.data : response.data;
-            setUsuarios(data);
-        } catch (error) {
-            console.error('Error fetching usuarios:', error);
-        }
-    };
+        const timer = setTimeout(async () => {
+            try {
+                const response = await api.get(`/users?search=${userSearchTerm}&limit=10&estado=activo`);
+                setUsuarios(response.data.data || []);
+            } catch (error) {
+                console.error('Error searching users:', error);
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [userSearchTerm, isOpen]);
 
     const handleSearch = async () => {
         setLoading(true);
@@ -179,55 +180,60 @@ const QuienAgendoModal: React.FC<QuienAgendoModalProps> = ({ isOpen, onClose }) 
                                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                     Paciente
                                                 </label>
-                                                <div className="relative">
-                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                                            <circle cx="12" cy="7" r="4"></circle>
-                                                        </svg>
-                                                    </div>
-                                                    <select
-                                                        value={pacienteId || ''}
-                                                        onChange={(e) => setPacienteId(e.target.value ? Number(e.target.value) : undefined)}
-                                                        className="w-full pl-10 pr-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                    >
-                                                        <option value="">Todos los pacientes</option>
-                                                        {pacientes.map((p) => (
-                                                            <option key={p.id} value={p.id}>
-                                                                {formatFullName(p)}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                </div>
+                                                <SearchablePatientSelect
+                                                    onSelect={(type, id) => setPacienteId(id || undefined)}
+                                                    selectedId={pacienteId}
+                                                    selectedType={pacienteId ? 'particular' : null} // Simplified for this modal which currently only handles particular patients in its original select? 
+                                                    // Wait, the original select didn't differentiate between type? 
+                                                    // Let's check line 195: {pacientes.map((p) => ( ... formatFullName(p) ))}
+                                                    // The original QuienAgendoModal only fetched from /pacientes (particular). 
+                                                    placeholder="Todos los pacientes"
+                                                />
                                             </div>
 
                                             {/* User Dropdown */}
-                                            <div>
+                                            <div className="relative">
                                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                     Usuario
                                                 </label>
                                                 <div className="relative">
-                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                                             <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                                             <circle cx="8.5" cy="7" r="4"></circle>
-                                                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                                                            <line x1="23" y1="11" x2="17" y2="11"></line>
                                                         </svg>
                                                     </div>
-                                                    <select
-                                                        value={usuarioId || ''}
-                                                        onChange={(e) => setUsuarioId(e.target.value ? Number(e.target.value) : undefined)}
-                                                        className="w-full pl-10 pr-3 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                    >
-                                                        <option value="">Todos los usuarios</option>
-                                                        {usuarios.map((u) => (
-                                                            <option key={u.id} value={u.id}>
-                                                                {u.name}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                                    <input
+                                                        type="text"
+                                                        value={isUserSearchOpen ? userSearchTerm : (usuarios.find(u => u.id === usuarioId)?.name || 'Todos los usuarios')}
+                                                        onFocus={() => setIsUserSearchOpen(true)}
+                                                        onChange={(e) => setUserSearchTerm(e.target.value)}
+                                                        placeholder="Buscar usuario..."
+                                                        className="w-full pl-10 pr-10 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    />
+                                                    {usuarioId && (
+                                                        <button 
+                                                            onClick={() => { setUsuarioId(undefined); setIsUserSearchOpen(false); setUserSearchTerm(''); }}
+                                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                        </button>
+                                                    )}
                                                 </div>
+                                                {isUserSearchOpen && userSearchTerm.length >= 2 && (
+                                                    <div className="absolute z-[100] w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg max-h-40 overflow-y-auto">
+                                                        {usuarios.map(u => (
+                                                            <div 
+                                                                key={u.id}
+                                                                onClick={() => { setUsuarioId(u.id); setIsUserSearchOpen(false); setUserSearchTerm(''); }}
+                                                                className="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer text-sm text-gray-800 dark:text-gray-200"
+                                                            >
+                                                                {u.name}
+                                                            </div>
+                                                        ))}
+                                                        {usuarios.length === 0 && <div className="p-2 text-xs text-gray-500 text-center">No se encontraron usuarios</div>}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
