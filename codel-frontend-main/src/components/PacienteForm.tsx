@@ -164,6 +164,16 @@ const PacienteForm: React.FC = () => {
         // Finalize cell number
         payload.telefono_celular = fullCelular;
 
+        // Add user ID for auditing
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            try {
+                payload.usuarioId = JSON.parse(userStr).id;
+            } catch (e) {
+                console.error("Error parsing user for auditing", e);
+            }
+        }
+
         // Ensure no insurance fields are sent (security against residual state)
         Object.keys(payload).forEach(key => {
             // Remove any insurance-related field but KEEP 'particularidad'

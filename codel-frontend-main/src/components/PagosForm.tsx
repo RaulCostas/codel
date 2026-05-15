@@ -533,7 +533,19 @@ const PagosForm: React.FC = () => {
                 monto_comision:
                     formData.formaPagoId && formasPago.find(fp => fp.id === formData.formaPagoId)?.forma_pago?.toLowerCase() === 'tarjeta' && Number(formData.comisionTarjetaId) > 0
                         ? (finalMonto * (comisiones.find(c => c.id === Number(formData.comisionTarjetaId))?.monto || 0)) / 100
-                        : undefined
+                        : undefined,
+                usuarioId: (() => {
+                    const userStr = localStorage.getItem('user');
+                    if (userStr) {
+                        try {
+                            const user = JSON.parse(userStr);
+                            return user.id ? Number(user.id) : undefined;
+                        } catch (e) {
+                            console.error("Error parsing user for auditing", e);
+                        }
+                    }
+                    return undefined;
+                })()
             };
 
             if (id) {
@@ -644,7 +656,19 @@ const PagosForm: React.FC = () => {
                 sourceProformaId: Number(formData.proformaId) || null,
                 targetPacienteId: Number(targetPacienteId),
                 targetProformaId: Number(targetProformaId) || null, // Optional?
-                amount: Number(transferAmount)
+                amount: Number(transferAmount),
+                usuarioId: (() => {
+                    const userStr = localStorage.getItem('user');
+                    if (userStr) {
+                        try {
+                            const user = JSON.parse(userStr);
+                            return user.id ? Number(user.id) : undefined;
+                        } catch (e) {
+                            console.error("Error parsing user for auditing", e);
+                        }
+                    }
+                    return undefined;
+                })()
             });
 
             Swal.fire({

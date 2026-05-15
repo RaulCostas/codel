@@ -310,6 +310,16 @@ const HistoriaClinicaForm: React.FC<HistoriaClinicaFormProps> = ({
                 cantidad: isNaN(Number(formData.cantidad)) ? 1 : Number(formData.cantidad),
             };
 
+            // Add user ID for auditing
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    payload.usuarioId = JSON.parse(userStr).id;
+                } catch (e) {
+                    console.error("Error parsing user for auditing", e);
+                }
+            }
+
             if (firmaData) {
                 payload.firmaPaciente = firmaData;
             }

@@ -120,7 +120,13 @@ const PacienteTabPagos: React.FC<PacienteTabPagosProps> = ({ tipo }) => {
         if (result.isConfirmed) {
             try {
                 await api.delete(`/pagos/${pagoId}`);
-                Swal.fire('¡Eliminado!', 'El pago ha sido eliminado.', 'success');
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Eliminado!',
+                    text: 'El pago ha sido eliminado.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
                 fetchData();
             } catch (error) {
                 Swal.fire('Error', 'No se pudo eliminar el pago.', 'error');
@@ -189,7 +195,19 @@ const PacienteTabPagos: React.FC<PacienteTabPagosProps> = ({ tipo }) => {
                 recibo: paymentFormData.recibo,
                 factura: paymentFormData.factura,
                 formaPagoId: paymentFormData.formaPagoId,
-                observaciones: paymentFormData.observaciones
+                observaciones: paymentFormData.observaciones,
+                usuarioId: (() => {
+                    const userStr = localStorage.getItem('user');
+                    if (userStr) {
+                        try {
+                            const user = JSON.parse(userStr);
+                            return user.id ? Number(user.id) : undefined;
+                        } catch (e) {
+                            console.error("Error parsing user for auditing", e);
+                        }
+                    }
+                    return undefined;
+                })()
             };
 
             if (editingPagoId) {

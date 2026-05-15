@@ -173,6 +173,17 @@ const PacienteSeguroForm: React.FC = () => {
                 celular: `${countryCode}${localCelular}`
             };
 
+            // Add user ID for auditing
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    if (user.id) payload.usuarioId = Number(user.id);
+                } catch (e) {
+                    console.error("Error parsing user for auditing", e);
+                }
+            }
+
             // Clean empty strings for dates to avoid validation errors
             if (payload.fecha_nacimiento === '') delete payload.fecha_nacimiento;
             if (payload.fecha_ingreso === '') delete payload.fecha_ingreso;

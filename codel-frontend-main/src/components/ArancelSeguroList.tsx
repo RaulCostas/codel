@@ -49,7 +49,11 @@ const ArancelSeguroList: React.FC<ArancelSeguroListProps> = ({ seguroId }) => {
             if (seguroId) params.append('seguroId', seguroId.toString());
 
             const response = await api.get(`/arancel-seguro?${params}`);
-            const sortedData = response.data.data.sort((a: any, b: any) => (a.codigo || '').localeCompare(b.codigo || ''));
+            const sortedData = response.data.data.sort((a: any, b: any) => {
+                const codeCompare = (a.codigo || '').localeCompare(b.codigo || '');
+                if (codeCompare !== 0) return codeCompare;
+                return (a.detalle || '').localeCompare(b.detalle || '');
+            });
             setAranceles(sortedData);
             setTotalPages(response.data.totalPages);
             setTotal(response.data.total);

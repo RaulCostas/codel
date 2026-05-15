@@ -176,12 +176,23 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const payload = {
+            const payload: any = {
                 ...formData,
                 pacienteSeguroId: Number(id),
                 arancelId: formData.arancelId || null,
                 doctorId: formData.doctorId || null
             };
+
+            // Add user ID for auditing
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    if (user.id) payload.usuarioId = Number(user.id);
+                } catch (e) {
+                    console.error("Error parsing user for auditing", e);
+                }
+            }
 
             if (editingItem) {
                 await api.patch(`/historia-clinica-seguro/${editingItem.id}`, payload);

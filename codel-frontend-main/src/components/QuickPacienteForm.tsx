@@ -89,6 +89,17 @@ const QuickPacienteForm: React.FC<QuickPacienteFormProps> = ({ isOpen, onClose, 
                 }
             });
 
+            // Add user ID for auditing
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    if (user.id) payload.usuarioId = Number(user.id);
+                } catch (e) {
+                    console.error("Error parsing user for auditing", e);
+                }
+            }
+
             const response = await api.post('/pacientes', payload);
             if (response.data) {
                 Swal.fire({
