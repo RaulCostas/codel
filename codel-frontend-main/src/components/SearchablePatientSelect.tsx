@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import { formatFullName } from '../utils/formatters';
-import { Paciente } from '../types';
+import type { Paciente } from '../types';
 
 interface SearchablePatientSelectProps {
     onSelect: (type: 'particular' | 'seguro' | null, id: number) => void;
