@@ -136,7 +136,6 @@ export class ChatbotService implements OnModuleInit, OnModuleDestroy {
             session.sock = makeWASocket({
                 version,
                 logger: pino({ level: 'error' }) as any,
-                printQRInTerminal: true,
                 auth: {
                     creds: state.creds,
                     keys: state.keys,
