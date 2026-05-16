@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 import { FichaClinicaSeguro } from './ficha_clinica_seguro.entity';
 import { Seguro } from '../../seguro/entities/seguro.entity';
 import { User } from '../../users/entities/user.entity';
@@ -20,6 +20,7 @@ export class PacienteSeguro {
     @Column({ type: 'text', nullable: true })
     nombre: string;
 
+    @Index()
     @Column({ type: 'date', nullable: true })
     fecha_nacimiento: string;
 
@@ -62,6 +63,7 @@ export class PacienteSeguro {
     @Column({ type: 'text', nullable: true })
     peso: string;
 
+    @Index()
     @Column({ type: 'text', default: 'activo' })
     estado: string;
 
@@ -71,6 +73,7 @@ export class PacienteSeguro {
     @OneToOne(() => FichaClinicaSeguro, (ficha) => ficha.pacienteSeguro, { cascade: true, eager: false })
     fichaClinica: FichaClinicaSeguro;
 
+    @Index()
     @Column({ type: 'int', nullable: true })
     usuarioId: number | null;
 

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 import { Paciente } from '../../pacientes/entities/paciente.entity';
 import { Doctor } from '../../doctors/entities/doctor.entity';
 import { Proforma } from '../../proformas/entities/proforma.entity';
@@ -12,6 +12,7 @@ export class Agenda {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Index()
     @Column({ type: 'date' })
     fecha: string;
 
@@ -24,6 +25,7 @@ export class Agenda {
     @Column({ type: 'int' })
     consultorio: number; // 1 - 4
 
+    @Index()
     @Column({ type: 'int', nullable: true })
     pacienteId: number;
 
@@ -31,6 +33,7 @@ export class Agenda {
     @JoinColumn({ name: 'pacienteId' })
     paciente: Paciente;
 
+    @Index()
     @Column({ type: 'int', nullable: true })
     pacienteSeguroId: number;
 
@@ -68,6 +71,7 @@ export class Agenda {
     // Hora agendado is implicitly part of fecha_agendado timestamp, but if specific column needed:
     // We will rely on fechaAgendado being a full timestamp.
 
+    @Index()
     @Column({ type: 'text', default: 'agendado' })
     estado: string;
 

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm';
 import { Paciente } from '../../pacientes/entities/paciente.entity';
 import { Doctor } from '../../doctors/entities/doctor.entity';
 import { Especialidad } from '../../especialidad/entities/especialidad.entity';
@@ -13,6 +13,7 @@ export class HistoriaClinica {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Index()
     @Column({ type: 'int' })
     pacienteId: number;
 
@@ -20,6 +21,7 @@ export class HistoriaClinica {
     @JoinColumn({ name: 'pacienteId' })
     paciente: Paciente;
 
+    @Index()
     @Column({ type: 'date' })
     fecha: Date;
 
@@ -62,6 +64,7 @@ export class HistoriaClinica {
     @Column({ type: 'text',  default: 'no terminado' })
     estadoPresupuesto: string; // 'terminado' | 'no terminado'
 
+    @Index()
     @Column({ type: 'int',  nullable: true })
     proformaId: number;
 

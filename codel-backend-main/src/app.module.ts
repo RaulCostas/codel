@@ -132,6 +132,7 @@ import { ProformaSeguro } from './proforma_seguro/entities/proforma_seguro.entit
 import { ExamenDentalSeguro } from './pacientes_seguro/entities/examen_dental_seguro.entity';
 import { TurnosPersonalModule } from './personal/turnos_personal.module';
 import { TurnoPersonal } from './personal/entities/turno_personal.entity';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -280,6 +281,7 @@ import { TurnoPersonal } from './personal/entities/turno_personal.entity';
     HistoriaClinicaSeguroModule,
     ProformaSeguroModule,
     TurnosPersonalModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -14,5 +14,6 @@ import { HistoriaClinica } from '../historia_clinica/entities/historia_clinica.e
     ],
     controllers: [TrabajosLaboratoriosController],
     providers: [TrabajosLaboratoriosService],
+    exports: [TrabajosLaboratoriosService],
 })
 export class TrabajosLaboratoriosModule { }

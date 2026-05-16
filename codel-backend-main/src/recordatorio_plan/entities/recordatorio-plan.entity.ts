@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 import { Proforma } from '../../proformas/entities/proforma.entity';
 
 @Entity('recordatorio_plan')
@@ -13,6 +13,7 @@ export class RecordatorioPlan {
     @JoinColumn({ name: 'proformaId' })
     proforma: Proforma;
 
+    @Index()
     @Column({ type: 'date' })
     fechaRecordatorio: string;
 
@@ -22,6 +23,7 @@ export class RecordatorioPlan {
     @Column({ type: 'text', nullable: true })
     mensaje: string;
 
+    @Index()
     @Column({ type: 'text',  default: 'activo' })
     estado: string;
 

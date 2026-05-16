@@ -8,5 +8,6 @@ import { RecordatorioTratamiento } from './entities/recordatorio-tratamiento.ent
   imports: [TypeOrmModule.forFeature([RecordatorioTratamiento])],
   controllers: [RecordatorioTratamientoController],
   providers: [RecordatorioTratamientoService],
+  exports: [RecordatorioTratamientoService],
 })
 export class RecordatorioTratamientoModule { }

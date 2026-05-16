@@ -8,5 +8,6 @@ import { GastosFijos } from './entities/gastos_fijos.entity';
     imports: [TypeOrmModule.forFeature([GastosFijos])],
     controllers: [GastosFijosController],
     providers: [GastosFijosService],
+    exports: [GastosFijosService],
 })
 export class GastosFijosModule { }

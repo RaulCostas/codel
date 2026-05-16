@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 import { HistoriaClinica } from '../../historia_clinica/entities/historia_clinica.entity';
 
 @Entity('recordatorio_tratamientos')
@@ -13,6 +13,7 @@ export class RecordatorioTratamiento {
     @JoinColumn({ name: 'historiaClinicaId' })
     historiaClinica: HistoriaClinica;
 
+    @Index()
     @Column({ type: 'date' })
     fechaRecordatorio: string;
 
@@ -22,6 +23,7 @@ export class RecordatorioTratamiento {
     @Column({ type: 'int' })
     dias: number;
 
+    @Index()
     @Column({ type: 'enum', enum: ['pendiente', 'completado', 'cancelado', 'archivado'], default: 'pendiente' })
     estado: string;
 
