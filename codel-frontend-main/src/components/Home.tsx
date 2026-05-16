@@ -141,14 +141,7 @@ const Home: React.FC = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh]">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-                <p className="text-gray-500 dark:text-gray-400 font-medium">Cargando dashboard...</p>
-            </div>
-        );
-    }
+    // Removed explicit loading spinner to satisfy user preference for immediate transition
 
     return (
         <div className="content-card dark:bg-gray-800 p-8 rounded-xl shadow-sm transition-colors duration-200">
