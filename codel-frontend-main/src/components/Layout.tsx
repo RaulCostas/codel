@@ -30,33 +30,40 @@ const Layout: React.FC = () => {
 
     const fetchUserData = async () => {
         const userStr = localStorage.getItem('user');
+        const lastFetchStr = localStorage.getItem('user_last_fetch');
+        const now = Date.now();
+        const FIVE_MINUTES = 5 * 60 * 1000;
+
         if (userStr) {
             try {
-                // Try to parse just to get ID, but always fetch fresh from API
                 const localUser = JSON.parse(userStr);
+
+                // If we have a local user and it was fetched recently, skip API call
+                if (localUser && localUser.id && lastFetchStr) {
+                    const lastFetch = parseInt(lastFetchStr);
+                    if (now - lastFetch < FIVE_MINUTES) {
+                        console.log('[Layout] Using cached user data (less than 5 mins old)');
+                        setCurrentUser(localUser);
+                        setPermisos(Array.isArray(localUser.permisos) ? localUser.permisos : []);
+                        return;
+                    }
+                }
 
                 if (localUser && localUser.id) {
                     console.log(`[Layout] Fetching fresh data for user ID: ${localUser.id}`);
                     const response = await api.get(`/users/${localUser.id}`);
                     const freshUser = response.data;
-                    console.log(`[Layout] Received fresh user data:`, freshUser);
 
                     if (freshUser && freshUser.id) {
                         setCurrentUser(freshUser);
-
-                        // Update permissions
-                        const freshPermisos = Array.isArray(freshUser.permisos) ? freshUser.permisos : [];
-                        setPermisos(freshPermisos);
-
-                        // Update localStorage to keep it in sync
+                        setPermisos(Array.isArray(freshUser.permisos) ? freshUser.permisos : []);
+                        
                         localStorage.setItem('user', JSON.stringify(freshUser));
-                    } else {
-                        console.warn('[Layout] API returned invalid user data, keeping local state');
+                        localStorage.setItem('user_last_fetch', now.toString());
                     }
                 }
             } catch (error) {
                 console.error('Error fetching user data:', error);
-                // Fallback to local storage if API fails, but be careful
                 try {
                     const user = JSON.parse(userStr);
                     setCurrentUser(user);

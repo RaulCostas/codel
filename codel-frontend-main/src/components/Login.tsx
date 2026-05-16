@@ -23,6 +23,7 @@ const Login: React.FC = () => {
             const response = await api.post('/auth/login', { email, password });
             localStorage.setItem('token', response.data.access_token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
+            localStorage.setItem('user_last_fetch', Date.now().toString());
 
             // Update chat context with new user
             loginUser(response.data.user);

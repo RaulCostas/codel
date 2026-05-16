@@ -23,8 +23,12 @@ const Home: React.FC = () => {
     const [sendingGreeting, setSendingGreeting] = useState<number[]>([]);
     const [isGastoModalOpen, setIsGastoModalOpen] = useState(false);
     const [selectedGasto, setSelectedGasto] = useState<GastoFijo | null>(null);
+    const [noRegistrados, setNoRegistrados] = useState<any[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
-    
+
+    const [loading, setLoading] = useState(true);
 
     // Permission Logic
     const userString = localStorage.getItem('user');
@@ -38,40 +42,36 @@ const Home: React.FC = () => {
     const hasAccess = (moduleId: string) => !permisos.includes(moduleId);
 
     useEffect(() => {
-        fetchBirthdays();
-        fetchStats();
-        fetchTodayAppointments();
-        fetchDueGastos();
-        fetchLabAlerts();
-        fetchLowStockItems();
-        fetchNoRegistrados();
-        fetchRecordatorios();
-        fetchTratamientosPendientes();
-        fetchPlanesPendientes();
+        fetchDashboardSummary();
     }, []);
 
-    const fetchPlanesPendientes = async () => {
+    const fetchDashboardSummary = async () => {
+        setLoading(true);
         try {
-            const response = await api.get<RecordatorioPlan[]>('/recordatorio-plan/pendientes');
-            setPlanesPendientes(response.data);
+            const response = await api.get('/dashboard/summary');
+            const data = response.data;
+            
+            setBirthdays(data.personalBirthdays);
+            setStats(data.pacienteStats);
+            setTodayAppointmentsCount(data.todayAppointmentsCount);
+            setDueGastos(data.dueGastos);
+            setLabAlerts(data.labAlerts);
+            setLowStockItems(data.lowStock);
+            setNoRegistrados(data.noRegistrados);
+            setRecordatorios(data.reminders);
+            setTratamientosPendientes(data.pendingTreatments);
+            setPlanesPendientes(data.pendingPlans);
         } catch (error) {
-            console.error('Error fetching planes pendientes:', error);
-        }
-    };
-
-    const fetchTratamientosPendientes = async () => {
-        try {
-            const response = await api.get<RecordatorioTratamiento[]>('/recordatorio-tratamiento/pendientes');
-            setTratamientosPendientes(response.data);
-        } catch (error) {
-            console.error('Error fetching tratamientos pendientes:', error);
+            console.error('Error fetching dashboard summary:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleCompletarTratamiento = async (id: number) => {
         try {
             await api.patch(`/recordatorio-tratamiento/${id}`, { estado: 'completado' });
-            fetchTratamientosPendientes(); // Refresh list
+            fetchDashboardSummary(); // Refresh all to keep it simple and consistent
         } catch (error) {
             console.error('Error al completar tratamiento:', error);
         }
@@ -80,7 +80,7 @@ const Home: React.FC = () => {
     const handleCompletarPlan = async (id: number) => {
         try {
             await api.patch(`/recordatorio-plan/${id}`, { estado: 'inactivo' });
-            fetchPlanesPendientes();
+            fetchDashboardSummary();
         } catch (error) {
             console.error('Error al completar plan:', error);
         }
@@ -88,72 +88,12 @@ const Home: React.FC = () => {
 
     const handleCompletarRecordatorioGeneral = async (id: number) => {
         try {
-            await api.patch(`/recordatorio/${id}`, { estado: 'inactivo' }); // Assuming 'inactivo' means processed/done for general reminders
-            fetchRecordatorios();
+            await api.patch(`/recordatorio/${id}`, { estado: 'inactivo' });
+            fetchDashboardSummary();
         } catch (error) {
             console.error('Error al completar recordatorio:', error);
         }
     };
-
-    const fetchTodayAppointments = async () => {
-        try {
-            const today = getLocalDateString();
-            const url = `/agenda?date=${today}`;
-            const response = await api.get(url);
-            if (response.data) {
-                // Filter to only count 'agendado' and 'confirmado'
-                const count = response.data.filter((app: any) => 
-                    app.estado === 'agendado' || app.estado === 'confirmado'
-                ).length;
-                setTodayAppointmentsCount(count);
-            }
-        } catch (error) {
-            console.error('Error fetching today appointments:', error);
-        }
-    };
-
-    const fetchBirthdays = async () => {
-        try {
-            const url = '/personal/birthdays';
-            const response = await api.get<Personal[]>(url);
-            setBirthdays(response.data);
-        } catch (error) {
-            console.error('Error fetching birthdays:', error);
-        }
-    };
-
-    const fetchStats = async () => {
-        try {
-            const url = '/pacientes/dashboard-stats';
-            const response = await api.get(url);
-            setStats(response.data);
-        } catch (error) {
-            console.error('Error fetching stats:', error);
-        }
-    };
-
-    const fetchDueGastos = async () => {
-        try {
-            const url = '/gastos-fijos';
-            const response = await api.get<GastoFijo[]>(url);
-            const gastos = response.data;
-            const today = new Date();
-            const currentDay = today.getDate();
-            const currentMonth = today.toLocaleDateString('es-ES', { month: 'long' }).toLowerCase();
-
-            const due = gastos.filter(gasto => {
-                if (gasto.dia !== currentDay) return false;
-                if (gasto.anual) {
-                    return gasto.mes?.toLowerCase() === currentMonth;
-                }
-                return true; // Monthly expense matches day
-            });
-            setDueGastos(due);
-        } catch (error) {
-            console.error('Error fetching due expenses:', error);
-        }
-    };
-
 
     const calculateAge = (dateString: string) => {
         const birthDate = new Date(dateString);
@@ -166,51 +106,8 @@ const Home: React.FC = () => {
         return age;
     };
 
-    const fetchLabAlerts = async () => {
-        try {
-            const url = '/trabajos-laboratorios/alertas/terminados-sin-cita';
-            const response = await api.get(url);
-            setLabAlerts(response.data);
-        } catch (error) {
-            console.error('Error fetching lab alerts:', error);
-        }
-    };
-
-    const fetchLowStockItems = async () => {
-        try {
-            const url = '/inventario/alertas/bajo-stock';
-            const response = await api.get<Inventario[]>(url);
-            setLowStockItems(response.data);
-        } catch (error) {
-            console.error('Error fetching low stock items:', error);
-        }
-    };
-
-    const [noRegistrados, setNoRegistrados] = useState<any[]>([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
-
-    const fetchNoRegistrados = async () => {
-        try {
-            const url = '/pacientes/no-registrados';
-            const response = await api.get(url);
-            setNoRegistrados(response.data);
-        } catch (error) {
-            console.error('Error fetching no registrados:', error);
-        }
-    };
-
-    const fetchRecordatorios = async () => {
-        try {
-            const usuarioId = user?.id;
-            const response = await api.get<Recordatorio[]>(`/recordatorio/activos${usuarioId ? `?usuarioId=${usuarioId}` : ''}`);
-            setRecordatorios(response.data);
-        } catch (error) {
-            console.error('Error fetching recordatorios:', error);
-        }
-    };
-
     const handleSendGreeting = async (paciente: any) => {
+
         setSendingGreeting((prev) => [...prev, paciente.id]);
         try {
             await api.post(`/chatbot/send-birthday/${paciente.id}`, { clinicName: 'CODEL' });
@@ -243,6 +140,15 @@ const Home: React.FC = () => {
             setSendingGreeting((prev) => prev.filter((id) => id !== paciente.id));
         }
     };
+
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh]">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+                <p className="text-gray-500 dark:text-gray-400 font-medium">Cargando dashboard...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="content-card dark:bg-gray-800 p-8 rounded-xl shadow-sm transition-colors duration-200">
@@ -703,7 +609,7 @@ const Home: React.FC = () => {
                         onSave={() => {
                             setIsGastoModalOpen(false);
                             setSelectedGasto(null);
-                            fetchDueGastos(); // Refresh list
+                            fetchDashboardSummary(); // Refresh list
                         }}
                     />
                 </div>
