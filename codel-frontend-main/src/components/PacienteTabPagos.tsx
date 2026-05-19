@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import type { Pago, Proforma, Paciente, PacienteSeguro, FormaPago } from '../types';
@@ -322,15 +322,7 @@ const PacienteTabPagos: React.FC<PacienteTabPagosProps> = ({ tipo }) => {
 
         doc.autoPrint();
         const blobUrl = doc.output('bloburl');
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.right = '0';
-        iframe.style.bottom = '0';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.style.border = '0';
-        iframe.src = String(blobUrl);
-        document.body.appendChild(iframe);
+        window.open(String(blobUrl), '_blank');
     };
 
     // Filter pagos by selected plan

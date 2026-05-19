@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import type { GastoFijo, PagoGastoFijo } from '../types';
 import * as XLSX from 'xlsx';
@@ -470,15 +470,7 @@ const GastosFijosList: React.FC = () => {
             } else {
                 doc.autoPrint();
                 const blobUrl = doc.output('bloburl');
-                const iframe = document.createElement('iframe');
-                iframe.style.position = 'fixed';
-                iframe.style.right = '0';
-                iframe.style.bottom = '0';
-                iframe.style.width = '0';
-                iframe.style.height = '0';
-                iframe.style.border = '0';
-                iframe.src = blobUrl as unknown as string;
-                document.body.appendChild(iframe);
+                window.open(String(blobUrl), '_blank');
             }
         } catch (error) {
             console.error('Error exporting Pagos PDF:', error);

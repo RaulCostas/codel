@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useParams } from 'react-router-dom';
@@ -321,23 +321,7 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
 
         doc.autoPrint();
         const blobUrl = doc.output('bloburl');
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.right = '0';
-        iframe.style.bottom = '0';
-        iframe.style.width = '1px';
-        iframe.style.height = '1px';
-        iframe.style.opacity = '0';
-        iframe.style.border = '0';
-        iframe.src = String(blobUrl);
-        document.body.appendChild(iframe);
-
-        // Clean up the iframe from DOM after print dialog has been triggered
-        setTimeout(() => {
-            if (document.body.contains(iframe)) {
-                document.body.removeChild(iframe);
-            }
-        }, 3000);
+        window.open(String(blobUrl), '_blank');
     };
 
     const handleDelete = async (itemId: number) => {

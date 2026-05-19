@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Swal from 'sweetalert2';
@@ -574,23 +574,7 @@ const PresupuestoList: React.FC = () => {
         if (action === 'print') {
             doc.autoPrint();
             const blobUrl = doc.output('bloburl');
-            const iframe = document.createElement('iframe');
-            iframe.style.position = 'fixed';
-            iframe.style.right = '0';
-            iframe.style.bottom = '0';
-            iframe.style.width = '1px';
-            iframe.style.height = '1px';
-            iframe.style.opacity = '0';
-            iframe.style.border = '0';
-            iframe.src = String(blobUrl);
-            document.body.appendChild(iframe);
-            
-            // Clean up the iframe from DOM after print dialog has been triggered
-            setTimeout(() => {
-                if (document.body.contains(iframe)) {
-                    document.body.removeChild(iframe);
-                }
-            }, 3000);
+            window.open(String(blobUrl), '_blank');
         } else if (action === 'download') {
             doc.save(`plan_de_tratamiento_${proforma.numero}_${paciente?.paterno}.pdf`);
         } else if (action === 'blob') {
