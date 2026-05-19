@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { formatDate, getLocalDateString } from '../utils/dateUtils';
 import type { PagosPedidos } from '../types';
@@ -166,7 +166,7 @@ const PagosPedidosList: React.FC = () => {
 
             // Add logo
             try {
-                const logoPath = '/logo-curare.png';
+                const logoPath = '/logo-codel.jpg';
                 const logo = await new Promise<HTMLImageElement>((resolve, reject) => {
                     const img = new Image();
                     if (logoPath.startsWith('http') || logoPath.startsWith('data:')) {
@@ -348,7 +348,7 @@ const PagosPedidosList: React.FC = () => {
             doc.text(`Comprobante generado automáticamente por el sistema CODEL`, 105, 290, { align: 'center' });
 
             // Auto print and open
-            const receiptLogo = '/logo-curare.png';
+            const receiptLogo = '/logo-codel.jpg';
             if (receiptLogo) {
                 try {
                     const logo = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -493,7 +493,7 @@ const PagosPedidosList: React.FC = () => {
             </head>
             <body>
                 <div class="header">
-                    <img src="${'/logo-curare.png'}" alt="Logo">
+                    <img src="${'/logo-codel.jpg'}" alt="Logo">
                     <h1>LISTA DE PAGOS DE PEDIDOS</h1>
                 </div>
                 ${filteredProvider ? `<div class="lab-subtitle">Proveedor: ${filteredProvider}</div>` : ''}

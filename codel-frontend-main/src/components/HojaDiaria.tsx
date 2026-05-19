@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import Swal from 'sweetalert2';
 import { formatDate, getLocalDateString } from '../utils/dateUtils';
@@ -513,7 +513,7 @@ const HojaDiaria: React.FC = () => {
         const summary = calculateSummary(ingresos, 'ingreso');
         const filterInfo = getFilterInfoText();
 
-        const logoUrl = '/logo-curare.png';
+        const logoUrl = '/logo-codel.jpg';
 
         const printContent = `
             <!DOCTYPE html>
@@ -642,7 +642,7 @@ const HojaDiaria: React.FC = () => {
         const summary = calculateSummary(egresos, 'egreso');
         const filterInfo = getFilterInfoText();
 
-        const logoUrl = '/logo-curare.png';
+        const logoUrl = '/logo-codel.jpg';
 
         const printContent = `
             <!DOCTYPE html>
@@ -767,7 +767,7 @@ const HojaDiaria: React.FC = () => {
         const summary = calculateSummary(pagosDoctores, 'doctor');
         const filterInfo = getFilterInfoText();
 
-        const logoUrl = '/logo-curare.png';
+        const logoUrl = '/logo-codel.jpg';
 
         const printContent = `
             <!DOCTYPE html>
@@ -892,7 +892,7 @@ const HojaDiaria: React.FC = () => {
         const summary = calculateSummary(pagosLaboratorios, 'laboratorio');
         const filterInfo = getFilterInfoText();
 
-        const logoUrl = '/logo-curare.png';
+        const logoUrl = '/logo-codel.jpg';
 
         const printContent = `
             <!DOCTYPE html>
@@ -1021,7 +1021,7 @@ const HojaDiaria: React.FC = () => {
         const summary = calculateSummary(pagosPedidos, 'pedido');
         const filterInfo = getFilterInfoText();
 
-        const logoUrl = '/logo-curare.png';
+        const logoUrl = '/logo-codel.jpg';
 
         const printContent = `
             <!DOCTYPE html>
@@ -1150,7 +1150,7 @@ const HojaDiaria: React.FC = () => {
         const summary = calculateSummary(pagosGastosFijos, 'gasto');
         const filterInfo = getFilterInfoText();
 
-        const logoUrl = '/logo-curare.png';
+        const logoUrl = '/logo-codel.jpg';
 
         const printContent = `
             <!DOCTYPE html>
@@ -1306,7 +1306,7 @@ const HojaDiaria: React.FC = () => {
 
         const summary = calculateSummary(ingresosSeguros, 'seguro');
         const filterInfo = getFilterInfoText();
-        const logoUrl = '/logo-curare.png';
+        const logoUrl = '/logo-codel.jpg';
 
         const printContent = `
             <!DOCTYPE html>

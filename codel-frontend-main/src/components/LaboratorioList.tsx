@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { getLocalDateString } from '../utils/dateUtils';
 import type { Laboratorio } from '../types';
@@ -391,7 +391,7 @@ const response = await api.get<PaginatedResponse>(`/laboratorios?${params}`);
             </head>
             <body>
                 <div class="header" style="border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 20px; display: flex; align-items: center;">
-                    <img src="${'/logo-curare.png'}" alt="Logo" style="height: 60px; margin-right: 20px;">
+                    <img src="${'/logo-codel.jpg'}" alt="Logo" style="height: 60px; margin-right: 20px;">
                     <h1 style="color: #2c3e50; margin: 0; font-size: 24px;">Lista de Laboratorios</h1>
                 </div>
                 

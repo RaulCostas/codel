@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Swal from 'sweetalert2';
@@ -266,6 +266,15 @@ const PresupuestoList: React.FC = () => {
 
 
 
+    const loadImage = (src: string): Promise<HTMLImageElement> => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = src;
+            img.onload = () => resolve(img);
+            img.onerror = (e) => reject(e);
+        });
+    };
+
     const generatePDF = async (proforma: Proforma, action: 'print' | 'download' | 'blob', includePaymentInfo: boolean = true) => {
         const doc = new jsPDF();
 
@@ -273,14 +282,14 @@ const PresupuestoList: React.FC = () => {
         let pdfSignatures: any[] = [];
         try {
             const response = await api.get(`/firmas/documento/presupuesto/${proforma.id}`);
-            pdfSignatures = response.data;
+            pdfSignatures = Array.isArray(response.data) ? response.data : [];
             
             // Fallback: If no patient signature is found for the proforma, look for the patient's HC signature
             const patientSignatureInProforma = pdfSignatures.find(s => s.rolFirmante === 'paciente');
             if (!patientSignatureInProforma) {
                 try {
                     const resHC = await api.get(`/firmas/documento/historia_clinica/${proforma.pacienteId}`);
-                    const patientSignatureHC = resHC.data.find((s: any) => s.rolFirmante === 'paciente');
+                    const patientSignatureHC = Array.isArray(resHC.data) ? resHC.data.find((s: any) => s.rolFirmante === 'paciente') : undefined;
                     if (patientSignatureHC) {
                         pdfSignatures.push(patientSignatureHC);
                     }
@@ -301,10 +310,10 @@ const PresupuestoList: React.FC = () => {
 
         // 1. Header (Logo)
         try {
-            const logoSrc = '/logo-curare.png';
+            const logoSrc = '/logo-codel.jpg';
             if (logoSrc) {
-                // We add it at top left
-                doc.addImage(logoSrc, 'PNG', 14, 10, 35, 14);
+                const logo = await loadImage(logoSrc);
+                doc.addImage(logo, 'PNG', 14, 10, 35, 14);
             }
         } catch (error) {
             console.warn('Could not load logo for PDF', error);
@@ -569,11 +578,19 @@ const PresupuestoList: React.FC = () => {
             iframe.style.position = 'fixed';
             iframe.style.right = '0';
             iframe.style.bottom = '0';
-            iframe.style.width = '0';
-            iframe.style.height = '0';
+            iframe.style.width = '1px';
+            iframe.style.height = '1px';
+            iframe.style.opacity = '0';
             iframe.style.border = '0';
             iframe.src = String(blobUrl);
             document.body.appendChild(iframe);
+            
+            // Clean up the iframe from DOM after print dialog has been triggered
+            setTimeout(() => {
+                if (document.body.contains(iframe)) {
+                    document.body.removeChild(iframe);
+                }
+            }, 3000);
         } else if (action === 'download') {
             doc.save(`plan_de_tratamiento_${proforma.numero}_${paciente?.paterno}.pdf`);
         } else if (action === 'blob') {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import type { TrabajoLaboratorio, SeguimientoTrabajo } from '../types';
 import { formatDate } from '../utils/dateUtils';
@@ -190,7 +190,7 @@ const TrabajoLaboratorioViewModal: React.FC<Props> = ({ isOpen, onClose, trabajo
             </head>
             <body>
                 <div class="header">
-                    <img src="${'/logo-curare.png'}" alt="Logo">
+                    <img src="${'/logo-codel.jpg'}" alt="Logo">
                     <div>
                         <h1>Detalle de Trabajo de Laboratorio</h1>
                         <div class="subtitle">Orden #${trabajo.id}</div>

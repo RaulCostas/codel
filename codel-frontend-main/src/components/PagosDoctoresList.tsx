@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import api from '../services/api';
@@ -463,7 +463,7 @@ const response = await api.get(`/pagos-doctores?${params}`);
                 </head>
                 <body>
                     <div class="header">
-                        <img src="${'/logo-curare.png'}" alt="Logo">
+                        <img src="${'/logo-codel.jpg'}" alt="Logo">
                         <div>
                             <h1>RECIBO DE PAGO A DOCTOR</h1>
                             <div class="receipt-number">Nº Recibo: ${String(pago.id).padStart(6, '0')}</div>

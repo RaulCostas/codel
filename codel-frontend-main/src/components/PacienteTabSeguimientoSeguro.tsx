@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useParams } from 'react-router-dom';
@@ -228,7 +228,7 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
         const filteredHist = filteredHistoria;
 
         try {
-            const logoSrc = "/logo-curare.png";
+            const logoSrc = "/logo-codel.jpg";
             if (logoSrc) {
                 const logo = await loadImage(logoSrc);
                 doc.addImage(logo, 'PNG', 14, 15, 35, 14);
@@ -325,11 +325,19 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
         iframe.style.position = 'fixed';
         iframe.style.right = '0';
         iframe.style.bottom = '0';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
+        iframe.style.width = '1px';
+        iframe.style.height = '1px';
+        iframe.style.opacity = '0';
         iframe.style.border = '0';
         iframe.src = String(blobUrl);
         document.body.appendChild(iframe);
+
+        // Clean up the iframe from DOM after print dialog has been triggered
+        setTimeout(() => {
+            if (document.body.contains(iframe)) {
+                document.body.removeChild(iframe);
+            }
+        }, 3000);
     };
 
     const handleDelete = async (itemId: number) => {

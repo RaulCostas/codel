@@ -1,4 +1,4 @@
-
+﻿
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -250,7 +250,7 @@ const PagosLaboratoriosList: React.FC = () => {
                 </head>
                 <body>
                     <div class="header">
-                        <img src="${'/logo-curare.png'}" alt="Logo">
+                        <img src="${'/logo-codel.jpg'}" alt="Logo">
                         <div>
                             <h1>Pagos a Laboratorios</h1>
                         </div>
@@ -342,7 +342,7 @@ const PagosLaboratoriosList: React.FC = () => {
 
             // Add logo
             try {
-                const logoPath = '/logo-curare.png';
+                const logoPath = '/logo-codel.jpg';
                 const logo = await new Promise<HTMLImageElement>((resolve, reject) => {
                     const img = new Image();
                     if (logoPath.startsWith('http') || logoPath.startsWith('data:')) {

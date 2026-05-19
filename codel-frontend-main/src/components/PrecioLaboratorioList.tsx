@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 
 import api from '../services/api';
 import type { PrecioLaboratorio } from '../types';
@@ -379,7 +379,7 @@ const PrecioLaboratorioList: React.FC = () => {
                 </head>
                 <body>
                     <div class="header">
-                        <img src="${'/logo-curare.png'}" alt="Logo">
+                        <img src="${'/logo-codel.jpg'}" alt="Logo">
                         <h1>${reportTitle}</h1>
                     </div>
                     ${labSubtitle ? `<div class="lab-subtitle">Laboratorio: ${labSubtitle}</div>` : ''}

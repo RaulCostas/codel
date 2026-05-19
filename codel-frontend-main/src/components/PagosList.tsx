@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Swal from 'sweetalert2';
@@ -108,7 +108,7 @@ const PagosList: React.FC = () => {
     const generateReciboPDF = async (pago: Pago) => {
         const doc = new jsPDF();
         try {
-            const logo = await loadImage('/logo-curare.png');
+            const logo = await loadImage('/logo-codel.jpg');
             doc.addImage(logo, 'PNG', 14, 10, 50, 20);
         } catch (error) {
             console.warn('Could not load logo', error);
@@ -228,11 +228,19 @@ const PagosList: React.FC = () => {
         iframe.style.position = 'fixed';
         iframe.style.right = '0';
         iframe.style.bottom = '0';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
+        iframe.style.width = '1px';
+        iframe.style.height = '1px';
+        iframe.style.opacity = '0';
         iframe.style.border = '0';
         iframe.src = String(blobUrl);
         document.body.appendChild(iframe);
+
+        // Clean up the iframe from DOM after print dialog has been triggered
+        setTimeout(() => {
+            if (document.body.contains(iframe)) {
+                document.body.removeChild(iframe);
+            }
+        }, 3000);
     };
 
     const filteredPagos = pagos.filter(pago => {

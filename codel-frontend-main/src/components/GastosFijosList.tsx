@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import type { GastoFijo, PagoGastoFijo } from '../types';
 import * as XLSX from 'xlsx';
@@ -233,7 +233,7 @@ const GastosFijosList: React.FC = () => {
             
             // Add logo
             try {
-                const logoPath = '/logo-curare.png';
+                const logoPath = '/logo-codel.jpg';
                 const logo = await new Promise<HTMLImageElement>((resolve, reject) => {
                     const img = new Image();
                     if (logoPath.startsWith('http') || logoPath.startsWith('data:')) {
@@ -368,7 +368,7 @@ const GastosFijosList: React.FC = () => {
             
             // Add logo
             try {
-                const logoPath = '/logo-curare.png';
+                const logoPath = '/logo-codel.jpg';
                 const logo = await new Promise<HTMLImageElement>((resolve, reject) => {
                     const img = new Image();
                     if (logoPath.startsWith('http') || logoPath.startsWith('data:')) {
@@ -492,7 +492,7 @@ const GastosFijosList: React.FC = () => {
             
             let logoBase64 = '';
             try {
-                const logoPath = '/logo-curare.png';
+                const logoPath = '/logo-codel.jpg';
                 const logo = await new Promise<HTMLImageElement>((resolve, reject) => {
                     const img = new Image();
                     if (logoPath.startsWith('http') || logoPath.startsWith('data:')) {
@@ -707,7 +707,7 @@ const GastosFijosList: React.FC = () => {
             const filtrosTexto = [];
             if (printPeriodo !== 'todos') filtrosTexto.push(`Periodo: ${printPeriodo.charAt(0).toUpperCase() + printPeriodo.slice(1)}`);
             
-            const logoUrl = '/logo-curare.png';
+            const logoUrl = '/logo-codel.jpg';
 
             const printContent = `
                 <!DOCTYPE html>
@@ -863,7 +863,7 @@ const GastosFijosList: React.FC = () => {
                 return acc;
             }, {} as Record<string, number>);
 
-            const logoUrl = '/logo-curare.png';
+            const logoUrl = '/logo-codel.jpg';
             const filterText = printPagoGastoFilter !== 'todos' ? `Gasto Fijo: ${printPagoGastoFilter.toUpperCase()}` : 'Reporte General de Pagos';
 
             const printContent = `

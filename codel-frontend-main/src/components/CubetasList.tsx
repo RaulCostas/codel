@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -197,7 +197,7 @@ const CubetasList: React.FC = () => {
     const exportToPDF = async () => {
         try {
             // Load Logo
-            const logoUrl = '/logo-curare.png';
+            const logoUrl = '/logo-codel.jpg';
             let logoDataUrl: string | null = null;
             try {
                 logoDataUrl = await new Promise((resolve) => {
@@ -410,7 +410,7 @@ const response = await api.get(`/cubetas?${params}`);
                 </head>
                 <body>
                     <div class="header">
-                        <img src="${'/logo-curare.png'}" alt="Logo">
+                        <img src="${'/logo-codel.jpg'}" alt="Logo">
                         <h1>Lista de Cubetas</h1>
                     </div>
                     

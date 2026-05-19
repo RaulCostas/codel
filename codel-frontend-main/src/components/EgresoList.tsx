@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import type { Egreso } from '../types';
 import * as XLSX from 'xlsx';
@@ -209,7 +209,7 @@ const response = await api.get<PaginatedResponse>(`/egresos?${params}`);
             
             // Add logo
             try {
-                const logoPath = '/logo-curare.png';
+                const logoPath = '/logo-codel.jpg';
                 const logo = await new Promise<HTMLImageElement>((resolve, reject) => {
                     const img = new Image();
                     if (logoPath.startsWith('http') || logoPath.startsWith('data:')) {
@@ -455,7 +455,7 @@ const response = await api.get<PaginatedResponse>(`/egresos?${params}`);
                 </head>
                 <body>
                     <div class="header">
-                        <img src="${'/logo-curare.png'}" alt="Logo">
+                        <img src="${'/logo-codel.jpg'}" alt="Logo">
                         <h1>Reporte de Egresos</h1>
                     </div>
                     

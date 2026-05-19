@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import type { Pedidos } from '../types';
 import { formatDate } from '../utils/dateUtils';
@@ -203,7 +203,7 @@ const PedidoViewModal: React.FC<Props> = ({ isOpen, onClose, pedidoId }) => {
             </head>
             <body>
                 <div class="header">
-                    <img src="${'/logo-curare.png'}" alt="Logo">
+                    <img src="${'/logo-codel.jpg'}" alt="Logo">
                     <h1>Detalle de Pedido #${pedidoId}</h1>
                 </div>
 

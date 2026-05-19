@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import type { Arancel } from '../types';
 import * as XLSX from 'xlsx';
@@ -269,7 +269,7 @@ const ArancelList: React.FC<ArancelListProps> = ({ tipo }) => {
             const pageWidth = doc.internal.pageSize.getWidth();
 
             // Add logo
-            const logoPath = '/logo-curare.png';
+            const logoPath = '/logo-codel.jpg';
             try {
                 const img = new Image();
                 img.src = logoPath;
@@ -455,7 +455,7 @@ const ArancelList: React.FC<ArancelListProps> = ({ tipo }) => {
                 </head>
                 <body>
                     <div class="header">
-                        <img src="${'/logo-curare.png'}" alt="Logo">
+                        <img src="${'/logo-codel.jpg'}" alt="Logo">
                         <div>
                             <h1>Lista de Aranceles</h1>
                         </div>

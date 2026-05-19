@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 
 import api from '../services/api';
 import type { Receta } from '../types';
@@ -299,7 +299,7 @@ const RecetarioList: React.FC = () => {
             </head>
             <body>
                 <div class="header">
-                    <img src="/logo-curare.png" alt="Logo">
+                    <img src="/logo-codel.jpg" alt="Logo">
                     <h1>Receta Médica</h1>
                 </div>
                 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -100,7 +100,7 @@ const PacientesDeudores: React.FC = () => {
             const doc = new jsPDF('portrait');
 
             // Load Logo
-            const logoUrl = '/logo-curare.png';
+            const logoUrl = '/logo-codel.jpg';
             const logoImg = new Image();
             logoImg.src = logoUrl;
 

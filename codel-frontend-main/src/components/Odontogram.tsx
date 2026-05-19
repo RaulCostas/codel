@@ -67,11 +67,15 @@ const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly
 
     const handleSurfaceClick = (tooth: number, surface: string) => {
         if (readOnly) return;
-        const newMap = { ...toothMap };
+        const newMap = JSON.parse(JSON.stringify(toothMap));
         if (!newMap[tooth]) newMap[tooth] = { state: 0, surfaces: {} };
         
-        // Toggle selected code on surface
-        newMap[tooth].surfaces[surface] = selectedCode;
+        // Toggle selected code on surface (if same code is clicked, or selectedCode is 0/eraser, deselect)
+        if (newMap[tooth].surfaces[surface] === selectedCode || selectedCode === 0) {
+            delete newMap[tooth].surfaces[surface];
+        } else {
+            newMap[tooth].surfaces[surface] = selectedCode;
+        }
         
         setToothMap(newMap);
         if (onChange) onChange(newMap);
@@ -79,7 +83,7 @@ const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly
 
     const handleToothClick = (tooth: number) => {
         if (readOnly) return;
-        const newMap = { ...toothMap };
+        const newMap = JSON.parse(JSON.stringify(toothMap));
         if (!newMap.connections) newMap.connections = [];
         
         // Connection Logic (Bridges / Ortho / Protesis) - Individual Toggle
@@ -281,7 +285,16 @@ const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly
                     <Shield className="text-blue-600" size={24} />
                     <h3 className="text-lg font-bold text-gray-800 dark:text-white">Odontograma Clínico</h3>
                 </div>
-                {/* Reset button removed per user request */}
+                {!readOnly && (
+                    <button
+                        type="button"
+                        onClick={() => setSelectedCode(selectedCode === 0 ? 14 : 0)}
+                        className={`flex items-center gap-2 py-2 px-4 rounded-xl border transition-all text-xs font-bold shadow-sm transform hover:-translate-y-0.5 active:scale-95 ${selectedCode === 0 ? 'border-red-600 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 ring-2 ring-red-500/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}
+                    >
+                        <span className="text-sm">✖</span>
+                        Desmarcar / Limpiar Cara
+                    </button>
+                )}
             </div>
 
             {/* Legend / Tool Selection (Categorized) */}

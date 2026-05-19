@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import api from '../services/api';
 import Pagination from './Pagination';
@@ -336,7 +336,7 @@ if (searchTerm) {
             </head>
             <body>
                 <div class="header">
-                    <img src="/logo-curare.png" alt="Logo">
+                    <img src="/logo-codel.jpg" alt="Logo">
                     <h1>Inventario</h1>
                 </div>
                 ${filterSubtitle ? `<div class="filter-subtitle">${filterSubtitle}</div>` : ''}
@@ -487,7 +487,7 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
                 </head>
                 <body>
                     <div class="header">
-                        <img src="/logo-curare.png" alt="Logo">
+                        <img src="/logo-codel.jpg" alt="Logo">
                         <h1>Lista de Inventario</h1>
                     </div>
                     ${filterSubtitle ? `<div class="subtitle">${filterSubtitle}</div>` : ''}
@@ -620,7 +620,7 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
             try {
                 const logo = await new Promise<HTMLImageElement>((resolve, reject) => {
                     const img = new Image();
-                    img.src = '/logo-curare.png';
+                    img.src = '/logo-codel.jpg';
                     img.onload = () => resolve(img);
                     img.onerror = reject;
                 });
