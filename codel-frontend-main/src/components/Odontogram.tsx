@@ -40,6 +40,7 @@ const legend = [
     { code: 17, label: 'Sellante de fosas y fisuras (M)', color: 'border-red-700 bg-red-700', symbol: 'SFF', type: 'col2' },
     { code: 21, label: 'Prótesis parcial fija (M)', color: 'border-red-800 bg-red-100', symbol: '▭', type: 'col2' },
     { code: 18, label: 'Fractura de corona dental', color: 'border-red-600 bg-red-100', symbol: '⚡', type: 'col2' },
+    { code: 1, label: 'Caries dental (se marca la superficie afectada)', color: 'border-red-600 bg-red-600 text-white', symbol: '●', type: 'col2' },
 ];
 
 const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly = false }) => {
@@ -141,6 +142,7 @@ const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly
         const isSellanteB = state === 16;
         const isSellanteM = state === 17;
         const isFractura = state === 18;
+        const isCariesState = state === 1;
 
         // Connection indicators
         const connType = toothData.connectionType;
@@ -223,6 +225,10 @@ const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly
                     {/* Fractura */}
                     {isFractura && (
                         <path d="M20,20 L40,50 L60,20 L80,50" fill="none" stroke="#dc2626" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
+                    )}
+                    {/* Caries (Punto Rojo) */}
+                    {isCariesState && (
+                        <circle cx="50" cy="50" r="18" fill="#dc2626" stroke="#ffffff" strokeWidth="4" className="drop-shadow" />
                     )}
                 </svg>
             </div>

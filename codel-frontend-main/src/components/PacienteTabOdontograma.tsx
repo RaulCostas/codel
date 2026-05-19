@@ -284,6 +284,7 @@ const PacienteTabOdontograma: React.FC<PacienteTabOdontogramaProps> = ({ tipo })
                         <div class="legend-item"><div class="legend-symbol" style="border-color: #991b1b; background: #fee2e2; color: #991b1b;">▭</div> <span>PRÓTESIS FIJA (M)</span></div>
                         <div class="legend-item"><div class="legend-symbol" style="border-color: #dc2626; color: #dc2626; font-size: 7px;">SFF</div> <span>SELLANTE (M)</span></div>
                         <div class="legend-item"><div class="legend-symbol" style="border-color: #dc2626; color: #dc2626;">⚡</div> <span>FRACTURA CORONARIA</span></div>
+                        <div class="legend-item"><div class="legend-symbol" style="border-color: #dc2626; background: #dc2626; color: white;">●</div> <span>CARIES DENTAL (SE MARCA LA SUPERFICIE AFECTADA)</span></div>
                     </div>
                 </div>
                 

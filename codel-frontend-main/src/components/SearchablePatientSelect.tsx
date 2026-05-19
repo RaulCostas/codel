@@ -139,7 +139,7 @@ const SearchablePatientSelect: React.FC<SearchablePatientSelectProps> = ({
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                 </div>
-                {selectedId && !isOpen && (
+                {!!selectedId && !isOpen && (
                     <button 
                         type="button"
                         onClick={(e) => {
@@ -147,7 +147,7 @@ const SearchablePatientSelect: React.FC<SearchablePatientSelectProps> = ({
                             onSelect(null, 0);
                             setSelectedLabel('');
                         }}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 bg-transparent hover:bg-transparent border-none p-0 min-h-0 min-w-0 shadow-none focus:outline-none focus:ring-0"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
