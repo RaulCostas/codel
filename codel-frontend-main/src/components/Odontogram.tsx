@@ -32,6 +32,7 @@ const legend = [
     { code: 16, label: 'Sellante de fosas y fisuras (B)', color: 'border-blue-700 bg-blue-700', symbol: 'SFF', type: 'col1' },
     { code: 20, label: 'Prótesis parcial fija (B)', color: 'border-blue-800 bg-blue-100', symbol: '▭', type: 'col1' },
     { code: 22, label: 'Presencia de aparato de ortodoncia', color: 'border-indigo-600 bg-indigo-50', symbol: '⬓', type: 'col1' },
+    { code: 23, label: 'Lesión Cervical No Cariosa (B)', color: 'border-blue-600 bg-blue-100 text-blue-600', symbol: '▬', type: 'col1' },
 
     // Column 2: Mal Estado
     { code: 11, label: 'Diente indicado a extracción', color: 'border-red-500 bg-red-50', symbol: '✕', type: 'col2' },
@@ -40,6 +41,7 @@ const legend = [
     { code: 17, label: 'Sellante de fosas y fisuras (M)', color: 'border-red-700 bg-red-700', symbol: 'SFF', type: 'col2' },
     { code: 21, label: 'Prótesis parcial fija (M)', color: 'border-red-800 bg-red-100', symbol: '▭', type: 'col2' },
     { code: 18, label: 'Fractura de corona dental', color: 'border-red-600 bg-red-100', symbol: '⚡', type: 'col2' },
+    { code: 24, label: 'Lesión Cervical No Cariosa (M)', color: 'border-red-600 bg-red-100 text-red-600', symbol: '▬', type: 'col2' },
     { code: 1, label: 'Caries dental (se marca la superficie afectada)', color: 'border-red-600 bg-red-600 text-white', symbol: '●', type: 'col2' },
 ];
 
@@ -86,8 +88,12 @@ const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly
         const newMap = JSON.parse(JSON.stringify(toothMap));
         if (!newMap.connections) newMap.connections = [];
         
-        // Connection Logic (Bridges / Ortho / Protesis) - Individual Toggle
-        if (selectedCode === 20 || selectedCode === 21 || selectedCode === 22) {
+        if (selectedCode === 0) {
+            if (newMap[tooth]) {
+                delete newMap[tooth].connectionType;
+                newMap[tooth].state = 0;
+            }
+        } else if (selectedCode === 20 || selectedCode === 21 || selectedCode === 22) {
             if (!newMap[tooth]) newMap[tooth] = { state: 0, surfaces: {} };
             
             // Toggle this connection type on the tooth
@@ -147,19 +153,14 @@ const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly
         const isSellanteM = state === 17;
         const isFractura = state === 18;
         const isCariesState = state === 1;
+        const isLcncB = state === 23;
+        const isLcncM = state === 24;
 
         // Connection indicators
         const connType = toothData.connectionType;
         const connColor = connType === 20 ? '#2563eb' : connType === 21 ? '#dc2626' : connType === 22 ? '#9333ea' : null;
 
         const isUpper = num < 30;
-
-        const connectionBar = connColor && (
-            <div 
-                className="absolute w-[calc(100%+1rem)] -top-1 -left-2 z-30 h-1.5 shadow-sm" 
-                style={{ backgroundColor: connColor }}
-            />
-        );
 
         const schematicBox = (
             <div className="relative w-8 h-8 sm:w-10 sm:h-10 cursor-pointer mb-1">
@@ -234,6 +235,42 @@ const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly
                     {isCariesState && (
                         <circle cx="50" cy="50" r="18" fill="#dc2626" stroke="#ffffff" strokeWidth="4" className="drop-shadow" />
                     )}
+                    {/* Lesión Cervical No Cariosa */}
+                    {(isLcncB || isLcncM) && (
+                        <line 
+                            x1="15" 
+                            y1="82" 
+                            x2="85" 
+                            y2="82" 
+                            stroke={isLcncB ? '#2563eb' : '#dc2626'} 
+                            strokeWidth="10" 
+                            strokeLinecap="round"
+                        />
+                    )}
+                    {/* Prótesis parcial fija / Ortodoncia */}
+                    {connColor && (
+                        connType === 22 ? (
+                            <line 
+                                x1="0" 
+                                y1="50" 
+                                x2="100" 
+                                y2="50" 
+                                stroke={connColor} 
+                                strokeWidth="8" 
+                            />
+                        ) : (
+                            <rect 
+                                x="4" 
+                                y="4" 
+                                width="92" 
+                                height="92" 
+                                fill={connType === 20 ? 'rgba(37, 99, 235, 0.15)' : connType === 21 ? 'rgba(220, 38, 38, 0.15)' : 'rgba(147, 51, 234, 0.15)'} 
+                                stroke={connColor} 
+                                strokeWidth="8" 
+                                rx="8"
+                            />
+                        )
+                    )}
                 </svg>
             </div>
         );
@@ -252,7 +289,6 @@ const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly
                 {isUpper ? (
                     <>
                         <div className="flex flex-col items-center relative">
-                            {connectionBar}
                             {anatomicalFigure}
                             {schematicBox}
                         </div>
@@ -268,7 +304,6 @@ const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly
                             {periodontalBox}
                         </div>
                         <div className="flex flex-col items-center relative">
-                            {connectionBar}
                             {schematicBox}
                             {anatomicalFigure}
                         </div>
@@ -316,7 +351,7 @@ const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-[9px] font-bold text-gray-700 dark:text-gray-200 uppercase leading-tight">{item.label}</span>
-                                        {[20, 21, 22].includes(item.code) && selectedCode === item.code && (
+                                        {[20, 21, 22, 23, 24].includes(item.code) && selectedCode === item.code && (
                                             <span className="text-[8px] text-blue-600 font-bold animate-pulse mt-0.5">MARQUE PIEZA POR PIEZA</span>
                                         )}
                                     </div>
@@ -338,7 +373,7 @@ const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-[9px] font-bold text-gray-700 dark:text-gray-200 uppercase leading-tight">{item.label}</span>
-                                        {[20, 21, 22].includes(item.code) && selectedCode === item.code && (
+                                        {[20, 21, 22, 23, 24].includes(item.code) && selectedCode === item.code && (
                                             <span className="text-[8px] text-red-600 font-bold animate-pulse mt-0.5">MARQUE PIEZA POR PIEZA</span>
                                         )}
                                     </div>
@@ -424,7 +459,7 @@ const Odontogram: React.FC<OdontogramProps> = ({ initialData, onChange, readOnly
                             <div className="mt-4 flex flex-wrap gap-2 px-4">
                                 {computedRanges.map((c: any, index: number) => (
                                     <div key={index} className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black border shadow-sm transition-all hover:scale-105 ${c.type === 20 ? 'bg-blue-600 border-blue-700 text-white' : c.type === 21 ? 'bg-red-600 border-red-700 text-white' : 'bg-purple-600 border-purple-700 text-white'}`}>
-                                        <span>{c.type === 20 ? 'PRÓTESIS (B)' : c.type === 21 ? 'PRÓTESIS (M)' : 'ORTODONCIA'}: {c.from === c.to ? c.from : `${c.from} ↔ ${c.to}`}</span>
+                                        <span>{c.type === 20 ? 'PRÓTESIS FIJA (B)' : c.type === 21 ? 'PRÓTESIS FIJA (M)' : 'ORTODONCIA'}: {c.from === c.to ? c.from : `${c.from} ↔ ${c.to}`}</span>
                                     </div>
                                 ))}
                             </div>
