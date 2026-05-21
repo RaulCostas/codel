@@ -6,6 +6,7 @@ import ManualModal, { type ManualSection } from './ManualModal';
 
 import GrupoInventarioForm from './GrupoInventarioForm';
 import EspecialidadForm from './EspecialidadForm';
+import UnidadMedidaForm from './UnidadMedidaForm';
 
 
 interface InventarioFormProps {
@@ -39,6 +40,9 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
     
     // Estados para el Modal de Especialidad
     const [isEspecialidadModalOpen, setIsEspecialidadModalOpen] = useState(false);
+
+    // Estados para el Modal de Unidad de Medida
+    const [isUnidadMedidaModalOpen, setIsUnidadMedidaModalOpen] = useState(false);
     
     const [userPermisos, setUserPermisos] = useState<string[]>([]);
 
@@ -56,6 +60,7 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
 
     const puedeCrearGrupo = !userPermisos.includes('configuracion');
     const puedeCrearEspecialidad = !userPermisos.includes('configuracion');
+    const puedeCrearUnidadMedida = !userPermisos.includes('configuracion');
 
     const manualSections: ManualSection[] = [
         {
@@ -337,25 +342,40 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
 
                                 <div>
                                     <label className="block text-gray-700 dark:text-gray-300 font-medium text-sm mb-2">Unidad de Medida</label>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                            </svg>
+                                    <div className="flex gap-2">
+                                        <div className="relative flex-grow">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                                </svg>
+                                            </div>
+                                            <select
+                                                value={formData.idunidad_medida || ''}
+                                                onChange={(e) => setFormData({ ...formData, idunidad_medida: Number(e.target.value) || 0 })}
+                                                className="w-full pl-10 p-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
+                                            >
+                                                <option value={0} className="dark:bg-gray-700">Seleccione Unidad</option>
+                                                {unidades.map(u => (
+                                                    <option key={u.id} value={u.id} className="dark:bg-gray-700">{u.nombre}</option>
+                                                ))}
+                                            </select>
+                                            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                            </div>
                                         </div>
-                                        <select
-                                            value={formData.idunidad_medida || ''}
-                                            onChange={(e) => setFormData({ ...formData, idunidad_medida: Number(e.target.value) || 0 })}
-                                            className="w-full pl-10 p-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
-                                        >
-                                            <option value={0}>Seleccione Unidad</option>
-                                            {unidades.map(u => (
-                                                <option key={u.id} value={u.id} className="dark:bg-gray-700">{u.nombre}</option>
-                                            ))}
-                                        </select>
-                                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                                        </div>
+                                        {puedeCrearUnidadMedida && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsUnidadMedidaModalOpen(true)}
+                                                className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-3 py-2 rounded-xl flex items-center justify-center transform hover:-translate-y-0.5 transition-all active:scale-95 shadow-md"
+                                                title="Añadir Unidad de Medida"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                </svg>
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
@@ -439,6 +459,19 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
                         onSaveSuccess={() => {
                             fetchDropdowns();
                             setIsEspecialidadModalOpen(false);
+                        }}
+                    />
+                </div>
+            )}
+            {/* Modal de Creación Rápida de Unidad de Medida */}
+            {puedeCrearUnidadMedida && (
+                <div style={{ zIndex: 60 }} className="relative">
+                    <UnidadMedidaForm
+                        isOpen={isUnidadMedidaModalOpen}
+                        onClose={() => setIsUnidadMedidaModalOpen(false)}
+                        onSaveSuccess={() => {
+                            fetchDropdowns();
+                            setIsUnidadMedidaModalOpen(false);
                         }}
                     />
                 </div>
