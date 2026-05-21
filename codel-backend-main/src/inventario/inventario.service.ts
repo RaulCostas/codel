@@ -28,7 +28,8 @@ export class InventarioService {
     async findAll(search?: string, page: number = 1, limit: number = 10, expirationStatus?: string) {
         const queryBuilder = this.inventarioRepository.createQueryBuilder('inventario')
             .leftJoinAndSelect('inventario.especialidad', 'especialidad')
-            .leftJoinAndSelect('inventario.grupoInventario', 'grupoInventario');
+            .leftJoinAndSelect('inventario.grupoInventario', 'grupoInventario')
+            .leftJoinAndSelect('inventario.unidadMedida', 'unidadMedida');
 
         if (search) {
             queryBuilder.andWhere('inventario.descripcion ILIKE :search', { search: `%${search}%` });
@@ -90,6 +91,7 @@ export class InventarioService {
         const query = this.inventarioRepository.createQueryBuilder('inventario')
             .leftJoinAndSelect('inventario.especialidad', 'especialidad')
             .leftJoinAndSelect('inventario.grupoInventario', 'grupoInventario')
+            .leftJoinAndSelect('inventario.unidadMedida', 'unidadMedida')
             .where('inventario.cantidad_existente < inventario.stock_minimo')
             .andWhere('inventario.estado = :estado', { estado: 'Activo' });
 
@@ -99,7 +101,7 @@ export class InventarioService {
     findOne(id: number) {
         return this.inventarioRepository.findOne({
             where: { id },
-            relations: ['especialidad', 'grupoInventario'],
+            relations: ['especialidad', 'grupoInventario', 'unidadMedida'],
         });
     }
 
@@ -124,7 +126,8 @@ export class InventarioService {
         const queryBuilder = this.inventarioRepository.manager.createQueryBuilder(PedidosDetalle, 'pd')
             .leftJoinAndSelect('pd.inventario', 'inventario')
             .leftJoinAndSelect('inventario.especialidad', 'especialidad')
-            .leftJoinAndSelect('inventario.grupoInventario', 'grupoInventario');
+            .leftJoinAndSelect('inventario.grupoInventario', 'grupoInventario')
+            .leftJoinAndSelect('inventario.unidadMedida', 'unidadMedida');
 
         const today = new Date().toISOString().split('T')[0];
 

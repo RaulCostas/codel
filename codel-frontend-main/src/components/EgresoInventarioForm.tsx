@@ -107,7 +107,7 @@ const EgresoInventarioForm: React.FC<EgresoInventarioFormProps> = ({ inventario,
                                 />
                             </div>
                             <span className="px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300 flex items-center justify-center min-w-[70px]">
-                                {inventario.unidad_medida || 'Unidad'}
+                                {inventario.unidadMedida?.nombre || 'Unidad'}
                             </span>
                         </div>
                     </div>
@@ -130,7 +130,7 @@ const EgresoInventarioForm: React.FC<EgresoInventarioFormProps> = ({ inventario,
                                 <option value="">Sin lote específico (Opcional)</option>
                                 {availableDates.map((date, idx) => (
                                     <option key={idx} value={date.fecha} className="dark:bg-gray-700">
-                                        {date.fecha} (Stock: {date.stock} {inventario.unidad_medida || 'Unidad'})
+                                        {date.fecha} (Stock: {date.stock} {inventario.unidadMedida?.nombre || 'Unidad'})
                                     </option>
                                 ))}
                             </select>

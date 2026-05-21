@@ -26,7 +26,7 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
         estado: 'Activo',
         idespecialidad: 0,
         idgrupo_inventario: 0,
-        unidad_medida: 'Unidad'
+        idunidad_medida: 0
     });
 
     const [especialidades, setEspecialidades] = useState<Especialidad[]>([]);
@@ -84,7 +84,7 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
                     estado: 'Activo',
                     idespecialidad: 0,
                     idgrupo_inventario: 0,
-                    unidad_medida: 'Unidad'
+                    idunidad_medida: 0
                 });
             }
         }
@@ -120,7 +120,7 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
                 estado: item.estado,
                 idespecialidad: item.idespecialidad,
                 idgrupo_inventario: item.idgrupo_inventario,
-                unidad_medida: item.unidad_medida || 'Unidad'
+                idunidad_medida: item.idunidad_medida || 0
             });
         } catch (error) {
             console.error('Error fetching inventario:', error);
@@ -138,6 +138,10 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
         }
         if (!formData.idgrupo_inventario) {
             Swal.fire('Atención', 'Por favor seleccione un grupo', 'warning');
+            return;
+        }
+        if (!formData.idunidad_medida) {
+            Swal.fire('Atención', 'Por favor seleccione una unidad de medida', 'warning');
             return;
         }
 
@@ -340,15 +344,13 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
                                             </svg>
                                         </div>
                                         <select
-                                            value={formData.unidad_medida || 'Unidad'}
-                                            onChange={(e) => setFormData({ ...formData, unidad_medida: e.target.value })}
+                                            value={formData.idunidad_medida || ''}
+                                            onChange={(e) => setFormData({ ...formData, idunidad_medida: Number(e.target.value) || 0 })}
                                             className="w-full pl-10 p-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
                                         >
-                                            {!unidades.some(u => u.nombre.toLowerCase() === 'unidad') && (
-                                                <option value="Unidad" className="dark:bg-gray-700">Unidad</option>
-                                            )}
+                                            <option value={0}>Seleccione Unidad</option>
                                             {unidades.map(u => (
-                                                <option key={u.id} value={u.nombre} className="dark:bg-gray-700">{u.nombre}</option>
+                                                <option key={u.id} value={u.id} className="dark:bg-gray-700">{u.nombre}</option>
                                             ))}
                                         </select>
                                         <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">

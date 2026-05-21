@@ -72,8 +72,9 @@ export interface Inventario {
     idgrupo_inventario: number;
     especialidad?: Especialidad;
     grupoInventario?: GrupoInventario;
+    unidadMedida?: UnidadMedida;
     egresosInventario?: EgresoInventario[];
-    unidad_medida: string;
+    idunidad_medida: number;
 }
 
 export interface EgresoInventario {

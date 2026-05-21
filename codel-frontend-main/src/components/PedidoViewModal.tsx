@@ -230,7 +230,7 @@ const PedidoViewModal: React.FC<Props> = ({ isOpen, onClose, pedidoId }) => {
                         ${(pedido.detalles || []).map((d) => `
                             <tr>
                                 <td>${d.inventario?.descripcion}</td>
-                                <td class="text-center">${d.cantidad} ${d.inventario?.unidad_medida || 'Unidad'}</td>
+                                <td class="text-center">${d.cantidad} ${d.inventario?.unidadMedida?.nombre || 'Unidad'}</td>
                                 <td class="text-right">${formatNumber(d.precio_unitario)}</td>
                                 <td class="text-right">${formatNumber(d.cantidad * d.precio_unitario)}</td>
                             </tr>
@@ -355,7 +355,7 @@ const PedidoViewModal: React.FC<Props> = ({ isOpen, onClose, pedidoId }) => {
                                                                     <tr key={index}>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{detalle.inventario?.descripcion}</td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                                                            {detalle.cantidad} {detalle.inventario?.unidad_medida || 'Unidad'}
+                                                                            {detalle.cantidad} {detalle.inventario?.unidadMedida?.nombre || 'Unidad'}
                                                                         </td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{formatNumber(detalle.precio_unitario)}</td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{formatNumber(detalle.cantidad * detalle.precio_unitario)}</td>

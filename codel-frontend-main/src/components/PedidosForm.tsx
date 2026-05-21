@@ -126,7 +126,7 @@ const PedidosForm: React.FC<PedidosFormProps> = ({ isOpen, onClose, id, onSaveSu
                 precio_unitario: Number(d.precio_unitario),
                 fecha_vencimiento: d.fecha_vencimiento,
                 inventarioNombre: d.inventario?.descripcion,
-                unidad_medida: d.inventario?.unidad_medida || 'Unidad'
+                unidad_medida: d.inventario?.unidadMedida?.nombre || 'Unidad'
             }));
             setDetalles(mappedDetalles);
         } catch (error) {
@@ -190,7 +190,7 @@ const PedidosForm: React.FC<PedidosFormProps> = ({ isOpen, onClose, id, onSaveSu
             precio_unitario: tempPrecio,
             fecha_vencimiento: tempVencimiento,
             inventarioNombre: selectedInventario.descripcion,
-            unidad_medida: selectedInventario.unidad_medida || 'Unidad'
+            unidad_medida: selectedInventario.unidadMedida?.nombre || 'Unidad'
         };
 
         setDetalles([...detalles, newDetail]);
@@ -398,7 +398,7 @@ const PedidosForm: React.FC<PedidosFormProps> = ({ isOpen, onClose, id, onSaveSu
                                     >
                                         <option value={0}>Seleccione ítem</option>
                                         {inventarioItems.map(i => (
-                                            <option key={i.id} value={i.id}>{i.descripcion} (Stock: {i.cantidad_existente} {i.unidad_medida || 'Unidad'})</option>
+                                            <option key={i.id} value={i.id}>{i.descripcion} (Stock: {i.cantidad_existente} {i.unidadMedida?.nombre || 'Unidad'})</option>
                                         ))}
                                     </select>
                                 </div>

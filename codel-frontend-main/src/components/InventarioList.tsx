@@ -358,7 +358,7 @@ if (searchTerm) {
                                 <td>${item.inventario?.especialidad?.especialidad || 'N/A'}</td>
                                 <td>${item.inventario?.grupoInventario?.grupo || 'N/A'}</td>
                                 <td>${formatDate(item.fecha_vencimiento)}</td>
-                                <td>${item.cantidad} ${item.inventario?.unidad_medida || 'Unidad'}</td>
+                                <td>${item.cantidad} ${item.inventario?.unidadMedida?.nombre || 'Unidad'}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -510,7 +510,7 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
                                     <td>${idx + 1}</td>
                                     <td>${item.descripcion}</td>
                                     <td>${item.cantidad_existente}</td>
-                                    <td>${item.unidad_medida || 'Unidad'}</td>
+                                    <td>${item.unidadMedida?.nombre || 'Unidad'}</td>
                                     <td>${item.stock_minimo}</td>
                                     <td>${item.especialidad?.especialidad || 'N/A'}</td>
                                     <td>${item.grupoInventario?.grupo || 'N/A'}</td>
@@ -686,7 +686,7 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
             const tableRows = allItems.map((i: Inventario) => [
                 i.descripcion,
                 i.cantidad_existente.toString(),
-                i.unidad_medida || 'Unidad',
+                i.unidadMedida?.nombre || 'Unidad',
                 i.stock_minimo.toString(),
                 i.especialidad?.especialidad || 'N/A',
                 i.grupoInventario?.grupo || 'N/A',
@@ -780,7 +780,7 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
             const excelData = allItems.map((i: Inventario) => ({
                 'Descripción': i.descripcion,
                 'Cantidad Existente': i.cantidad_existente,
-                'Unidad de Medida': i.unidad_medida || 'Unidad',
+                'Unidad de Medida': i.unidadMedida?.nombre || 'Unidad',
                 'Stock Mínimo': i.stock_minimo,
                 'Especialidad': i.especialidad?.especialidad || 'N/A',
                 'Grupo': i.grupoInventario?.grupo || 'N/A',
@@ -985,7 +985,7 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
                             <td className="p-3 text-gray-800 dark:text-gray-300">{item.descripcion}</td>
                             <td className="p-3 text-gray-800 dark:text-gray-300">{item.cantidad_existente}</td>
                             <td className="p-3 text-gray-800 dark:text-gray-300">{item.stock_minimo}</td>
-                            <td className="p-3 text-gray-800 dark:text-gray-300">{item.unidad_medida || 'Unidad'}</td>
+                            <td className="p-3 text-gray-800 dark:text-gray-300">{item.unidadMedida?.nombre || 'Unidad'}</td>
                             <td className="p-3 text-gray-800 dark:text-gray-300">{item.especialidad?.especialidad}</td>
                             <td className="p-3 text-gray-800 dark:text-gray-300">{item.grupoInventario?.grupo}</td>
                             <td className="p-3">
@@ -1112,7 +1112,7 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
                                                 <td className="p-3 text-gray-800 dark:text-gray-300">{item.inventario?.especialidad?.especialidad}</td>
                                                 <td className="p-3 text-gray-800 dark:text-gray-300">{item.inventario?.grupoInventario?.grupo}</td>
                                                 <td className="p-3 text-gray-800 dark:text-gray-300">{formatDate(item.fecha_vencimiento)}</td>
-                                                <td className="p-3 font-bold text-gray-800 dark:text-gray-300">{item.cantidad} {item.inventario?.unidad_medida || 'Unidad'}</td>
+                                                <td className="p-3 font-bold text-gray-800 dark:text-gray-300">{item.cantidad} {item.inventario?.unidadMedida?.nombre || 'Unidad'}</td>
                                             </tr>
                                         ))
                                     ) : (

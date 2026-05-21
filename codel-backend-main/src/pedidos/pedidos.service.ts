@@ -66,7 +66,7 @@ export class PedidosService {
 
     async findAll() {
         return this.pedidosRepository.find({
-            relations: ['proveedor', 'detalles', 'detalles.inventario'],
+            relations: ['proveedor', 'detalles', 'detalles.inventario', 'detalles.inventario.unidadMedida'],
             order: { fecha: 'DESC' }
         });
     }
@@ -74,7 +74,7 @@ export class PedidosService {
     async findOne(id: number) {
         const pedido = await this.pedidosRepository.findOne({
             where: { id },
-            relations: ['proveedor', 'detalles', 'detalles.inventario']
+            relations: ['proveedor', 'detalles', 'detalles.inventario', 'detalles.inventario.unidadMedida']
         });
         if (!pedido) {
             throw new NotFoundException(`Pedido with ID ${id} not found`);
@@ -246,6 +246,7 @@ export class PedidosService {
             .innerJoinAndSelect('detalle.pedido', 'pedido')
             .innerJoinAndSelect('pedido.proveedor', 'proveedor')
             .innerJoinAndSelect('detalle.inventario', 'inventario')
+            .leftJoin('inventario.unidadMedida', 'unidadMedida')
             .where('detalle.idinventario = :inventoryId', { inventoryId })
             .andWhere('pedido.fecha BETWEEN :startDate AND :endDate', { startDate, endDate })
             .select([
@@ -254,7 +255,7 @@ export class PedidosService {
                 'detalle.cantidad AS cantidad',
                 'detalle.precio_unitario AS precio_unitario',
                 '(detalle.cantidad * detalle.precio_unitario) AS total',
-                'inventario.unidad_medida AS unidad_medida'
+                'unidadMedida.nombre AS unidad_medida'
             ])
             .orderBy('pedido.fecha', 'ASC');
 

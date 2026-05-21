@@ -23,9 +23,9 @@ export class CreateInventarioDto {
     @IsOptional()
     idgrupo_inventario?: number;
 
-    @IsString()
+    @IsNumber()
     @IsOptional()
-    unidad_medida?: string;
+    idunidad_medida?: number;
 }
 
 export class UpdateInventarioDto {
@@ -53,7 +53,7 @@ export class UpdateInventarioDto {
     @IsOptional()
     idgrupo_inventario?: number;
 
-    @IsString()
+    @IsNumber()
     @IsOptional()
-    unidad_medida?: string;
+    idunidad_medida?: number;
 }

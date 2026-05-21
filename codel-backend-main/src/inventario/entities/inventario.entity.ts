@@ -3,6 +3,7 @@ import { Especialidad } from '../../especialidad/entities/especialidad.entity';
 import { GrupoInventario } from '../../grupo_inventario/entities/grupo_inventario.entity';
 import { EgresoInventario } from '../../egreso_inventario/entities/egreso_inventario.entity';
 import { PedidosDetalle } from '../../pedidos/entities/pedidos-detalle.entity';
+import { UnidadMedida } from '../../unidad_medida/entities/unidad-medida.entity';
 
 
 @Entity('inventario')
@@ -22,8 +23,12 @@ export class Inventario {
     @Column({ type: 'text',  default: 'Activo' })
     estado: string; // 'Activo' | 'Inactivo'
 
-    @Column({ type: 'text', default: 'Unidad' })
-    unidad_medida: string;
+    @ManyToOne(() => UnidadMedida, (unidad) => unidad.inventarios, { onDelete: 'SET NULL', nullable: true })
+    @JoinColumn({ name: 'idunidad_medida' })
+    unidadMedida: UnidadMedida;
+
+    @Column({ type: 'int', nullable: true })
+    idunidad_medida: number;
 
     @ManyToOne(() => Especialidad, (especialidad) => especialidad.inventarios)
     @JoinColumn({ name: 'idespecialidad' })

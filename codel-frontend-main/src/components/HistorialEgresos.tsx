@@ -91,7 +91,7 @@ const HistorialEgresos: React.FC<HistorialEgresosProps> = ({ inventario, onClose
                                 egresos.map((egreso) => (
                                     <tr key={egreso.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{formatDate(egreso.fecha)}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{egreso.cantidad}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{egreso.cantidad} {inventario.unidadMedida?.nombre || 'Unidad'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{formatDate(egreso.fecha_vencimiento)}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div className="flex items-center gap-2">
