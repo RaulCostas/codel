@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings } from 'lucide-react';
+import { Settings, Scale } from 'lucide-react';
 
 const Configuration: React.FC = () => {
     return (
@@ -131,6 +131,20 @@ const Configuration: React.FC = () => {
                         <h3 className="text-xl font-bold text-gray-800 dark:text-white">Grupos Inventario</h3>
                     </div>
                     <p className="text-gray-600 dark:text-gray-400">Asignar categorías y grupos a los productos del inventario</p>
+                </div>
+
+                {/* 7.5. Unidades de Medida */}
+                <div
+                    onClick={() => window.location.href = '/unidad-medida'}
+                    className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer border-2 border-transparent hover:border-indigo-500"
+                >
+                    <div className="flex items-center gap-4 mb-3">
+                        <div className="p-3 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
+                            <Scale className="h-8 w-8 text-indigo-600 dark:text-indigo-300" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-white">Unidades de Medida</h3>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400">Gestionar las unidades de medida (Caja, Blíster, Unidad, etc.)</p>
                 </div>
 
                 {/* 8. Particular / Seguro */}

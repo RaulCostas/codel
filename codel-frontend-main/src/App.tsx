@@ -35,6 +35,7 @@ import Configuration from './components/Configuration';
 import ChatbotConfig from './components/ChatbotConfig';
 import FormaPagoList from './components/FormaPagoList';
 import GrupoInventarioList from './components/GrupoInventarioList';
+import UnidadMedidaList from './components/UnidadMedidaList';
 import InventarioList from './components/InventarioList';
 import VacacionesList from './components/VacacionesList';
 import CalificacionList from './components/CalificacionList';
@@ -110,6 +111,7 @@ function App() {
                                     <Route path="/configuration" element={<Configuration />} />
                                     <Route path="/configuration/chatbot" element={<ChatbotConfig />} />
                                     <Route path="/seguro" element={<SeguroList />} />
+                                    <Route path="/unidad-medida" element={<UnidadMedidaList />} />
                                     <Route element={<ProtectedRoute moduleId="config-backup" />}>
                                         <Route path="/backup" element={<BackupManager />} />
                                     </Route>

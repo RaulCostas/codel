@@ -22,6 +22,9 @@ export class Inventario {
     @Column({ type: 'text',  default: 'Activo' })
     estado: string; // 'Activo' | 'Inactivo'
 
+    @Column({ type: 'text', default: 'Unidad' })
+    unidad_medida: string;
+
     @ManyToOne(() => Especialidad, (especialidad) => especialidad.inventarios)
     @JoinColumn({ name: 'idespecialidad' })
     especialidad: Especialidad;

@@ -91,19 +91,24 @@ const EgresoInventarioForm: React.FC<EgresoInventarioFormProps> = ({ inventario,
                     </div>
                     <div>
                         <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Cantidad</label>
-                        <div style={{ position: 'relative' }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
-                                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
-                            </svg>
-                            <input
-                                type="number"
-                                value={formData.cantidad}
-                                onChange={(e) => setFormData({ ...formData, cantidad: Number(e.target.value) })}
-                                placeholder="0"
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3498db] transition duration-200 text-gray-900 dark:text-white bg-white dark:bg-gray-700 text-sm"
-                                style={{ paddingLeft: '35px' }}
-                                required
-                            />
+                        <div className="flex gap-2">
+                            <div className="relative flex-grow">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+                                    <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+                                </svg>
+                                <input
+                                    type="number"
+                                    value={formData.cantidad}
+                                    onChange={(e) => setFormData({ ...formData, cantidad: Number(e.target.value) })}
+                                    placeholder="0"
+                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3498db] transition duration-200 text-gray-900 dark:text-white bg-white dark:bg-gray-700 text-sm"
+                                    style={{ paddingLeft: '35px' }}
+                                    required
+                                />
+                            </div>
+                            <span className="px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300 flex items-center justify-center min-w-[70px]">
+                                {inventario.unidad_medida || 'Unidad'}
+                            </span>
                         </div>
                     </div>
 
@@ -124,8 +129,8 @@ const EgresoInventarioForm: React.FC<EgresoInventarioFormProps> = ({ inventario,
                             >
                                 <option value="">Sin lote específico (Opcional)</option>
                                 {availableDates.map((date, idx) => (
-                                    <option key={idx} value={date.fecha}>
-                                        {date.fecha} (Stock: {date.stock})
+                                    <option key={idx} value={date.fecha} className="dark:bg-gray-700">
+                                        {date.fecha} (Stock: {date.stock} {inventario.unidad_medida || 'Unidad'})
                                     </option>
                                 ))}
                             </select>

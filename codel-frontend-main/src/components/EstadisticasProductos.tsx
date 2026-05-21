@@ -34,6 +34,7 @@ interface ProductHistory {
     total: number;
     recibo?: string;
     factura?: string;
+    unidad_medida?: string;
 }
 
 const EstadisticasProductos: React.FC = () => {
@@ -222,7 +223,7 @@ const EstadisticasProductos: React.FC = () => {
                             <div className="flex items-center gap-3 bg-blue-50 dark:bg-blue-900/30 px-4 py-2 rounded-full border border-blue-100 dark:border-blue-800 shadow-sm">
                                 <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Precio Promedio:</span>
                                 <span className="text-lg font-bold text-blue-700 dark:text-blue-300">
-                                    {formatNumber(history.reduce((acc, curr) => acc + Number(curr.precio_unitario), 0) / history.length)}
+                                    {formatNumber(history.reduce((acc, curr) => acc + Number(curr.precio_unitario), 0) / history.length)} Bs / {history[0]?.unidad_medida || 'Unidad'}
                                 </span>
                             </div>
                         )}
@@ -310,7 +311,7 @@ const EstadisticasProductos: React.FC = () => {
                                             {item.factura && `F: ${item.factura}`}
                                             {!item.recibo && !item.factura && '-'}
                                         </td>
-                                        <td className="p-3 text-center text-gray-800 dark:text-gray-300">{item.cantidad}</td>
+                                        <td className="p-3 text-center text-gray-800 dark:text-gray-300">{item.cantidad} {item.unidad_medida || 'Unidad'}</td>
                                         <td className="p-3 text-right font-bold text-blue-600 dark:text-blue-400">{formatNumber(Number(item.precio_unitario))}</td>
                                         <td className="p-3 text-right text-gray-900 dark:text-gray-300">{formatNumber(Number(item.total))}</td>
                                     </tr>

@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import api from '../services/api';
 import Pagination from './Pagination';
@@ -358,7 +358,7 @@ if (searchTerm) {
                                 <td>${item.inventario?.especialidad?.especialidad || 'N/A'}</td>
                                 <td>${item.inventario?.grupoInventario?.grupo || 'N/A'}</td>
                                 <td>${formatDate(item.fecha_vencimiento)}</td>
-                                <td>${item.cantidad}</td>
+                                <td>${item.cantidad} ${item.inventario?.unidad_medida || 'Unidad'}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -497,6 +497,7 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
                                 <th>#</th>
                                 <th>Descripción</th>
                                 <th>Existente</th>
+                                <th>U. Medida</th>
                                 <th>Mínimo</th>
                                 <th>Especialidad</th>
                                 <th>Grupo</th>
@@ -509,6 +510,7 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
                                     <td>${idx + 1}</td>
                                     <td>${item.descripcion}</td>
                                     <td>${item.cantidad_existente}</td>
+                                    <td>${item.unidad_medida || 'Unidad'}</td>
                                     <td>${item.stock_minimo}</td>
                                     <td>${item.especialidad?.especialidad || 'N/A'}</td>
                                     <td>${item.grupoInventario?.grupo || 'N/A'}</td>
@@ -680,10 +682,11 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
             doc.setTextColor(0, 0, 0);
 
             // Table data
-            const tableColumn = ["Descripción", "Cant.", "Min.", "Especialidad", "Grupo", "Estado"];
+            const tableColumn = ["Descripción", "Cant.", "U. Medida", "Min.", "Especialidad", "Grupo", "Estado"];
             const tableRows = allItems.map((i: Inventario) => [
                 i.descripcion,
                 i.cantidad_existente.toString(),
+                i.unidad_medida || 'Unidad',
                 i.stock_minimo.toString(),
                 i.especialidad?.especialidad || 'N/A',
                 i.grupoInventario?.grupo || 'N/A',
@@ -715,15 +718,16 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
                 },
                 columnStyles: {
                     0: { cellWidth: 'auto' },
-                    1: { cellWidth: 20, halign: 'center' },
+                    1: { cellWidth: 15, halign: 'center' },
                     2: { cellWidth: 20, halign: 'center' },
-                    3: { cellWidth: 35 },
-                    4: { cellWidth: 35 },
-                    5: { cellWidth: 25, halign: 'center' }
+                    3: { cellWidth: 15, halign: 'center' },
+                    4: { cellWidth: 30 },
+                    5: { cellWidth: 30 },
+                    6: { cellWidth: 20, halign: 'center' }
                 },
                 didParseCell: function (data) {
                     // Style estado column
-                    if (data.column.index === 5 && data.section === 'body') {
+                    if (data.column.index === 6 && data.section === 'body') {
                         const estado = data.cell.raw as string;
                         if (estado && estado.toLowerCase().includes('activo')) {
                             data.cell.styles.textColor = [39, 174, 96]; // green
@@ -776,6 +780,7 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
             const excelData = allItems.map((i: Inventario) => ({
                 'Descripción': i.descripcion,
                 'Cantidad Existente': i.cantidad_existente,
+                'Unidad de Medida': i.unidad_medida || 'Unidad',
                 'Stock Mínimo': i.stock_minimo,
                 'Especialidad': i.especialidad?.especialidad || 'N/A',
                 'Grupo': i.grupoInventario?.grupo || 'N/A',
@@ -966,6 +971,7 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
                         <th className="p-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Descripción</th>
                         <th className="p-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Cant. Exis.</th>
                         <th className="p-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Stock Min.</th>
+                        <th className="p-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">U. Medida</th>
                         <th className="p-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Especialidad</th>
                         <th className="p-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Grupo</th>
                         <th className="p-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Estado</th>
@@ -979,6 +985,7 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
                             <td className="p-3 text-gray-800 dark:text-gray-300">{item.descripcion}</td>
                             <td className="p-3 text-gray-800 dark:text-gray-300">{item.cantidad_existente}</td>
                             <td className="p-3 text-gray-800 dark:text-gray-300">{item.stock_minimo}</td>
+                            <td className="p-3 text-gray-800 dark:text-gray-300">{item.unidad_medida || 'Unidad'}</td>
                             <td className="p-3 text-gray-800 dark:text-gray-300">{item.especialidad?.especialidad}</td>
                             <td className="p-3 text-gray-800 dark:text-gray-300">{item.grupoInventario?.grupo}</td>
                             <td className="p-3">
@@ -1105,7 +1112,7 @@ const response = await api.get<PaginatedResponse>(`/inventario?${params}`);
                                                 <td className="p-3 text-gray-800 dark:text-gray-300">{item.inventario?.especialidad?.especialidad}</td>
                                                 <td className="p-3 text-gray-800 dark:text-gray-300">{item.inventario?.grupoInventario?.grupo}</td>
                                                 <td className="p-3 text-gray-800 dark:text-gray-300">{formatDate(item.fecha_vencimiento)}</td>
-                                                <td className="p-3 font-bold text-gray-800 dark:text-gray-300">{item.cantidad}</td>
+                                                <td className="p-3 font-bold text-gray-800 dark:text-gray-300">{item.cantidad} {item.inventario?.unidad_medida || 'Unidad'}</td>
                                             </tr>
                                         ))
                                     ) : (

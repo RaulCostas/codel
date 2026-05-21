@@ -17,6 +17,7 @@ interface PedidoDetail {
     fecha_vencimiento: string;
     // Helper to display name in table
     inventarioNombre?: string;
+    unidad_medida?: string;
 }
 
 interface PedidosFormProps {
@@ -124,7 +125,8 @@ const PedidosForm: React.FC<PedidosFormProps> = ({ isOpen, onClose, id, onSaveSu
                 cantidad: d.cantidad,
                 precio_unitario: Number(d.precio_unitario),
                 fecha_vencimiento: d.fecha_vencimiento,
-                inventarioNombre: d.inventario?.descripcion
+                inventarioNombre: d.inventario?.descripcion,
+                unidad_medida: d.inventario?.unidad_medida || 'Unidad'
             }));
             setDetalles(mappedDetalles);
         } catch (error) {
@@ -187,7 +189,8 @@ const PedidosForm: React.FC<PedidosFormProps> = ({ isOpen, onClose, id, onSaveSu
             cantidad: tempCantidad,
             precio_unitario: tempPrecio,
             fecha_vencimiento: tempVencimiento,
-            inventarioNombre: selectedInventario.descripcion
+            inventarioNombre: selectedInventario.descripcion,
+            unidad_medida: selectedInventario.unidad_medida || 'Unidad'
         };
 
         setDetalles([...detalles, newDetail]);
@@ -395,7 +398,7 @@ const PedidosForm: React.FC<PedidosFormProps> = ({ isOpen, onClose, id, onSaveSu
                                     >
                                         <option value={0}>Seleccione ítem</option>
                                         {inventarioItems.map(i => (
-                                            <option key={i.id} value={i.id}>{i.descripcion} (Stock: {i.cantidad_existente})</option>
+                                            <option key={i.id} value={i.id}>{i.descripcion} (Stock: {i.cantidad_existente} {i.unidad_medida || 'Unidad'})</option>
                                         ))}
                                     </select>
                                 </div>
@@ -486,7 +489,7 @@ const PedidosForm: React.FC<PedidosFormProps> = ({ isOpen, onClose, id, onSaveSu
                                     {detalles.map((detalle, index) => (
                                         <tr key={index} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50">
                                             <td className="py-3 px-6 text-left whitespace-nowrap font-medium">{detalle.inventarioNombre}</td>
-                                            <td className="py-3 px-6 text-center">{detalle.cantidad}</td>
+                                            <td className="py-3 px-6 text-center">{detalle.cantidad} {detalle.unidad_medida || 'Unidad'}</td>
                                             <td className="py-3 px-6 text-right">{formatNumber(detalle.precio_unitario)}</td>
                                             <td className="py-3 px-6 text-right">{formatNumber(detalle.cantidad * detalle.precio_unitario)}</td>
                                             <td className="py-3 px-6 text-center">{formatDate(detalle.fecha_vencimiento)}</td>

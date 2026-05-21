@@ -245,6 +245,7 @@ export class PedidosService {
             .createQueryBuilder(PedidosDetalle, 'detalle')
             .innerJoinAndSelect('detalle.pedido', 'pedido')
             .innerJoinAndSelect('pedido.proveedor', 'proveedor')
+            .innerJoinAndSelect('detalle.inventario', 'inventario')
             .where('detalle.idinventario = :inventoryId', { inventoryId })
             .andWhere('pedido.fecha BETWEEN :startDate AND :endDate', { startDate, endDate })
             .select([
@@ -252,7 +253,8 @@ export class PedidosService {
                 'proveedor.proveedor AS proveedor',
                 'detalle.cantidad AS cantidad',
                 'detalle.precio_unitario AS precio_unitario',
-                '(detalle.cantidad * detalle.precio_unitario) AS total'
+                '(detalle.cantidad * detalle.precio_unitario) AS total',
+                'inventario.unidad_medida AS unidad_medida'
             ])
             .orderBy('pedido.fecha', 'ASC');
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import Swal from 'sweetalert2';
-import type { Especialidad, GrupoInventario, Inventario } from '../types';
+import type { Especialidad, GrupoInventario, Inventario, UnidadMedida } from '../types';
 import ManualModal, { type ManualSection } from './ManualModal';
 
 import GrupoInventarioForm from './GrupoInventarioForm';
@@ -25,11 +25,13 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
         stock_minimo: 0,
         estado: 'Activo',
         idespecialidad: 0,
-        idgrupo_inventario: 0
+        idgrupo_inventario: 0,
+        unidad_medida: 'Unidad'
     });
 
     const [especialidades, setEspecialidades] = useState<Especialidad[]>([]);
     const [grupos, setGrupos] = useState<GrupoInventario[]>([]);
+    const [unidades, setUnidades] = useState<UnidadMedida[]>([]);
     const [showManual, setShowManual] = useState(false);
 
     // Estados para el Modal de Grupo Inventario
@@ -81,7 +83,8 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
                     stock_minimo: 0,
                     estado: 'Activo',
                     idespecialidad: 0,
-                    idgrupo_inventario: 0
+                    idgrupo_inventario: 0,
+                    unidad_medida: 'Unidad'
                 });
             }
         }
@@ -91,12 +94,15 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
         try {
             const espRes = await api.get<any>('/especialidad?limit=100');
             const grupRes = await api.get<any>('/grupo-inventario?limit=100');
+            const uniRes = await api.get<UnidadMedida[]>('/unidad-medida/active');
 
             const especialidadesData = Array.isArray(espRes.data) ? espRes.data : (espRes.data.data || []);
             setEspecialidades(especialidadesData);
 
             const gruposData = Array.isArray(grupRes.data) ? grupRes.data : (grupRes.data.data || []);
             setGrupos(gruposData);
+
+            setUnidades(Array.isArray(uniRes.data) ? uniRes.data : []);
         } catch (error) {
             console.error('Error fetching dropdowns:', error);
         }
@@ -113,7 +119,8 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
                 stock_minimo: item.stock_minimo,
                 estado: item.estado,
                 idespecialidad: item.idespecialidad,
-                idgrupo_inventario: item.idgrupo_inventario
+                idgrupo_inventario: item.idgrupo_inventario,
+                unidad_medida: item.unidad_medida || 'Unidad'
             });
         } catch (error) {
             console.error('Error fetching inventario:', error);
@@ -321,6 +328,32 @@ const InventarioForm: React.FC<InventarioFormProps> = ({ isOpen, onClose, id, on
                                                 </svg>
                                             </button>
                                         )}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-gray-700 dark:text-gray-300 font-medium text-sm mb-2">Unidad de Medida</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                            </svg>
+                                        </div>
+                                        <select
+                                            value={formData.unidad_medida || 'Unidad'}
+                                            onChange={(e) => setFormData({ ...formData, unidad_medida: e.target.value })}
+                                            className="w-full pl-10 p-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
+                                        >
+                                            {!unidades.some(u => u.nombre.toLowerCase() === 'unidad') && (
+                                                <option value="Unidad" className="dark:bg-gray-700">Unidad</option>
+                                            )}
+                                            {unidades.map(u => (
+                                                <option key={u.id} value={u.nombre} className="dark:bg-gray-700">{u.nombre}</option>
+                                            ))}
+                                        </select>
+                                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        </div>
                                     </div>
                                 </div>
 
