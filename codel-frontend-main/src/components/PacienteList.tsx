@@ -11,7 +11,7 @@ import { formatDate } from '../utils/dateUtils';
 import { formatFullName } from '../utils/formatters';
 import PacienteImagenesModal from './PacienteImagenesModal';
 import Swal from 'sweetalert2';
-import { FileText, Download, Printer, Users, CheckCircle } from 'lucide-react';
+import { FileText, Download, Printer, Users, CheckCircle, PenTool } from 'lucide-react';
 import SignatureModal from './SignatureModal';
 
 
@@ -491,7 +491,7 @@ const PacienteList: React.FC = () => {
 
             let signatures: any[] = [];
             try {
-                const resHC = await api.get(`/firmas/documento/historia_clinica/${fullPaciente.id}`);
+                const resHC = await api.get(`/firmas/documento/paciente_particular/${fullPaciente.id}`);
                 signatures = Array.isArray(resHC.data) ? resHC.data : [];
             } catch (error) {
                 console.error('Error fetching signatures for patient print:', error);
@@ -500,7 +500,11 @@ const PacienteList: React.FC = () => {
             const patientSignature = signatures.filter(s => s.rolFirmante === 'paciente').pop();
 
             const check = (val: boolean | undefined) => val ? 'SÍ' : 'NO';
-            const checkIcon = (val: boolean | undefined) => val ? '☒' : '☐';
+            const checkIcon = (val: boolean | undefined) => val ? '☑' : '☐';
+            const renderSiNo = (val: boolean | undefined) => {
+                const isTrue = !!val;
+                return `<span class="checkbox-icon">${isTrue ? '☑' : '☐'}</span> SÍ &nbsp;|&nbsp; <span class="checkbox-icon">${!isTrue ? '☑' : '☐'}</span> NO`;
+            };
 
             const iframe = document.createElement('iframe');
             iframe.style.position = 'fixed';
@@ -580,6 +584,31 @@ const PacienteList: React.FC = () => {
                         .checkbox-table td { padding: 3px; border-bottom: 1px solid #f9fafb; }
                         .checkbox-icon { font-size: 12px; margin-right: 5px; color: #3b82f6; font-weight: bold; }
                         
+                        .diseases-table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin-top: 5px; 
+                            margin-bottom: 10px; 
+                        }
+                        .diseases-table th { 
+                            background: #eff6ff; 
+                            color: #1e40af; 
+                            padding: 5px 8px; 
+                            font-size: 9px; 
+                            font-weight: bold; 
+                            text-transform: uppercase; 
+                            border: 1px solid #e5e7eb; 
+                            text-align: left; 
+                        }
+                        .diseases-table td { 
+                            padding: 5px 8px; 
+                            border: 1px solid #e5e7eb; 
+                            font-size: 9px; 
+                        }
+                        .diseases-table tr:nth-child(even) { 
+                            background: #f9fafb; 
+                        }
+                        
                         .signature-section {
                             margin-top: auto;
                             padding-top: 30px;
@@ -652,34 +681,103 @@ const PacienteList: React.FC = () => {
                             <div class="field"><span class="label">Hermanos</span><div class="value">${fullPaciente.fichaClinica?.ant_familiares_hermanos || '-'}</div></div>
                         </div>
 
-                        <div class="history-grid">
-                            <div>
-                                <h2>Antecedentes Patológicos</h2>
-                                <table class="checkbox-table">
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_pat_tratamiento_medico)}</span> Tratamiento Médico ${fullPaciente.fichaClinica?.tratamiento_medico_detalle ? `<div class="detail-text">Detalle: ${fullPaciente.fichaClinica.tratamiento_medico_detalle}</div>` : ''}</td></tr>
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_pat_hemorragias)}</span> Hemorragias</td></tr>
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_pat_intervencion_quirurgica)}</span> Int. Quirúrgica</td></tr>
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_pat_reaccion_anestesia)}</span> Reac. Anestesia ${fullPaciente.fichaClinica?.reaccion_anestesia_detalle ? `<div class="detail-text">Detalle: ${fullPaciente.fichaClinica.reaccion_anestesia_detalle}</div>` : ''}</td></tr>
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_pat_toma_medicamentos)}</span> Toma Medicamentos ${fullPaciente.fichaClinica?.medicamento_72h_detalle ? `<div class="detail-text">72h: ${fullPaciente.fichaClinica.medicamento_72h_detalle}</div>` : ''}</td></tr>
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_pat_alergias)}</span> Alergias ${fullPaciente.fichaClinica?.alergia_medicamento_detalle ? `<div class="detail-text">A: ${fullPaciente.fichaClinica.alergia_medicamento_detalle}</div>` : ''}</td></tr>
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_pat_alteraciones_cicatrizacion)}</span> Alt. Cicatrización</td></tr>
-                                </table>
-                                <div style="margin-top: 5px;"><span class="label">Otros Patológicos</span><div class="value">${fullPaciente.fichaClinica?.ant_pat_otros || '-'}</div></div>
-                            </div>
-                            <div>
-                                <h2>No Patológicos</h2>
-                                <table class="checkbox-table">
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_no_pat_fuma)}</span> Fuma ${fullPaciente.fichaClinica?.fuma_cantidad ? `(${fullPaciente.fichaClinica.fuma_cantidad})` : ''}</td></tr>
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_no_pat_bruxismo)}</span> Bruxismo</td></tr>
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_no_pat_bebe)}</span> Bebe</td></tr>
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_no_pat_succion_digital)}</span> Succión Digital</td></tr>
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_no_pat_onicofagia)}</span> Onicofagia</td></tr>
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_no_pat_mordisqueo_objetos)}</span> Mordisqueo Objetos</td></tr>
-                                    <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.ant_no_pat_queilofagia)}</span> Queilofagia</td></tr>
-                                </table>
-                                <div style="margin-top: 5px;"><span class="label">Otros No Patológicos</span><div class="value">${fullPaciente.fichaClinica?.ant_no_pat_otros || '-'}</div></div>
-                            </div>
-                        </div>
+                        <h2>Antecedentes Patológicos</h2>
+                        <table class="diseases-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 35%;">ANTECEDENTES PATOLÓGICOS</th>
+                                    <th style="width: 15%; text-align: center;">SÍ | NO</th>
+                                    <th style="width: 50%;">DETALLE / ESPECIFICACIÓN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Tratamiento Médico Actual</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_pat_tratamiento_medico)}</td>
+                                    <td>${fullPaciente.fichaClinica?.tratamiento_medico_detalle || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Hemorragias</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_pat_hemorragias)}</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Int. Quirúrgica</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_pat_intervencion_quirurgica)}</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Reac. Anestesia</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_pat_reaccion_anestesia)}</td>
+                                    <td>${fullPaciente.fichaClinica?.reaccion_anestesia_detalle || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Toma Medicamentos</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_pat_toma_medicamentos)}</td>
+                                    <td>${fullPaciente.fichaClinica?.medicamento_72h_detalle || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Alergias</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_pat_alergias)}</td>
+                                    <td>${fullPaciente.fichaClinica?.alergia_medicamento_detalle || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Alt. Cicatrización</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_pat_alteraciones_cicatrizacion)}</td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style="margin-top: 5px; margin-bottom: 15px;"><span class="label">Otros Patológicos</span><div class="value">${fullPaciente.fichaClinica?.ant_pat_otros || '-'}</div></div>
+
+                        <h2>Antecedentes No Patológicos</h2>
+                        <table class="diseases-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 35%;">ANTECEDENTES NO PATOLÓGICOS</th>
+                                    <th style="width: 15%; text-align: center;">SÍ | NO</th>
+                                    <th style="width: 50%;">DETALLE / ESPECIFICACIÓN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Fuma</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_no_pat_fuma)}</td>
+                                    <td>${fullPaciente.fichaClinica?.fuma_cantidad || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Bruxismo</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_no_pat_bruxismo)}</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Bebe</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_no_pat_bebe)}</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Succión Digital</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_no_pat_succion_digital)}</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Onicofagia</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_no_pat_onicofagia)}</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Mordisqueo Objetos</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_no_pat_mordisqueo_objetos)}</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Queilofagia</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.ant_no_pat_queilofagia)}</td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style="margin-top: 5px; margin-bottom: 15px;"><span class="label">Otros No Patológicos</span><div class="value">${fullPaciente.fichaClinica?.ant_no_pat_otros || '-'}</div></div>
 
                         <div style="margin-top: 15px;">
                             <span class="label">Observaciones Generales</span>
@@ -864,7 +962,7 @@ const PacienteList: React.FC = () => {
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Celular</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Fecha Nacimiento</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Estado</th>
-                            <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Firma HC</th>
+                            <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Firma</th>
                             <th className="no-print px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                         </tr>
                     </thead>
@@ -901,7 +999,7 @@ const PacienteList: React.FC = () => {
                                 <td className="p-3 text-center">
                                     <div className="flex justify-center items-center gap-2">
                                         {(paciente as any).esta_firmado ? (
-                                            <div className="flex items-center text-green-600 dark:text-green-400 font-bold" title="Historia Clínica Firmada">
+                                            <div className="flex items-center text-green-600 dark:text-green-400 font-bold" title="Ficha Clínica Firmada">
                                                 <CheckCircle size={20} className="mr-1" />
                                                 <span className="text-xs">Firmado</span>
                                             </div>
@@ -912,11 +1010,9 @@ const PacienteList: React.FC = () => {
                                                     setShowSignatureModal(true);
                                                 }}
                                                 className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md transition-all transform hover:-translate-y-0.5"
-                                                title="Firmar Historia Clínica"
+                                                title="Firmar Ficha Clínica"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                </svg>
+                                                <PenTool size={20} />
                                             </button>
                                         )}
                                     </div>
@@ -1003,7 +1099,7 @@ const PacienteList: React.FC = () => {
                         setShowSignatureModal(false);
                         setSelectedPacienteId(null);
                     }}
-                    tipoDocumento="historia_clinica"
+                    tipoDocumento="paciente_particular"
                     documentoId={selectedPacienteId}
                     rolFirmante="paciente"
                     onSuccess={() => {

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import api from '../services/api';
 import type { Receta } from '../types';
@@ -10,7 +10,7 @@ import ManualModal, { type ManualSection } from './ManualModal';
 import SignatureModal from './SignatureModal';
 import RecetarioForm from './RecetarioForm';
 
-import { ClipboardList, Printer } from 'lucide-react';
+import { ClipboardList, Printer, CheckCircle, PenTool } from 'lucide-react';
 
 
 const RecetarioList: React.FC = () => {
@@ -529,6 +529,7 @@ const RecetarioList: React.FC = () => {
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Paciente</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Registrado por</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Medicamentos</th>
+                            <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Firma</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                         </tr>
                     </thead>
@@ -548,7 +549,27 @@ const RecetarioList: React.FC = () => {
                                         ? `${receta.detalles.length} medicamento${receta.detalles.length !== 1 ? 's' : ''} (${receta.detalles[0].medicamento}...)`
                                         : receta.medicamentos}
                                 </td>
-
+                                <td className="p-3 text-center whitespace-nowrap">
+                                    <div className="flex justify-center items-center gap-2">
+                                        {receta.esta_firmado ? (
+                                            <div className="flex items-center text-green-600 dark:text-green-400 font-bold" title="Receta Firmada">
+                                                <CheckCircle size={20} className="mr-1" />
+                                                <span className="text-xs">Firmado</span>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedReceta(receta);
+                                                    setShowSignatureModal(true);
+                                                }}
+                                                className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md transition-all transform hover:-translate-y-0.5"
+                                                title="Firmar Receta"
+                                            >
+                                                <PenTool size={20} />
+                                            </button>
+                                        )}
+                                    </div>
+                                </td>
                                 <td className="p-3 flex gap-2">
                                     <button
                                         onClick={() => handleWhatsApp(receta)}
@@ -589,7 +610,7 @@ const RecetarioList: React.FC = () => {
                             </tr>
                         ))}
                         {paginatedRecetas.length === 0 && (
-                            <tr><td colSpan={5} className="text-center p-4 text-gray-500 dark:text-gray-400">No hay recetas registradas</td></tr>
+                            <tr><td colSpan={7} className="text-center p-4 text-gray-500 dark:text-gray-400">No hay recetas registradas</td></tr>
                         )}
                     </tbody>
                 </table>

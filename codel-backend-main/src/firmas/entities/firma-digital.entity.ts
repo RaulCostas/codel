@@ -7,7 +7,7 @@ export class FirmaDigital {
     id: number;
 
     @Column({ type: 'varchar', length: 50 })
-    tipoDocumento: string; // 'presupuesto' | 'historia_clinica' | 'receta'
+    tipoDocumento: string; // 'presupuesto' | 'paciente_particular' | 'paciente_seguro' | 'receta'
 
     @Column({ type: 'int' })
     documentoId: number;

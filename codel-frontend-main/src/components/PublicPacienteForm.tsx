@@ -180,7 +180,7 @@ const PublicPacienteForm: React.FC = () => {
 
         try {
             await api.post('/firmas', {
-                tipoDocumento: 'paciente',
+                tipoDocumento: 'paciente_particular',
                 documentoId: newPatientId,
                 rolFirmante: 'paciente',
                 firmaData: signatureData,

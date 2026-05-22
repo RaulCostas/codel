@@ -53,7 +53,11 @@ export class FirmasService {
 
         // Actualizar estado de firma en las entidades correspondientes
         try {
-            if (createFirmaDto.tipoDocumento === 'historia_clinica' || createFirmaDto.tipoDocumento === 'paciente') {
+            if (
+                createFirmaDto.tipoDocumento === 'paciente_particular' ||
+                createFirmaDto.tipoDocumento === 'historia_clinica' ||
+                createFirmaDto.tipoDocumento === 'paciente'
+            ) {
                 // Intentar actualizar en pacientes particulares
                 await this.dataSource.createQueryBuilder()
                     .update(Paciente)
@@ -66,7 +70,7 @@ export class FirmasService {
                     .set({ esta_firmado: true })
                     .where("pacienteId = :id", { id: createFirmaDto.documentoId })
                     .execute();
-
+            } else if (createFirmaDto.tipoDocumento === 'paciente_seguro') {
                 // Intentar actualizar en pacientes de seguro
                 await this.dataSource.createQueryBuilder()
                     .update(PacienteSeguro)
@@ -103,13 +107,17 @@ export class FirmasService {
      * Get all signatures for a specific document
      */
     async findByDocumento(tipoDocumento: string, documentoId: number): Promise<FirmaDigital[]> {
-        // Soporte para sinónimos: 'historia_clinica' y 'paciente' son equivalentes para el registro del paciente
+        // Soporte para sinónimos: 'paciente_particular', 'historia_clinica' y 'paciente' son equivalentes para el registro del paciente particular
         const query = this.firmaRepository.createQueryBuilder('firma')
             .leftJoinAndSelect('firma.usuario', 'usuario')
             .where('firma.documentoId = :documentoId', { documentoId });
 
-        if (tipoDocumento === 'historia_clinica' || tipoDocumento === 'paciente') {
-            query.andWhere('firma.tipoDocumento IN (:...tipos)', { tipos: ['historia_clinica', 'paciente'] });
+        if (
+            tipoDocumento === 'paciente_particular' ||
+            tipoDocumento === 'historia_clinica' ||
+            tipoDocumento === 'paciente'
+        ) {
+            query.andWhere('firma.tipoDocumento IN (:...tipos)', { tipos: ['paciente_particular', 'historia_clinica', 'paciente'] });
         } else {
             query.andWhere('firma.tipoDocumento = :tipoDocumento', { tipoDocumento });
         }

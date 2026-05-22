@@ -102,7 +102,7 @@ export class PacientesSeguroService {
 
             return (await manager.findOne(PacienteSeguro, {
                 where: { id: saved.id },
-                relations: ['fichaClinica'],
+                relations: ['fichaClinica', 'seguro'],
             }))!;
         });
     }
@@ -133,7 +133,7 @@ export class PacientesSeguroService {
     async findOne(id: number): Promise<PacienteSeguro> {
         const paciente = await this.pacientesSeguroRepository.findOne({
             where: { id },
-            relations: ['fichaClinica'],
+            relations: ['fichaClinica', 'seguro'],
         });
         if (!paciente) throw new NotFoundException(`Paciente Seguro #${id} not found`);
         return paciente;
@@ -165,7 +165,7 @@ export class PacientesSeguroService {
 
             return (await manager.findOne(PacienteSeguro, {
                 where: { id },
-                relations: ['fichaClinica'],
+                relations: ['fichaClinica', 'seguro'],
             }))!;
         });
     }

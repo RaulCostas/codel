@@ -614,7 +614,7 @@ const PacienteForm: React.FC = () => {
                     handleVolver();
                 }} 
                 documentoId={id ? parseInt(id) : (newPatientId || 0)}
-                tipoDocumento="paciente"
+                tipoDocumento="paciente_particular"
                 rolFirmante="paciente"
             />
 

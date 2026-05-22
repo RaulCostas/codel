@@ -524,7 +524,7 @@ const PacienteSeguroForm: React.FC = () => {
                             <thead className="bg-gray-50 dark:bg-gray-900/60">
                                 <tr>
                                     <th className="p-4 text-[10px] font-black uppercase text-gray-500 tracking-wider font-sans">Enfermedades</th>
-                                    <th className="p-4 text-[10px] font-black uppercase text-gray-500 tracking-wider text-center font-sans">Padece</th>
+                                    <th className="p-4 text-[10px] font-black uppercase text-gray-500 tracking-wider text-center font-sans">SÍ | NO</th>
                                     <th className="p-4 text-[10px] font-black uppercase text-gray-500 tracking-wider font-sans">Tratamiento</th>
                                 </tr>
                             </thead>
@@ -543,7 +543,28 @@ const PacienteSeguroForm: React.FC = () => {
                                     <tr key={enf.id} className={idx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50/30 dark:bg-gray-900/20'}>
                                         <td className="p-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase font-sans">{enf.label}</td>
                                         <td className="p-4 text-center">
-                                            <input type="checkbox" name={enf.id} checked={formData[enf.id as keyof typeof formData] as boolean} onChange={handleChange} className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" />
+                                            <div className="flex justify-center gap-4">
+                                                <label className="flex items-center gap-1 cursor-pointer group">
+                                                    <input 
+                                                        type="radio" 
+                                                        name={enf.id}
+                                                        checked={formData[enf.id as keyof typeof formData] === true} 
+                                                        onChange={() => setFormData(prev => ({ ...prev, [enf.id]: true }))} 
+                                                        className="w-4 h-4 text-blue-600 focus:ring-blue-500" 
+                                                    />
+                                                    <span className="text-[10px] font-black group-hover:text-blue-600 font-sans">SÍ</span>
+                                                </label>
+                                                <label className="flex items-center gap-1 cursor-pointer group">
+                                                    <input 
+                                                        type="radio" 
+                                                        name={enf.id}
+                                                        checked={formData[enf.id as keyof typeof formData] === false} 
+                                                        onChange={() => setFormData(prev => ({ ...prev, [enf.id]: false }))} 
+                                                        className="w-4 h-4 text-blue-600 focus:ring-blue-500" 
+                                                    />
+                                                    <span className="text-[10px] font-black group-hover:text-blue-600 font-sans">NO</span>
+                                                </label>
+                                            </div>
                                         </td>
                                         <td className="p-4">
                                             <input type="text" name={`${enf.id}_tratamiento`} value={formData[`${enf.id}_tratamiento` as keyof typeof formData] as string} onChange={handleChange} placeholder="Tratamiento..." className="w-full px-4 py-1 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none font-sans" />
@@ -555,7 +576,28 @@ const PacienteSeguroForm: React.FC = () => {
                                         Otros
                                     </td>
                                     <td className="p-4 text-center">
-                                        <input type="checkbox" name="enf_otros" checked={formData.enf_otros} onChange={handleChange} className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" />
+                                        <div className="flex justify-center gap-4">
+                                            <label className="flex items-center gap-1 cursor-pointer group">
+                                                <input 
+                                                    type="radio" 
+                                                    name="enf_otros"
+                                                    checked={formData.enf_otros === true} 
+                                                    onChange={() => setFormData(prev => ({ ...prev, enf_otros: true }))} 
+                                                    className="w-4 h-4 text-blue-600 focus:ring-blue-500" 
+                                                />
+                                                <span className="text-[10px] font-black group-hover:text-blue-600 font-sans">SÍ</span>
+                                            </label>
+                                            <label className="flex items-center gap-1 cursor-pointer group">
+                                                <input 
+                                                    type="radio" 
+                                                    name="enf_otros"
+                                                    checked={formData.enf_otros === false} 
+                                                    onChange={() => setFormData(prev => ({ ...prev, enf_otros: false }))} 
+                                                    className="w-4 h-4 text-blue-600 focus:ring-blue-500" 
+                                                />
+                                                <span className="text-[10px] font-black group-hover:text-blue-600 font-sans">NO</span>
+                                            </label>
+                                        </div>
                                     </td>
                                     <td className="p-4">
                                         <input type="text" name="enf_otros_tratamiento" value={formData.enf_otros_tratamiento} onChange={handleChange} placeholder="Tratamiento..." className="w-full px-4 py-1 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none font-sans" />

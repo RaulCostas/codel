@@ -266,11 +266,15 @@ const PacienteSeguroList: React.FC = () => {
             const fullPaciente = response.data;
             let signatures: any[] = [];
             try {
-                const resHC = await api.get(`/firmas/documento/historia_clinica/${fullPaciente.id}`);
+                const resHC = await api.get(`/firmas/documento/paciente_seguro/${fullPaciente.id}`);
                 signatures = Array.isArray(resHC.data) ? resHC.data : [];
             } catch (error) { console.error('Error fetching signatures:', error); }
             const patientSignature = signatures.filter(s => s.rolFirmante === 'paciente').pop();
-            const checkIcon = (val: boolean | undefined) => val ? '☒' : '☐';
+            const checkIcon = (val: boolean | undefined) => val ? '☑' : '☐';
+            const renderSiNo = (val: boolean | undefined) => {
+                const isTrue = !!val;
+                return `<span class="checkbox-icon">${isTrue ? '☑' : '☐'}</span> SÍ &nbsp;|&nbsp; <span class="checkbox-icon">${!isTrue ? '☑' : '☐'}</span> NO`;
+            };
             const iframe = document.createElement('iframe');
             iframe.style.position = 'fixed'; iframe.style.right = '0'; iframe.style.bottom = '0'; iframe.style.width = '0'; iframe.style.height = '0'; iframe.style.border = '0';
             document.body.appendChild(iframe);
@@ -339,6 +343,31 @@ const PacienteSeguroList: React.FC = () => {
                         .checkbox-table td { padding: 3px; border-bottom: 1px solid #f9fafb; }
                         .checkbox-icon { font-size: 12px; margin-right: 5px; color: #9333ea; font-weight: bold; }
                         
+                        .diseases-table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin-top: 5px; 
+                            margin-bottom: 10px; 
+                        }
+                        .diseases-table th { 
+                            background: #f5f3ff; 
+                            color: #6b21a8; 
+                            padding: 5px 8px; 
+                            font-size: 9px; 
+                            font-weight: bold; 
+                            text-transform: uppercase; 
+                            border: 1px solid #e5e7eb; 
+                            text-align: left; 
+                        }
+                        .diseases-table td { 
+                            padding: 5px 8px; 
+                            border: 1px solid #e5e7eb; 
+                            font-size: 9px; 
+                        }
+                        .diseases-table tr:nth-child(even) { 
+                            background: #f9fafb; 
+                        }
+                        
                         .signature-section {
                             margin-top: auto;
                             padding-top: 30px;
@@ -370,6 +399,7 @@ const PacienteSeguroList: React.FC = () => {
                         @media print {
                             .page-container { min-height: auto; }
                             h2 { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                            .page-break { page-break-before: always; }
                         }
                     </style>
                 </head>
@@ -377,53 +407,138 @@ const PacienteSeguroList: React.FC = () => {
                     <div class="page-container">
                         <div class="header">
                             <h1>Historia Clínica Odontológica (Seguro)</h1>
-                            <div style="font-size: 10px; color: #666;">Seguro: ${fullPaciente.seguro?.nombre || 'Particular/Seguro'}</div>
+                            <div style="font-size: 10px; color: #666;">Seguro: ${fullPaciente.seguro?.nombre || 'Particular/Seguro'} | Fecha de Registro: ${fullPaciente.fecha_ingreso ? formatDate(fullPaciente.fecha_ingreso) : '-'}</div>
                         </div>
 
                         <h2>Filiación del Paciente</h2>
                         <div class="info-grid">
+                            <div class="field"><span class="label">Aseguradora</span><div class="value">${fullPaciente.seguro?.nombre || '-'}</div></div>
+                            <div class="field"><span class="label">Matrícula Seguro</span><div class="value">${fullPaciente.matricula_seguro || '-'}</div></div>
+                            <div class="field"><span class="label">Relación</span><div class="value">${fullPaciente.es_trabajador ? 'Trabajador' : fullPaciente.es_beneficiario ? 'Beneficiario' : '-'}</div></div>
+
                             <div class="field"><span class="label">Paterno</span><div class="value">${fullPaciente.paterno || '-'}</div></div>
                             <div class="field"><span class="label">Materno</span><div class="value">${fullPaciente.materno || '-'}</div></div>
                             <div class="field"><span class="label">Nombres</span><div class="value">${fullPaciente.nombre || '-'}</div></div>
-                            
-                            <div class="field"><span class="label">Matrícula</span><div class="value">${fullPaciente.matricula_seguro || '-'}</div></div>
+
                             <div class="field"><span class="label">CI</span><div class="value">${fullPaciente.ci || '-'}</div></div>
+                            <div class="field"><span class="label">Fecha Nacimiento</span><div class="value">${formatDate(fullPaciente.fecha_nacimiento) || '-'}</div></div>
                             <div class="field"><span class="label">Edad</span><div class="value">${calcularEdad(fullPaciente.fecha_nacimiento)}</div></div>
-                            
+
                             <div class="field"><span class="label">Género</span><div class="value">${fullPaciente.genero || '-'}</div></div>
                             <div class="field"><span class="label">Celular</span><div class="value">${fullPaciente.celular || '-'}</div></div>
+                            <div class="field"><span class="label">Teléfono Fijo</span><div class="value">${fullPaciente.telefono || '-'}</div></div>
+
                             <div class="field"><span class="label">Fecha Ingreso</span><div class="value">${formatDate(fullPaciente.fecha_ingreso)}</div></div>
-                            
+                            <div class="field"><span class="label">Altura</span><div class="value">${fullPaciente.altura ? `${fullPaciente.altura} cm` : '-'}</div></div>
+                            <div class="field"><span class="label">Peso</span><div class="value">${fullPaciente.peso ? `${fullPaciente.peso} kg` : '-'}</div></div>
+
                             <div class="field" style="grid-column: span 3;"><span class="label">Dirección</span><div class="value">${fullPaciente.direccion || '-'}</div></div>
                         </div>
 
-                        <h2>Antecedentes Médicos</h2>
+                        <h2>Información Clínica y Consulta</h2>
                         <div class="info-grid">
                             <div class="field" style="grid-column: span 3;"><span class="label">Motivo de Consulta</span><div class="value">${fullPaciente.fichaClinica?.motivo_consulta || '-'}</div></div>
-                            <div class="field" style="grid-column: span 3;"><span class="label">Antecedentes de Complicaciones</span><div class="value">${fullPaciente.fichaClinica?.complicaciones ? `SÍ - ${fullPaciente.fichaClinica.complicaciones_detalle}` : 'NO'}</div></div>
-                            <div class="field" style="grid-column: span 3;"><span class="label">Tratamiento Médico Actual</span><div class="value">${fullPaciente.fichaClinica?.tratamiento_medico_actual ? `SÍ - ${fullPaciente.fichaClinica.tratamiento_medico_enfermedad}` : 'NO'}</div></div>
-                            <div class="field" style="grid-column: span 3;"><span class="label">Toma Medicamentos</span><div class="value">${fullPaciente.fichaClinica?.toma_medicamento ? `SÍ - ${fullPaciente.fichaClinica.medicamento_detalle}` : 'NO'}</div></div>
-                            <div class="field" style="grid-column: span 3;"><span class="label">Alergias</span><div class="value">${fullPaciente.fichaClinica?.alergia_medicamento ? `SÍ - ${fullPaciente.fichaClinica.alergia_medicamento_detalle}` : 'NO'}</div></div>
+                            <div class="field" style="grid-column: span 2;"><span class="label">Motivo Visita Anterior</span><div class="value">${fullPaciente.fichaClinica?.motivo_visita_anterior || '-'}</div></div>
+                            <div class="field"><span class="label">Fecha Última Visita</span><div class="value">${fullPaciente.fichaClinica?.fecha_ultima_visita || '-'}</div></div>
                         </div>
 
-                        <h2>Cuestionario de Enfermedades</h2>
-                        <div class="checkbox-grid">
-                            <table class="checkbox-table">
-                                <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.enf_epilepsia)}</span> Epilepsia ${fullPaciente.fichaClinica?.enf_epilepsia_tratamiento ? `<div class="detail-text">Trat: ${fullPaciente.fichaClinica.enf_epilepsia_tratamiento}</div>` : ''}</td></tr>
-                                <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.enf_anemia)}</span> Anemia ${fullPaciente.fichaClinica?.enf_anemia_tratamiento ? `<div class="detail-text">Trat: ${fullPaciente.fichaClinica.enf_anemia_tratamiento}</div>` : ''}</td></tr>
-                                <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.enf_diabetes)}</span> Diabetes ${fullPaciente.fichaClinica?.enf_diabetes_tratamiento ? `<div class="detail-text">Trat: ${fullPaciente.fichaClinica.enf_diabetes_tratamiento}</div>` : ''}</td></tr>
-                                <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.enf_tiroidismo)}</span> Tiroidismo ${fullPaciente.fichaClinica?.enf_tiroidismo_tratamiento ? `<div class="detail-text">Trat: ${fullPaciente.fichaClinica.enf_tiroidismo_tratamiento}</div>` : ''}</td></tr>
-                                <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.enf_hipertension)}</span> Hipertensión ${fullPaciente.fichaClinica?.enf_hipertension_tratamiento ? `<div class="detail-text">Trat: ${fullPaciente.fichaClinica.enf_hipertension_tratamiento}</div>` : ''}</td></tr>
-                            </table>
-                            <table class="checkbox-table">
-                                <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.enf_infarto)}</span> Infarto ${fullPaciente.fichaClinica?.enf_infarto_tratamiento ? `<div class="detail-text">Trat: ${fullPaciente.fichaClinica.enf_infarto_tratamiento}</div>` : ''}</td></tr>
-                                <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.enf_asma)}</span> Asma ${fullPaciente.fichaClinica?.enf_asma_tratamiento ? `<div class="detail-text">Trat: ${fullPaciente.fichaClinica.enf_asma_tratamiento}</div>` : ''}</td></tr>
-                                <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.enf_renal)}</span> Enf. Renal ${fullPaciente.fichaClinica?.enf_renal_tratamiento ? `<div class="detail-text">Trat: ${fullPaciente.fichaClinica.enf_renal_tratamiento}</div>` : ''}</td></tr>
-                                <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.enf_gastritis)}</span> Gastritis ${fullPaciente.fichaClinica?.enf_gastritis_tratamiento ? `<div class="detail-text">Trat: ${fullPaciente.fichaClinica.enf_gastritis_tratamiento}</div>` : ''}</td></tr>
-                                <tr><td><span class="checkbox-icon">${checkIcon(fullPaciente.fichaClinica?.enf_otros)}</span> Otros ${fullPaciente.fichaClinica?.enf_otros_detalle ? `<div class="detail-text">Det: ${fullPaciente.fichaClinica.enf_otros_detalle}</div>` : ''}</td></tr>
-                            </table>
-                        </div>
+                        <h2>Antecedentes Generales</h2>
+                        <table class="diseases-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 35%;">ANTECEDENTES GENERALES</th>
+                                    <th style="width: 15%; text-align: center;">SÍ | NO</th>
+                                    <th style="width: 50%;">DETALLE / ESPECIFICACIÓN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Complicaciones Dentales</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.complicaciones)}</td>
+                                    <td>${fullPaciente.fichaClinica?.complicaciones_detalle || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Tratamiento Médico Actual</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.tratamiento_medico_actual)}</td>
+                                    <td>${fullPaciente.fichaClinica?.tratamiento_medico_enfermedad || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Toma Medicamentos</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.toma_medicamento)}</td>
+                                    <td>${fullPaciente.fichaClinica?.medicamento_detalle || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Alergias a Medicamentos</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.alergia_medicamento)}</td>
+                                    <td>${fullPaciente.fichaClinica?.alergia_medicamento_detalle || '-'}</td>
+                                </tr>
+                            </tbody>
+                        </table>
 
+                        <h2>Listado de Enfermedades</h2>
+                        <table class="diseases-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 35%;">ENFERMEDADES</th>
+                                    <th style="width: 15%; text-align: center;">SÍ | NO</th>
+                                    <th style="width: 50%;">TRATAMIENTO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Epilepsia o Convulsiones</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.enf_epilepsia)}</td>
+                                    <td>${fullPaciente.fichaClinica?.enf_epilepsia_tratamiento || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Anemia</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.enf_anemia)}</td>
+                                    <td>${fullPaciente.fichaClinica?.enf_anemia_tratamiento || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Diabetes</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.enf_diabetes)}</td>
+                                    <td>${fullPaciente.fichaClinica?.enf_diabetes_tratamiento || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Hiper o Hipotiroidismo</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.enf_tiroidismo)}</td>
+                                    <td>${fullPaciente.fichaClinica?.enf_tiroidismo_tratamiento || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Hipertensión Arterial</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.enf_hipertension)}</td>
+                                    <td>${fullPaciente.fichaClinica?.enf_hipertension_tratamiento || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Infarto al miocardio</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.enf_infarto)}</td>
+                                    <td>${fullPaciente.fichaClinica?.enf_infarto_tratamiento || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Asma</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.enf_asma)}</td>
+                                    <td>${fullPaciente.fichaClinica?.enf_asma_tratamiento || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Insuficiencia renal</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.enf_renal)}</td>
+                                    <td>${fullPaciente.fichaClinica?.enf_renal_tratamiento || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Gastritis</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.enf_gastritis)}</td>
+                                    <td>${fullPaciente.fichaClinica?.enf_gastritis_tratamiento || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Otros</td>
+                                    <td style="text-align: center;">${renderSiNo(fullPaciente.fichaClinica?.enf_otros)}</td>
+                                    <td>${fullPaciente.fichaClinica?.enf_otros_tratamiento || fullPaciente.fichaClinica?.enf_otros_detalle || '-'}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="page-break"></div>
                         <h2>Examen Clínico</h2>
                         <div class="info-grid">
                             <div class="field" style="grid-column: span 3;"><span class="label">Examen Extraoral</span><div class="value">${fullPaciente.fichaClinica?.examen_clinico_extraoral || '-'}</div></div>
@@ -586,7 +701,7 @@ const PacienteSeguroList: React.FC = () => {
                             <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Celular</th>
                             <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Fecha Nacimiento</th>
                             <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Estado</th>
-                            <th className="px-6 py-3 text-center text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Firma HC</th>
+                            <th className="px-6 py-3 text-center text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Firma</th>
                             <th className="no-print px-6 py-3 text-center text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                         </tr>
                     </thead>
@@ -628,7 +743,7 @@ const PacienteSeguroList: React.FC = () => {
                                 <td className="px-6 py-4 text-center">
                                     <div className="flex justify-center items-center gap-2">
                                         {p.esta_firmado ? (
-                                            <div className="flex items-center text-green-600 dark:text-green-400 font-bold" title="Historia Clínica Firmada">
+                                            <div className="flex items-center text-green-600 dark:text-green-400 font-bold" title="Ficha Clínica Firmada">
                                                 <CheckCircle size={20} className="mr-1" />
                                                 <span className="text-xs">Firmado</span>
                                             </div>
@@ -639,7 +754,7 @@ const PacienteSeguroList: React.FC = () => {
                                                     setShowSignatureModal(true);
                                                 }}
                                                 className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md transition-all transform hover:-translate-y-0.5"
-                                                title="Firmar Historia Clínica"
+                                                title="Firmar Ficha Clínica"
                                             >
                                                 <PenTool size={20} />
                                             </button>
@@ -718,7 +833,7 @@ const PacienteSeguroList: React.FC = () => {
                         setShowSignatureModal(false);
                         setSelectedPacienteId(null);
                     }}
-                    tipoDocumento="historia_clinica"
+                    tipoDocumento="paciente_seguro"
                     documentoId={selectedPacienteId}
                     rolFirmante="paciente"
                     onSuccess={() => {

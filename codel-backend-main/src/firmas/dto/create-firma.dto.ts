@@ -3,7 +3,7 @@ import { IsString, IsInt, IsNotEmpty, IsOptional, IsIn } from 'class-validator';
 export class CreateFirmaDto {
     @IsString()
     @IsNotEmpty()
-    @IsIn(['presupuesto', 'historia_clinica', 'receta', 'paciente'])
+    @IsIn(['presupuesto', 'historia_clinica', 'receta', 'paciente', 'paciente_particular', 'paciente_seguro'])
     tipoDocumento: string;
 
     @IsInt()
