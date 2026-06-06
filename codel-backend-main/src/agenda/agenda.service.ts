@@ -17,37 +17,46 @@ export class AgendaService {
         private readonly personalService: PersonalService,
     ) { }
 
-    async enviarRecordatoriosManana(): Promise<{ success: boolean; message: string; enviados: number; fallidos: number }> {
+    async enviarRecordatoriosManana(fecha?: string): Promise<{ success: boolean; message: string; enviados: number; fallidos: number }> {
         // Calculate tomorrow's date string (YYYY-MM-DD)
         const manana = new Date();
         manana.setDate(manana.getDate() + 1);
         const year = manana.getFullYear();
         const month = String(manana.getMonth() + 1).padStart(2, '0');
         const day = String(manana.getDate()).padStart(2, '0');
-        const fechaManana = `${year}-${month}-${day}`;
+        const tomorrowStr = `${year}-${month}-${day}`;
 
-        // Find all appointments for tomorrow
-        const citasManana = await this.findAll(fechaManana, undefined, undefined);
+        const targetFecha = fecha || tomorrowStr;
 
-        // Si no hay ninguna cita para mañana, retornar mensaje informativo (sin WhatsApp)
-        if (citasManana.length === 0) {
-            console.log(`[AgendaService] No hay citas para mañana (${fechaManana}).`);
+        // Determine relative date text
+        let fechaRelativa = 'mañana';
+        if (targetFecha !== tomorrowStr) {
+            const [y, m, d] = targetFecha.split('-');
+            fechaRelativa = `el día ${d}/${m}/${y}`;
+        }
+
+        // Find all appointments for target date
+        const citasFecha = await this.findAll(targetFecha, undefined, undefined);
+
+        // Si no hay ninguna cita, retornar mensaje informativo (sin WhatsApp)
+        if (citasFecha.length === 0) {
+            console.log(`[AgendaService] No hay citas para la fecha (${targetFecha}).`);
             return {
                 success: true,
-                message: `No hay pacientes agendados para mañana (${fechaManana}). La agenda está libre.`,
+                message: `No hay pacientes agendados para la fecha (${targetFecha}). La agenda está libre.`,
                 enviados: 0,
                 fallidos: 0
             };
         }
 
         // El usuario solo quiere mandar a los que están "agendado". Los que están "confirmado" o en "sala de espera" no reciben mensaje.
-        const citasParaRecordar = citasManana.filter(cita => {
+        const citasParaRecordar = citasFecha.filter(cita => {
             const tieneCelular = (cita.paciente?.telefono_celular) || (cita.pacienteSeguro?.celular);
             return cita.estado === 'agendado' && tieneCelular && !cita.recordatorioEnviado;
         });
 
-        const ignoradas = citasManana.length - citasParaRecordar.length;
-        console.log(`[AgendaService] Citas mañana: ${citasManana.length}. Filtradas a 'agendado'+sin_enviar+celular: ${citasParaRecordar.length} (Ignoradas: ${ignoradas})`);
+        const ignoradas = citasFecha.length - citasParaRecordar.length;
+        console.log(`[AgendaService] Citas fecha ${targetFecha}: ${citasFecha.length}. Filtradas a 'agendado'+sin_enviar+celular: ${citasParaRecordar.length} (Ignoradas: ${ignoradas})`);
 
         let enviados = 0;
         let fallidos = 0;
@@ -71,7 +80,7 @@ export class AgendaService {
                 const nombrePaciente = p.nombre;
                 const nomClinica = 'CODEL';
 
-                const mensaje = `Hola *${nombrePaciente}*, ${nomClinica} te recuerda que tienes una cita mañana a las *${horaStr}*.\n\n📌 Hola, somos ${nomClinica}, por favor guarda nuestro número para recibir tus recordatorios.`;
+                const mensaje = `Hola *${nombrePaciente}*, ${nomClinica} te recuerda que tienes una cita ${fechaRelativa} a las *${horaStr}*.`;
 
                 await this.chatbotService.sendAgendaMenu(
                     jid,

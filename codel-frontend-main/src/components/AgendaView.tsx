@@ -393,18 +393,33 @@ const AgendaView: React.FC = () => {
 
     const handleEnviarRecordatoriosManana = async () => {
         try {
-            const result = await Swal.fire({
-                title: '¿Enviar recordatorios?',
-                text: 'Se enviará un mensaje de WhatsApp a todos los pacientes con cita agendada para mañana.',
-                icon: 'question',
+            // Calculate tomorrow's date string (YYYY-MM-DD)
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const year = tomorrow.getFullYear();
+            const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+            const day = String(tomorrow.getDate()).padStart(2, '0');
+            const tomorrowStr = `${year}-${month}-${day}`;
+
+            const { value: selectedDate, isConfirmed } = await Swal.fire({
+                title: 'Seleccione la Fecha de Recordatorios',
+                html: '<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Se enviará un mensaje de WhatsApp a todos los pacientes con cita agendada para la fecha seleccionada.</p>',
+                input: 'date',
+                inputValue: tomorrowStr,
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, enviar',
-                cancelButtonText: 'Cancelar'
+                confirmButtonText: `<span class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg> Enviar Recordatorios</span>`,
+                cancelButtonText: `<span class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg> Cancelar</span>`,
+                customClass: {
+                    confirmButton: 'px-4 py-2 mx-2 bg-green-500 hover:bg-green-600 text-white rounded font-bold transition-all transform hover:-translate-y-0.5 shadow-md outline-none',
+                    cancelButton: 'px-4 py-2 mx-2 bg-red-500 hover:bg-red-600 text-white rounded font-bold transition-all transform hover:-translate-y-0.5 shadow-md outline-none',
+                    input: 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full max-w-xs mx-auto text-center'
+                },
+                buttonsStyling: false,
+                background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#fff',
+                color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#000',
             });
 
-            if (result.isConfirmed) {
+            if (isConfirmed && selectedDate) {
                 setIsSendingReminders(true);
                 Swal.fire({
                     title: 'Enviando mensajes...',
@@ -415,8 +430,7 @@ const AgendaView: React.FC = () => {
                     }
                 });
 
-                const response = await api.post('/agenda/recordatorios-manana', {
-                    });
+                const response = await api.post(`/agenda/recordatorios-manana?fecha=${selectedDate}`);
 
                 if (response.data.success) {
                     Swal.fire({
@@ -427,7 +441,7 @@ const AgendaView: React.FC = () => {
                         timer: 1500
                     });
                 } else {
-                    Swal.fire('Error', 'Hubo un problema al enviar los mensajes', 'error');
+                    Swal.fire('Error', response.data.message || 'Hubo un problema al enviar los mensajes', 'error');
                 }
             }
         } catch (error) {

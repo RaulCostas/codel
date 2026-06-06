@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 interface ChatbotIntento {
     id: number;
     keywords: string;
-    action: 'CONSULTAR_CITA' | 'CONSULTAR_SALDO' | 'TEXTO_LIBRE' | 'CONSULTAR_PRESUPUESTO';
+    action: 'CONSULTAR_CITA' | 'TEXTO_LIBRE';
     replyTemplate?: string;
     active: boolean;
     target?: 'PACIENTE' | 'USUARIO';

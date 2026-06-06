@@ -22,8 +22,8 @@ export class AgendaController {
     }
 
     @Post('recordatorios-manana')
-    async enviarRecordatoriosManana() {
-        return await this.agendaService.enviarRecordatoriosManana();
+    async enviarRecordatoriosManana(@Query('fecha') fecha?: string) {
+        return await this.agendaService.enviarRecordatoriosManana(fecha);
     }
 
     @Get()

@@ -450,7 +450,6 @@ export class ChatbotService implements OnModuleInit, OnModuleDestroy {
                 session.userSessions.delete(remoteJid);
                 return;
             } else {
-                await this.sendMessage(remoteJid, 'Por favor responde *A* para confirmar o *B* para cancelar tu cita.');
                 return;
             }
         }
@@ -531,17 +530,9 @@ export class ChatbotService implements OnModuleInit, OnModuleDestroy {
                     case 'MENU_PRINCIPAL' as any:
                         await this.sendMenu(remoteJid, actor);
                         break;
-                    case 'CONSULTAR_SALDO':
-                        if (!isDoctor) {
-                            const detailedReport = await this.calculateDetailedSaldo(actor.id);
-                            await this.sendMessage(remoteJid, `Hola ${actor.nombre}, aquí está su estado de cuenta:\n\n${detailedReport}`);
-                        }
-                        break;
                     case 'CONSULTAR_CITA':
                         if (isDoctor) {
                             await this.checkDoctorAppointments(actor, remoteJid);
-                        } else {
-                            await this.checkAppointments(actor, remoteJid);
                         }
                         break;
                     case 'CONSULTAR_CITA_HOY':
@@ -554,17 +545,6 @@ export class ChatbotService implements OnModuleInit, OnModuleDestroy {
                             await this.sendMessage(remoteJid, matchedIntent.replyTemplate);
                         }
                         break;
-                    case 'CONSULTAR_PRESUPUESTO':
-                        if (!isDoctor) {
-                            await this.executeConsultarPresupuesto(actor, remoteJid);
-                        }
-                        break;
-                    case 'CONSULTAR_DIRECCION':
-                        await this.sendMessage(remoteJid, `Nos encontramos en: la Av. Principal #123`);
-                        break;
-                    case 'CONSULTAR_HORARIO':
-                        await this.sendMessage(remoteJid, `Nuestro horario de atención es de Lunes a Viernes de 8:00 a 18:00.`);
-                        break;
                     case 'CONSULTAR_INVENTARIO' as any:
                         await this.handleConsultarInventario(remoteJid, normalizedText);
                         break;
@@ -572,79 +552,25 @@ export class ChatbotService implements OnModuleInit, OnModuleDestroy {
             } catch (error) {
                 await this.sendMessage(remoteJid, 'Lo siento, ocurrió un error al procesar tu solicitud.');
             }
-        } else {
-            if (actor && !isDoctor && (normalizedText.includes('cita') || normalizedText.includes('cuando') || normalizedText.includes('agend'))) {
-                await this.checkAppointments(actor, remoteJid);
-            }
         }
     }
 
 
     async sendMenu(remoteJid: string, actor: any) {
-        const session = this.getSession();
-        let menuType: 'new' | 'registered' = actor ? 'registered' : 'new';
+        const clinicaNombre = 'CODEL';
         let message = '';
 
-        const clinicaNombre = 'CODEL';
-
-        if (menuType === 'new') {
-            message = `¡Hola! Bienvenido a nuestra Clínica ${clinicaNombre}. ¿En qué podemos ayudarte?\n\n` +
-                `*Menu:*\n` +
-                `*A* ¿Donde queda la Clínica?\n` +
-                `*B* ¿Cual es el horario de atención?\n\n` +
-                `Por favor, responde con la letra de la opción que desees.`;
+        if (!actor) {
+            message = `¡Hola! Bienvenido a nuestra Clínica ${clinicaNombre}. En un momento un asesor se comunicará contigo.`;
         } else {
-            message = `¡Hola ${actor.nombre}! Bienvenido de nuevo. ¿En qué podemos ayudarte hoy?\n\n` +
-                `*Menu Principal:*\n` +
-                `*1* Consultar Citas\n` +
-                `*2* Consultar Planes de Tratamientos\n` +
-                `*3* Consultar mi Saldo\n\n` +
-                `Por favor, responde con el número de la opción que desees.`;
+            message = `¡Hola ${actor.nombre}! Bienvenido de nuevo a la Clínica ${clinicaNombre}. En un momento un asesor se comunicará contigo.`;
         }
 
         await this.sendMessage(remoteJid, message);
-        session.userSessions.set(remoteJid, { type: menuType, timestamp: Date.now() });
     }
 
     async handleMenuOption(remoteJid: string, option: string, actor: any, type: 'new' | 'registered') {
-        const session = this.getSession();
-        const opt = option.toUpperCase();
-
-        switch (opt) {
-            case 'A':
-                await this.sendMessage(remoteJid, `Nos encontramos en: la Av. Principal #123`);
-                break;
-            case 'B':
-                await this.sendMessage(remoteJid, `Nuestro horario de atención es de Lunes a Viernes de 8:00 a 18:00.`);
-                break;
-            case '1':
-                if (type === 'registered') {
-                    await this.checkAppointments(actor, remoteJid);
-                } else {
-                    await this.sendMessage(remoteJid, "Esta opción es solo para pacientes registrados.");
-                }
-                break;
-            case '2':
-                if (type === 'registered') {
-                    await this.executeConsultarPresupuesto(actor, remoteJid);
-                } else {
-                    await this.sendMessage(remoteJid, "Esta opción es solo para pacientes registrados.");
-                }
-                break;
-            case '3':
-                if (type === 'registered') {
-                    const detailedReport = await this.calculateDetailedSaldo(actor.id);
-                    await this.sendMessage(remoteJid, `Hola ${actor.nombre}, aquí está su estado de cuenta:\n\n${detailedReport}`);
-                } else {
-                    await this.sendMessage(remoteJid, "Esta opción es solo para pacientes registrados.");
-                }
-                break;
-            default:
-                await this.sendMessage(remoteJid, "Opción no válida. Por favor, selecciona una de las opciones del menú.");
-                break;
-        }
-
-        session.userSessions.set(remoteJid, { type, timestamp: Date.now() });
+        // No-op for now since patient menu is simplified
     }
 
     async executeConsultarPresupuesto(actor: any, remoteJid: string) {
@@ -917,7 +843,7 @@ export class ChatbotService implements OnModuleInit, OnModuleDestroy {
      */
     async sendAgendaMenu(jid: string, mensajeIntro: string, citaId: number): Promise<void> {
         const session = this.getSession();
-        const menuTexto = `${mensajeIntro}\n\nPor favor responde con:\n*A* ✅ Confirmar Cita\n*B* ❌ Cancelar Cita`;
+        const menuTexto = `${mensajeIntro}\n\nPor favor responde con una LETRA:\n*A* ✅ Confirmar Cita\n*B* ❌ Cancelar Cita\n\n📌 Hola, somos CODEL, por favor guarda nuestro número para recibir tus recordatorios.`;
         await this.sendMessage(jid, menuTexto);
         session.userSessions.set(jid, {
             type: 'waiting_agenda_response' as any,
