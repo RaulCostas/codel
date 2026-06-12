@@ -17,6 +17,7 @@ import ManualModal from './ManualModal';
 import type { ManualSection } from './ManualModal';
 import SeguimientoImagesModal from './SeguimientoImagesModal';
 import SeguimientoViewModal from './SeguimientoViewModal';
+import FichaEndodonciaSeguroForm from './FichaEndodonciaSeguro';
 
 const PacienteTabSeguimientoSeguro: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -28,6 +29,7 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
     const [showManual, setShowManual] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
+    const [activeSubTab, setActiveSubTab] = useState<'seguimiento' | 'endodoncia'>('seguimiento');
 
     const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [aranceles, setAranceles] = useState<any[]>([]);
@@ -366,8 +368,29 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            {/* Form section at the very TOP */}
-            {showForm && (
+            <div className="flex flex-wrap border-b border-gray-200 dark:border-gray-700 mb-6 bg-white dark:bg-gray-800 rounded-t-lg pt-2 px-2 transition-colors">
+                <div
+                    onClick={() => setActiveSubTab('seguimiento')}
+                    className={`px-6 py-3 cursor-pointer border-b-4 transition-all duration-200 text-base ${activeSubTab === 'seguimiento' 
+                        ? 'border-blue-500 text-blue-500 font-bold dark:border-blue-400 dark:text-blue-400' 
+                        : 'border-transparent text-gray-600 dark:text-gray-400 font-normal hover:text-blue-500 dark:hover:text-blue-300'}`}
+                >
+                    Seguimiento y Tratamientos
+                </div>
+                <div
+                    onClick={() => setActiveSubTab('endodoncia')}
+                    className={`px-6 py-3 cursor-pointer border-b-4 transition-all duration-200 text-base ${activeSubTab === 'endodoncia' 
+                        ? 'border-red-500 text-red-500 font-bold dark:border-red-400 dark:text-red-400' 
+                        : 'border-transparent text-gray-600 dark:text-gray-400 font-normal hover:text-red-500 dark:hover:text-red-300'}`}
+                >
+                    Ficha Endodoncia
+                </div>
+            </div>
+
+            {activeSubTab === 'seguimiento' ? (
+                <>
+                    {/* Form section at the very TOP */}
+                    {showForm && (
                 <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-6 shadow-xl relative overflow-hidden animate-fade-in-down">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
@@ -808,6 +831,12 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
                     onPageChange={setCurrentPage}
                 />
             </div>
+            </>
+            ) : (
+                <div className="animate-fade-in">
+                    <FichaEndodonciaSeguroForm pacienteSeguroId={Number(id)} />
+                </div>
+            )}
 
             <SeguimientoImagesModal 
                 isOpen={showImagesModal}

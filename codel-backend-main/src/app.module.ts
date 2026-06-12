@@ -127,6 +127,11 @@ import { FichaEndodoncia } from './ficha_endodoncia/entities/ficha_endodoncia.en
 import { EndodonciaPruebaVitalidad } from './ficha_endodoncia/entities/endodoncia_prueba_vitalidad.entity';
 import { EndodonciaControlTcr } from './ficha_endodoncia/entities/endodoncia_control_tcr.entity';
 import { EndodonciaMedicacion } from './ficha_endodoncia/entities/endodoncia_medicacion.entity';
+import { FichaEndodonciaSeguroModule } from './ficha_endodoncia_seguro/ficha_endodoncia_seguro.module';
+import { FichaEndodonciaSeguro } from './ficha_endodoncia_seguro/entities/ficha_endodoncia_seguro.entity';
+import { EndodonciaSeguroPruebaVitalidad } from './ficha_endodoncia_seguro/entities/endodoncia_seguro_prueba_vitalidad.entity';
+import { EndodonciaSeguroControlTcr } from './ficha_endodoncia_seguro/entities/endodoncia_seguro_control_tcr.entity';
+import { EndodonciaSeguroMedicacion } from './ficha_endodoncia_seguro/entities/endodoncia_seguro_medicacion.entity';
 import { HistoriaClinicaSeguroModule } from './historia_clinica_seguro/historia_clinica_seguro.module';
 import { HistoriaClinicaSeguro } from './pacientes_seguro/entities/historia_clinica_seguro.entity';
 import { ProformaSeguroModule } from './proforma_seguro/proforma_seguro.module';
@@ -218,6 +223,10 @@ import { DashboardModule } from './dashboard/dashboard.module';
         EndodonciaPruebaVitalidad,
         EndodonciaControlTcr,
         EndodonciaMedicacion,
+        FichaEndodonciaSeguro,
+        EndodonciaSeguroPruebaVitalidad,
+        EndodonciaSeguroControlTcr,
+        EndodonciaSeguroMedicacion,
         HistoriaClinicaSeguro,
         ProformaSeguro,
         ExamenDentalSeguro,
@@ -282,6 +291,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     PacientesSeguroModule,
     FichaOrtodonciaModule,
     FichaEndodonciaModule,
+    FichaEndodonciaSeguroModule,
     HistoriaClinicaSeguroModule,
     ProformaSeguroModule,
     TurnosPersonalModule,

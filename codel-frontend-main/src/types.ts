@@ -422,6 +422,104 @@ export interface FichaEndodoncia {
     updatedAt?: string;
 }
 
+export interface FichaEndodonciaSeguro {
+    id?: number;
+    pacienteSeguroId: number;
+    pieza_dental?: string;
+
+    // 1. Diagnóstico Clínico
+    clinico_caries_dental: boolean;
+    clinico_fractura_coronal: boolean;
+    clinico_decoloracion_pieza: boolean;
+    clinico_movilidad_dental: boolean;
+    clinico_exposicion_pulpar: boolean;
+    clinico_restauracion_deficiente: boolean;
+    clinico_lesion_furca: boolean;
+    clinico_recesion_gingival: boolean;
+    clinico_atrision: boolean;
+    clinico_abracion: boolean;
+    clinico_abfraccion: boolean;
+    clinico_alteracion_desarrollo: boolean;
+
+    // 2. Diagnóstico Radiográfico
+    radio_ligamento_ensanchado: boolean;
+    radio_fractura_vertical: boolean;
+    radio_fractura_horizontal: boolean;
+    radio_apice_inmaduro: boolean;
+    radio_caries_bajo_restauracion: boolean;
+    radio_reabsorcion_externa: boolean;
+    radio_reabsorcion_interna: boolean;
+    radio_tcr_deficiente: boolean;
+    radio_lesion_periapical: boolean;
+    radio_lesion_lateral: boolean;
+    radio_calcificacion_espacio: boolean;
+    radio_perdida_osea: boolean;
+
+    // 3. Dolor (Antes y Ahora) - Presencia
+    dolor_pres_ninguno_antes: boolean;
+    dolor_pres_ninguno_ahora: boolean;
+    dolor_pres_leve_antes: boolean;
+    dolor_pres_leve_ahora: boolean;
+    dolor_pres_moderado_antes: boolean;
+    dolor_pres_moderado_ahora: boolean;
+    dolor_pres_severo_antes: boolean;
+    dolor_pres_severo_ahora: boolean;
+
+    // 3. Dolor (Antes y Ahora) - Tipo
+    dolor_tipo_espontaneo_antes: boolean;
+    dolor_tipo_espontaneo_ahora: boolean;
+    dolor_tipo_estimulado_antes: boolean;
+    dolor_tipo_estimulado_ahora: boolean;
+    dolor_tipo_calor_antes: boolean;
+    dolor_tipo_calor_ahora: boolean;
+    dolor_tipo_frio_antes: boolean;
+    dolor_tipo_frio_ahora: boolean;
+    dolor_tipo_acidez_antes: boolean;
+    dolor_tipo_acidez_ahora: boolean;
+    dolor_tipo_dulce_antes: boolean;
+    dolor_tipo_dulce_ahora: boolean;
+    dolor_tipo_masticacion_antes: boolean;
+    dolor_tipo_masticacion_ahora: boolean;
+    dolor_tipo_constante_antes: boolean;
+    dolor_tipo_constante_ahora: boolean;
+    dolor_tipo_sordo_antes: boolean;
+    dolor_tipo_sordo_ahora: boolean;
+    dolor_tipo_palpitante_antes: boolean;
+    dolor_tipo_palpitante_ahora: boolean;
+
+    // 4. Diagnóstico Pulpar
+    pulpar_sana: boolean;
+    pulpar_reversible: boolean;
+    pulpar_irreversible_sintomatica: boolean;
+    pulpar_irreversible_asintomatica: boolean;
+    pulpar_necrosis: boolean;
+    pulpar_previamente_tratada: boolean;
+    pulpar_tcr_sin_terminar: boolean;
+    pulpar_conducto_no_sellado: boolean;
+
+    // 5. Diagnóstico Periapical
+    peri_saludable: boolean;
+    peri_apical_sintomatica: boolean;
+    peri_apical_asintomatica: boolean;
+    peri_absceso_agudo: boolean;
+    peri_absceso_cronico: boolean;
+    peri_osteitis_condensante: boolean;
+
+    // Secciones Adicionales
+    observaciones: string;
+    diagnostico: string;
+    tratamiento_check: boolean;
+    tratamiento_descripcion: string;
+    retratamiento_check: boolean;
+    retratamiento_descripcion: string;
+    pruebas_vitalidad: EndodonciaPruebaVitalidad[];
+    control_tcr: EndodonciaControlTcr[];
+    medicacion_intraconducto: EndodonciaMedicacion[];
+
+    createdAt?: string;
+    updatedAt?: string;
+}
+
 export interface EndodonciaPruebaVitalidad {
     id?: number;
     pieza: string;
