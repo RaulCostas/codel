@@ -106,6 +106,69 @@ export class AgendaService {
         };
     }
 
+    async enviarRecordatorioIndividual(id: number): Promise<{ success: boolean; message: string }> {
+        const cita = await this.findOne(id);
+        const p: any = cita.paciente || cita.pacienteSeguro;
+
+        if (!p) {
+            throw new BadRequestException('La cita no tiene un paciente asociado.');
+        }
+
+        let celular = (p.telefono_celular || p.celular || '').replace(/\D/g, '');
+        if (!celular) {
+            throw new BadRequestException('El paciente no tiene un número de celular registrado.');
+        }
+
+        // Automatically prepend country code 591 if it's a Bolivian number missing it
+        if (celular.length === 8 && /^[67]/.test(celular)) {
+            celular = '591' + celular;
+        }
+
+        const jid = `${celular}@s.whatsapp.net`;
+        const horaStr = cita.hora ? cita.hora.substring(0, 5) : 'la hora acordada';
+        const nombrePaciente = p.nombre;
+        const nomClinica = 'CODEL';
+
+        // Calculate relative date text (today, tomorrow, or specific date)
+        const hoy = new Date();
+        const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+
+        const manana = new Date();
+        manana.setDate(manana.getDate() + 1);
+        const tomorrowStr = `${manana.getFullYear()}-${String(manana.getMonth() + 1).padStart(2, '0')}-${String(manana.getDate()).padStart(2, '0')}`;
+
+        let fechaRelativa = '';
+        if (cita.fecha === hoyStr) {
+            fechaRelativa = 'hoy';
+        } else if (cita.fecha === tomorrowStr) {
+            fechaRelativa = 'mañana';
+        } else {
+            const [y, m, d] = cita.fecha.split('-');
+            fechaRelativa = `el día ${d}/${m}/${y}`;
+        }
+
+        const mensaje = `Hola *${nombrePaciente}*, ${nomClinica} te recuerda que tienes una cita ${fechaRelativa} a las *${horaStr}*.`;
+
+        try {
+            await this.chatbotService.sendAgendaMenu(
+                jid,
+                mensaje,
+                cita.id
+            );
+
+            // Marcar como enviado en la base de datos
+            await this.agendaRepository.update(cita.id, { recordatorioEnviado: true });
+
+            return {
+                success: true,
+                message: `Recordatorio enviado con éxito a ${nombrePaciente}.`
+            };
+        } catch (error) {
+            console.error(`Error enviando recordatorio individual a ${p?.telefono_celular || p?.celular || 'sin numero'}:`, error);
+            throw new InternalServerErrorException(`No se pudo enviar el recordatorio: ${error.message}`);
+        }
+    }
+
     /**
      * Notifica a todo el personal registrado (con celular) que no hay citas para el día dado.
      */

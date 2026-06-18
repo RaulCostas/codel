@@ -16,6 +16,8 @@ async function bootstrap() {
       'https://clinicacodel.com',
       'https://www.clinicacodel.com',
       'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:5175',
       'http://localhost:3001'
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',

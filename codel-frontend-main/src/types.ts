@@ -826,6 +826,7 @@ export interface Agenda {
     estado: string;
     tratamiento?: string;
     motivoCancelacion?: string;
+    recordatorioEnviado?: boolean;
 }
 
 export interface GastoFijo {
