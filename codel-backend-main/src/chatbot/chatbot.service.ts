@@ -362,13 +362,13 @@ export class ChatbotService implements OnModuleInit, OnModuleDestroy {
                         return data;
                     },
                     set: async (data: any) => {
-                        const promises: Promise<any>[] = [];
+                        const tasks: (() => Promise<any>)[] = [];
                         for (const type in data) {
                             for (const id in data[type]) {
                                 const value = data[type][id];
                                 const typeKey = `key-${type}`;
                                 
-                                const promise = (async () => {
+                                tasks.push(async () => {
                                     const existing = await this.whatsappSessionRepository.findOne({
                                         where: { type: typeKey, keyId: id }
                                     });
@@ -391,11 +391,18 @@ export class ChatbotService implements OnModuleInit, OnModuleDestroy {
                                             await this.whatsappSessionRepository.remove(existing);
                                         }
                                     }
-                                })();
-                                promises.push(promise);
+                                });
                             }
                         }
-                        await Promise.all(promises);
+
+                        // Process in chunks of 10 to avoid database connection pool exhaustion
+                        const chunks: (() => Promise<any>)[][] = [];
+                        for (let i = 0; i < tasks.length; i += 10) {
+                            chunks.push(tasks.slice(i, i + 10));
+                        }
+                        for (const chunk of chunks) {
+                            await Promise.all(chunk.map(task => task()));
+                        }
                     }
                 }
             },
