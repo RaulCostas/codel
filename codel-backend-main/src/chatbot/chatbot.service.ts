@@ -362,34 +362,40 @@ export class ChatbotService implements OnModuleInit, OnModuleDestroy {
                         return data;
                     },
                     set: async (data: any) => {
+                        const promises: Promise<any>[] = [];
                         for (const type in data) {
                             for (const id in data[type]) {
                                 const value = data[type][id];
                                 const typeKey = `key-${type}`;
-                                const existing = await this.whatsappSessionRepository.findOne({
-                                    where: { type: typeKey, keyId: id }
-                                });
+                                
+                                const promise = (async () => {
+                                    const existing = await this.whatsappSessionRepository.findOne({
+                                        where: { type: typeKey, keyId: id }
+                                    });
 
-                                if (value) {
-                                    const serialized = JSON.parse(JSON.stringify(value, BufferJSON.replacer));
-                                    if (existing) {
-                                        existing.data = serialized;
-                                        await this.whatsappSessionRepository.save(existing);
+                                    if (value) {
+                                        const serialized = JSON.parse(JSON.stringify(value, BufferJSON.replacer));
+                                        if (existing) {
+                                            existing.data = serialized;
+                                            await this.whatsappSessionRepository.save(existing);
+                                        } else {
+                                            const newKey = this.whatsappSessionRepository.create({
+                                                type: typeKey,
+                                                keyId: id,
+                                                data: serialized
+                                            });
+                                            await this.whatsappSessionRepository.save(newKey);
+                                        }
                                     } else {
-                                        const newKey = this.whatsappSessionRepository.create({
-                                            type: typeKey,
-                                            keyId: id,
-                                            data: serialized
-                                        });
-                                        await this.whatsappSessionRepository.save(newKey);
+                                        if (existing) {
+                                            await this.whatsappSessionRepository.remove(existing);
+                                        }
                                     }
-                                } else {
-                                    if (existing) {
-                                        await this.whatsappSessionRepository.remove(existing);
-                                    }
-                                }
+                                })();
+                                promises.push(promise);
                             }
                         }
+                        await Promise.all(promises);
                     }
                 }
             },
