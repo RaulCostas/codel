@@ -67,6 +67,7 @@ const PlanillasProformasSeguro: React.FC = () => {
     const [showViewModal, setShowViewModal] = useState(false);
     const [editingProforma, setEditingProforma] = useState<ProformaSeguro | null>(null);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [searchPacienteEditModal, setSearchPacienteEditModal] = useState('');
     const [showPagoModal, setShowPagoModal] = useState(false);
     const [proformaParaPagar, setProformaParaPagar] = useState<ProformaSeguro | null>(null);
     const [formasPago, setFormasPago] = useState<FormaPago[]>([]);
@@ -526,6 +527,7 @@ const PlanillasProformasSeguro: React.FC = () => {
 
             setShowEditModal(false);
             setEditingProforma(null);
+            setSearchPacienteEditModal('');
             fetchHistorial();
             fetchData();
         } catch (error: any) {
@@ -1333,6 +1335,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                                                                     onClick={() => {
                                                                         setEditingProforma(prof);
                                                                         setShowEditModal(true);
+                                                                        setSearchPacienteEditModal('');
                                                                     }}
                                                                     className="p-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-md transition-all transform hover:-translate-y-0.5 active:scale-95"
                                                                     title="Editar"
@@ -1397,7 +1400,7 @@ const PlanillasProformasSeguro: React.FC = () => {
 
             {/* Modal de Vista Previa (Ver) */}
             {showViewModal && viewingProforma && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                <div className="fixed inset-0 z-[1050] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
                     <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
                         <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-900/50">
                             <div>
@@ -1488,7 +1491,7 @@ const PlanillasProformasSeguro: React.FC = () => {
 
             {/* Modal de Edición */}
             {showEditModal && editingProforma && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                <div className="fixed inset-0 z-[1050] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
                     <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
                         <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-amber-50/50 dark:bg-amber-900/20">
                             <div>
@@ -1563,40 +1566,72 @@ const PlanillasProformasSeguro: React.FC = () => {
                                 </h3>
                                 
                                 <div className="space-y-3">
-                                    {registros.filter(r => 
-                                        r.pacienteSeguro?.seguro?.id === editingProforma.seguro?.id && 
-                                        !editingProforma.detalles?.some(d => d.id === r.id)
-                                    ).length === 0 ? (
-                                        <p className="text-xs text-gray-400 italic bg-gray-50 dark:bg-gray-900/30 p-4 rounded-xl text-center">
-                                            No hay más tratamientos pendientes para este seguro.
-                                        </p>
-                                    ) : (
-                                        registros.filter(r => 
+                                    {(() => {
+                                        const eligibleRegistros = registros.filter(r => 
                                             r.pacienteSeguro?.seguro?.id === editingProforma.seguro?.id && 
                                             !editingProforma.detalles?.some(d => d.id === r.id)
-                                        ).map(r => (
-                                            <div key={r.id} className="flex items-center justify-between p-3 bg-blue-50/30 dark:bg-blue-900/10 rounded-xl border border-blue-100/50 dark:border-blue-900/30 hover:border-blue-300 transition-colors">
-                                                <div className="flex flex-col">
-                                                    <span className="font-bold text-gray-800 dark:text-gray-200 uppercase text-xs">
-                                                        {formatFullName(r.pacienteSeguro)}
+                                        );
+
+                                        if (eligibleRegistros.length === 0) {
+                                            return (
+                                                <p className="text-xs text-gray-400 italic bg-gray-50 dark:bg-gray-900/30 p-4 rounded-xl text-center">
+                                                    No hay más tratamientos pendientes para este seguro.
+                                                </p>
+                                            );
+                                        }
+
+                                        const filteredRegistros = eligibleRegistros.filter(r => {
+                                            const fullName = formatFullName(r.pacienteSeguro).toLowerCase();
+                                            return fullName.includes(searchPacienteEditModal.toLowerCase());
+                                        });
+
+                                        return (
+                                            <>
+                                                {/* Buscador por paciente */}
+                                                <div className="relative mb-3">
+                                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                                                        <Search size={16} />
                                                     </span>
-                                                    <span className="text-[10px] text-gray-500">
-                                                        {r.arancel?.detalle} | {formatDate(r.fecha)}
-                                                    </span>
+                                                    <input 
+                                                        type="text"
+                                                        placeholder="Buscar por paciente..."
+                                                        value={searchPacienteEditModal}
+                                                        onChange={(e) => setSearchPacienteEditModal(e.target.value)}
+                                                        className="w-full pl-9 pr-4 py-2 text-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                                    />
                                                 </div>
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-sm font-bold text-blue-600">{formatCurrency(r.precio, 'Bs')}</span>
-                                                    <button 
-                                                        onClick={() => handleAgregarTratamiento(editingProforma.id, r.id)}
-                                                        className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg shadow-md transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center"
-                                                        title="Agregar a Proforma"
-                                                    >
-                                                        <Plus size={16} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))
-                                    )}
+
+                                                {filteredRegistros.length === 0 ? (
+                                                    <p className="text-xs text-gray-400 italic bg-gray-50 dark:bg-gray-900/30 p-4 rounded-xl text-center">
+                                                        No se encontraron tratamientos para "{searchPacienteEditModal}".
+                                                    </p>
+                                                ) : (
+                                                    filteredRegistros.map(r => (
+                                                        <div key={r.id} className="flex items-center justify-between p-3 bg-blue-50/30 dark:bg-blue-900/10 rounded-xl border border-blue-100/50 dark:border-blue-900/30 hover:border-blue-300 transition-colors">
+                                                            <div className="flex flex-col">
+                                                                <span className="font-bold text-gray-800 dark:text-gray-200 uppercase text-xs">
+                                                                    {formatFullName(r.pacienteSeguro)}
+                                                                </span>
+                                                                <span className="text-[10px] text-gray-500">
+                                                                    {r.arancel?.detalle} | {formatDate(r.fecha)}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center gap-3">
+                                                                <span className="text-sm font-bold text-blue-600">{formatCurrency(r.precio, 'Bs')}</span>
+                                                                <button 
+                                                                    onClick={() => handleAgregarTratamiento(editingProforma.id, r.id)}
+                                                                    className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg shadow-md transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center"
+                                                                    title="Agregar a Proforma"
+                                                                >
+                                                                    <Plus size={16} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         </div>
@@ -1611,6 +1646,7 @@ const PlanillasProformasSeguro: React.FC = () => {
                                     onClick={() => {
                                         setEditingProforma(null);
                                         setShowEditModal(false);
+                                        setSearchPacienteEditModal('');
                                     }}
                                     className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold rounded-xl transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center gap-2"
                                 >
@@ -1630,7 +1666,7 @@ const PlanillasProformasSeguro: React.FC = () => {
 
             {/* Modal de Registro de Pago */}
             {showPagoModal && proformaParaPagar && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                <div className="fixed inset-0 z-[1050] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
                     <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
                         <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-emerald-50/50 dark:bg-emerald-900/20">
                             <h2 className="text-xl font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-2">
