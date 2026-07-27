@@ -101,7 +101,14 @@ export class BackupService {
     }
 
     async createBackup(createBackupDto?: CreateBackupDto): Promise<BackupInfo> {
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const timestamp = `${year}-${month}-${day}T${hours}-${minutes}-${seconds}`;
         const filename = `codel_backup_${timestamp}.sql`;
         const targetDir = createBackupDto?.customPath || this.backupDir;
         const backupPath = path.join(targetDir, filename);
