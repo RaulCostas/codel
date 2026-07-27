@@ -17,6 +17,7 @@ export interface BackupInfo {
 @Injectable()
 export class BackupService {
     private readonly backupDir: string;
+    private readonly searchDirs: string[];
     private readonly dbHost: string;
     private readonly dbPort: number;
     private readonly dbName: string;
@@ -28,17 +29,24 @@ export class BackupService {
     constructor() {
         const isWindows = process.platform === 'win32';
 
-        // Default backup directory - production ready path
-        const defaultBackupDir = isWindows
+        // Preferred persistent backup directory inside the application folder
+        const cwdBackupDir = path.join(process.cwd(), 'backups');
+        
+        // Legacy/System default backup directories for backwards compatibility
+        const legacySysDir = isWindows
             ? 'C:\\ProgramData\\CODEL\\Backups'
             : '/tmp/backups';
-        this.backupDir = process.env.BACKUP_DIR || defaultBackupDir;
+
+        this.backupDir = process.env.BACKUP_DIR || cwdBackupDir;
+
+        // Directories to search for existing backups (de-duplicated)
+        this.searchDirs = Array.from(new Set([this.backupDir, cwdBackupDir, legacySysDir]));
 
         // Database configuration - try to parse DATABASE_URL if provided
         const dbUrl = process.env.DATABASE_URL;
         let host = process.env.DB_HOST || 'localhost';
         let port = parseInt(process.env.DB_PORT || '5433', 10);
-        let name = process.env.DB_DATABASE || 'indent_clinic';
+        let name = process.env.DB_DATABASE || 'codel';
         let user = process.env.DB_USERNAME || 'postgres';
         let password = process.env.DB_PASSWORD || 'postgrespg';
 
@@ -75,9 +83,13 @@ export class BackupService {
         this.pgDumpPath = process.env.PG_DUMP_PATH || (isWindows ? path.join(pgBinPath, 'pg_dump.exe') : 'pg_dump');
         this.psqlPath = process.env.PSQL_PATH || (isWindows ? path.join(pgBinPath, 'psql.exe') : 'psql');
 
-        // Ensure backup directory exists
+        // Ensure primary backup directory exists
         if (!fs.existsSync(this.backupDir)) {
-            fs.mkdirSync(this.backupDir, { recursive: true });
+            try {
+                fs.mkdirSync(this.backupDir, { recursive: true });
+            } catch (e) {
+                console.error('Could not create primary backup dir, falling back:', e);
+            }
         }
 
         // Log paths for debugging
@@ -90,7 +102,7 @@ export class BackupService {
 
     async createBackup(createBackupDto?: CreateBackupDto): Promise<BackupInfo> {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-        const filename = `clinicas_lens_backup_${timestamp}.sql`;
+        const filename = `codel_backup_${timestamp}.sql`;
         const targetDir = createBackupDto?.customPath || this.backupDir;
         const backupPath = path.join(targetDir, filename);
 
@@ -116,11 +128,12 @@ export class BackupService {
 
             // Get file stats
             const stats = fs.statSync(backupPath);
+            const createdAtDate = (stats.mtime && stats.mtime.getTime() > 0) ? stats.mtime : stats.birthtime;
 
             return {
                 filename,
                 size: stats.size,
-                createdAt: stats.birthtime.toISOString(),
+                createdAt: createdAtDate.toISOString(),
                 path: backupPath,
             };
         } catch (error) {
@@ -131,28 +144,42 @@ export class BackupService {
 
     async listBackups(): Promise<BackupInfo[]> {
         try {
-            if (!fs.existsSync(this.backupDir)) {
-                return [];
-            }
+            const backupsMap = new Map<string, BackupInfo>();
 
-            const files = fs.readdirSync(this.backupDir);
-            const backups: BackupInfo[] = [];
+            for (const dir of this.searchDirs) {
+                if (!fs.existsSync(dir)) {
+                    continue;
+                }
 
-            for (const file of files) {
-                if (file.endsWith('.sql')) {
-                    const filePath = path.join(this.backupDir, file);
-                    const stats = fs.statSync(filePath);
-
-                    backups.push({
-                        filename: file,
-                        size: stats.size,
-                        createdAt: stats.birthtime.toISOString(),
-                        path: filePath,
-                    });
+                try {
+                    const files = fs.readdirSync(dir);
+                    for (const file of files) {
+                        if (file.endsWith('.sql') && !backupsMap.has(file)) {
+                            const filePath = path.join(dir, file);
+                            try {
+                                const stats = fs.statSync(filePath);
+                                if (stats.isFile()) {
+                                    const createdAtDate = (stats.mtime && stats.mtime.getTime() > 0) ? stats.mtime : stats.birthtime;
+                                    backupsMap.set(file, {
+                                        filename: file,
+                                        size: stats.size,
+                                        createdAt: createdAtDate.toISOString(),
+                                        path: filePath,
+                                    });
+                                }
+                            } catch (err) {
+                                console.error(`Error stating backup file ${filePath}:`, err);
+                            }
+                        }
+                    }
+                } catch (dirErr) {
+                    console.error(`Error reading backup directory ${dir}:`, dirErr);
                 }
             }
 
-            // Sort by creation date, newest first
+            const backups = Array.from(backupsMap.values());
+
+            // Sort by creation/modification date, newest first
             return backups.sort((a, b) =>
                 new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
             );
@@ -162,29 +189,31 @@ export class BackupService {
         }
     }
 
-    async getBackupInfo(filename: string): Promise<BackupInfo> {
-        const filePath = path.join(this.backupDir, filename);
-
-        if (!fs.existsSync(filePath)) {
-            throw new NotFoundException(`Backup file ${filename} not found`);
+    private resolveBackupPath(filename: string): string {
+        for (const dir of this.searchDirs) {
+            const candidate = path.join(dir, filename);
+            if (fs.existsSync(candidate)) {
+                return candidate;
+            }
         }
+        throw new NotFoundException(`Backup file ${filename} not found`);
+    }
 
+    async getBackupInfo(filename: string): Promise<BackupInfo> {
+        const filePath = this.resolveBackupPath(filename);
         const stats = fs.statSync(filePath);
+        const createdAtDate = (stats.mtime && stats.mtime.getTime() > 0) ? stats.mtime : stats.birthtime;
 
         return {
             filename,
             size: stats.size,
-            createdAt: stats.birthtime.toISOString(),
+            createdAt: createdAtDate.toISOString(),
             path: filePath,
         };
     }
 
     async restoreBackup(filename: string): Promise<{ message: string }> {
-        const filePath = path.join(this.backupDir, filename);
-
-        if (!fs.existsSync(filePath)) {
-            throw new NotFoundException(`Backup file ${filename} not found`);
-        }
+        const filePath = this.resolveBackupPath(filename);
 
         try {
             // Check if psql exists (only if absolute path is provided)
@@ -224,11 +253,7 @@ export class BackupService {
     }
 
     async deleteBackup(filename: string): Promise<{ message: string }> {
-        const filePath = path.join(this.backupDir, filename);
-
-        if (!fs.existsSync(filePath)) {
-            throw new NotFoundException(`Backup file ${filename} not found`);
-        }
+        const filePath = this.resolveBackupPath(filename);
 
         try {
             fs.unlinkSync(filePath);

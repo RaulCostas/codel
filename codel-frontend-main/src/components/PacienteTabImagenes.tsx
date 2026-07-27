@@ -159,6 +159,7 @@ const PacienteTabImagenes: React.FC<PacienteTabImagenesProps> = ({ tipo = 'parti
             setFilesToUpload([]);
             if (fileInputRef.current) fileInputRef.current.value = '';
             
+            fetchProformas();
             if (isGeneralUpload) {
                 fetchGeneralImages();
                 if (viewingGeneral) {
@@ -213,6 +214,7 @@ const PacienteTabImagenes: React.FC<PacienteTabImagenesProps> = ({ tipo = 'parti
         if (result.isConfirmed) {
             try {
                 await api.delete(`/proformas/imagenes/${imageId}`);
+                fetchProformas();
                 if (viewingGeneral) {
                     fetchGeneralImagesAndShow();
                 } else if (selectedProforma) {
@@ -401,17 +403,15 @@ const PacienteTabImagenes: React.FC<PacienteTabImagenesProps> = ({ tipo = 'parti
                                                 </button>
                                                 <button 
                                                     onClick={() => { setSelectedProforma(p); fetchImages(p.id); }}
-                                                    className="p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-md transition-all transform hover:-translate-y-0.5 flex items-center gap-2" 
+                                                    className="relative p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-md transition-all transform hover:-translate-y-0.5 flex items-center justify-center" 
                                                     title="Ver"
                                                 >
-                                                    <div className="relative flex items-center gap-2">
-                                                        <Eye size={18} />
-                                                        {p.imageCount !== undefined && p.imageCount > 0 && (
-                                                            <span className="text-[10px] font-bold bg-white/20 px-1.5 rounded-md">
-                                                                {p.imageCount}
-                                                            </span>
-                                                        )}
-                                                    </div>
+                                                    <Eye size={18} />
+                                                    {p.imageCount !== undefined && p.imageCount > 0 && (
+                                                        <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full min-w-[20px] h-[20px] flex items-center justify-center border-2 border-white dark:border-gray-800 shadow-md leading-none">
+                                                            {p.imageCount}
+                                                        </span>
+                                                    )}
                                                 </button>
                                             </div>
                                         </td>
