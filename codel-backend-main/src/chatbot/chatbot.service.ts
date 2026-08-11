@@ -775,7 +775,7 @@ export class ChatbotService implements OnModuleInit, OnModuleDestroy {
         const jid = `${celular}@s.whatsapp.net`;
         
         const clinicaText = 'CODEL';
-        const text = `¡Hola ${paciente.nombre} ${paciente.paterno}! 🎉 En nombre de todo el equipo de ${clinicaText}, te deseamos un muy feliz cumpleaños. ¡Que tengas un excelente día! 🎂🎈\n\n📌 Hola, somos ${clinicaText}, por favor guarda nuestro número para recibir tus felicitaciones y recordatorios.`;
+        const text = `¡Hola ${paciente.nombre} ${paciente.paterno}! 🎉 En nombre de todo el equipo de ${clinicaText}, te deseamos un muy feliz cumpleaños. ¡Que tengas un excelente día! 🎂🎈`;
 
         await this.sendMessage(jid, text);
 
