@@ -28,7 +28,7 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showManual, setShowManual] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+    const itemsPerPage = 10;
     const [activeSubTab, setActiveSubTab] = useState<'seguimiento' | 'endodoncia'>('seguimiento');
 
     const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -724,7 +724,16 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             {paginatedHistoria.map((item) => (
                                 <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{formatDate(item.fecha)}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                        <div className="flex flex-col">
+                                            <span>{formatDate(item.fecha)}</span>
+                                            {item.cobrado === 'si' && (
+                                                <span className="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-0.5">
+                                                    descargado
+                                                </span>
+                                            )}
+                                        </div>
+                                    </td>
                                     <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-200 font-medium">
                                         {item.arancel?.detalle || 'Tratamiento General'}
                                     </td>
