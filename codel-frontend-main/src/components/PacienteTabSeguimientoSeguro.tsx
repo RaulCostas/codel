@@ -717,7 +717,6 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
                                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Diagnóstico</th>
                                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Doctor</th>
                                 <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Est. Trat.</th>
-                                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Cobrado</th>
                                 <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                             </tr>
                         </thead>
@@ -760,14 +759,6 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
                                             : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
                                             }`}>
                                             {item.estadoTratamiento}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3 whitespace-nowrap text-center">
-                                        <span className={`px-2 py-1 rounded text-sm ${item.cobrado === 'si'
-                                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300'
-                                            : 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-300'
-                                            }`}>
-                                            {item.cobrado === 'si' ? 'SÍ' : 'NO'}
                                         </span>
                                     </td>
                                     <td className="px-4 py-3 whitespace-nowrap text-center text-sm font-medium">
@@ -820,7 +811,7 @@ const PacienteTabSeguimientoSeguro: React.FC = () => {
                             ))}
                             {paginatedHistoria.length === 0 && (
                                 <tr>
-                                    <td colSpan={10} className="px-6 py-10 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50">
+                                    <td colSpan={9} className="px-6 py-10 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50">
                                         <div className="flex flex-col items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-2 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
